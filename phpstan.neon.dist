@@ -1,0 +1,19 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - welcart-simple-report-sales.php
+        - src
+
+    bootstrapFiles:
+        - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
+
+    scanFiles:
+        - welcart-simple-report-sales.php
+
+    excludePaths:
+        analyse:
+            - vendor

@@ -1,0 +1,117 @@
+{
+	// PHPSAB をフォーマッタに指定
+	"[php]": {
+		"editor.defaultFormatter": "valeryanm.vscode-phpsab",
+		"editor.formatOnSave": true
+	},
+	// Sniffer/CBF のパス：PHP を明示的に指定して実行
+	"phpsab.executablePathCS": "./vendor/bin/phpcs",
+	"phpsab.executablePathCBF": "./vendor/bin/phpcbf",
+	"phpsab.standard": "./phpcs.xml.dist",
+	// 有効化フラグ
+	"phpsab.snifferEnable": true,
+	"phpsab.fixerEnable": true,
+	// Intelephense: PHP補完・型推論・シンボルサポートなど
+	"intelephense.environment.phpVersion": "8.2",
+	"intelephense.files.associations": [
+		"*.php"
+	],
+	"intelephense.stubs": [
+		"apache",
+		"bcmath",
+		"bz2",
+		"calendar",
+		"com_dotnet",
+		"Core",
+		"ctype",
+		"curl",
+		"date",
+		"dba",
+		"dom",
+		"enchant",
+		"exif",
+		"FFI",
+		"fileinfo",
+		"filter",
+		"fpm",
+		"ftp",
+		"gd",
+		"gettext",
+		"gmp",
+		"hash",
+		"iconv",
+		"imap",
+		"intl",
+		"json",
+		"ldap",
+		"libxml",
+		"mbstring",
+		"meta",
+		"mysqli",
+		"oci8",
+		"odbc",
+		"openssl",
+		"pcntl",
+		"pcre",
+		"PDO",
+		"pgsql",
+		"Phar",
+		"posix",
+		"pspell",
+		"random",
+		"readline",
+		"Reflection",
+		"session",
+		"shmop",
+		"SimpleXML",
+		"snmp",
+		"soap",
+		"sockets",
+		"sodium",
+		"SPL",
+		"sqlite3",
+		"standard",
+		"superglobals",
+		"sysvmsg",
+		"sysvsem",
+		"sysvshm",
+		"tidy",
+		"tokenizer",
+		"xml",
+		"xmlreader",
+		"xmlrpc",
+		"xmlwriter",
+		"xsl",
+		"Zend OPcache",
+		"zip",
+		"zlib",
+		"wordpress"
+	],
+    // ------------------------------
+    // Formatting
+    // ------------------------------
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.formatOnSave": true
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.formatOnSave": true
+    },
+    "yaml.format.enable": true,
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[xml]": {
+        "editor.defaultFormatter": "redhat.vscode-xml",
+        "editor.insertSpaces": false,
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+    },
+}
