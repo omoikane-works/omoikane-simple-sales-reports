@@ -1,0 +1,66 @@
+# OS 系
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.tmp
+
+# IDE 系
+.vscode/
+.idea/
+.obsidian/
+*.sublime-workspace
+*.sublime-project
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Node/Yarn/Vue/Webpack 関連
+node_modules/
+dist/
+build/
+.cache/
+temp/
+tmp/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log
+.yarn/*
+.yarnrc.yml
+
+# Vue 3 の Vite や Webpack 関連
+.env
+.env.local
+.env.*.local
+
+# Tailwind CSS 関連（JITキャッシュなど）
+.tailwind*
+
+# Composer 関連
+/vendor/
+!/composer.lock
+
+# WordPress テスト系
+phpunit.xml
+tests/output/
+tests/_output/
+tests/_cache/
+tests/_support/_generated/
+
+# PHPUnit cache
+.phpunit.result.cache
+.phpunit.cache/
+
+# PHPStan cache (if you enable it)
+phpstan-cache/
+.phpstan-cache/
+
+# WordPress プラグイン不要ファイル
+*.zip
+
+# Git 管理対象から除外するが、プラグインには必要な場合
+!.gitattributes
+!.gitignore
+!.editorconfig
