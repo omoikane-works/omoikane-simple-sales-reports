@@ -10,9 +10,7 @@ parameters:
 
     bootstrapFiles:
         - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
-
-    scanFiles:
-        - welcart-simple-report-sales.php
+        - phpstan-bootstrap.php
 
     excludePaths:
         analyse:

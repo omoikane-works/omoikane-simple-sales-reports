@@ -1,0 +1,32 @@
+<?php
+/**
+ * PHPStan bootstrap for plugin constants.
+ *
+ * @package WelcartSimpleReportSales
+ */
+
+declare(strict_types=1);
+
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+if ( ! defined( 'WSRS_VERSION' ) ) {
+	define( 'WSRS_VERSION', '0.1.0' );
+}
+
+if ( ! defined( 'WSRS_PLUGIN_FILE' ) ) {
+	define( 'WSRS_PLUGIN_FILE', __DIR__ . '/welcart-simple-report-sales.php' );
+}
+
+if ( ! defined( 'WSRS_PLUGIN_DIR' ) ) {
+	define( 'WSRS_PLUGIN_DIR', __DIR__ . '/' );
+}
+
+if ( ! defined( 'WSRS_PLUGIN_URL' ) ) {
+	define( 'WSRS_PLUGIN_URL', 'https://example.test/wp-content/plugins/welcart-simple-report-sales/' );
+}
+
+if ( ! defined( 'WSRS_PLUGIN_BASENAME' ) ) {
+	define( 'WSRS_PLUGIN_BASENAME', 'welcart-simple-report-sales/welcart-simple-report-sales.php' );
+}
