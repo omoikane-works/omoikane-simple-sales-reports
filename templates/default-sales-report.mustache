@@ -1,0 +1,139 @@
+<style>
+	.wsrs-report {
+		font-family: sans-serif;
+		color: #1d2327;
+	}
+
+	.wsrs-report__header {
+		margin-bottom: 24px;
+		border-bottom: 2px solid #1d2327;
+	}
+
+	.wsrs-report__title {
+		margin: 0 0 8px;
+		font-size: 24px;
+	}
+
+	.wsrs-report__meta {
+		margin: 0 0 16px;
+		font-size: 13px;
+	}
+
+	.wsrs-report__section {
+		margin-top: 24px;
+	}
+
+	.wsrs-report table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.wsrs-report th,
+	.wsrs-report td {
+		padding: 8px;
+		border: 1px solid #c3c4c7;
+		text-align: left;
+	}
+
+	.wsrs-report th {
+		background: #f6f7f7;
+	}
+
+	@media print {
+		@page {
+			size: A4;
+			margin: 12mm;
+		}
+
+		body {
+			background: #fff !important;
+		}
+
+		#adminmenumain,
+		#wpadminbar,
+		#wpfooter,
+		.notice,
+		.update-nag {
+			display: none !important;
+		}
+
+		#wpcontent,
+		#wpbody-content {
+			margin-left: 0 !important;
+			padding-left: 0 !important;
+		}
+
+		.wsrs-report {
+			color: #000;
+		}
+
+		.wsrs-no-print {
+			display: none !important;
+		}
+	}
+</style>
+
+<div class="wsrs-report">
+	<header class="wsrs-report__header">
+		<h1 class="wsrs-report__title">{{ report.title }}</h1>
+		<p class="wsrs-report__meta">{{ report.period_label }}</p>
+	</header>
+
+	<section class="wsrs-report__section">
+		<h2>店舗情報</h2>
+		<table>
+			<tr>
+				<th>店舗名</th>
+				<td>{{ store.name }}</td>
+			</tr>
+		</table>
+	</section>
+
+	<section class="wsrs-report__section">
+		<h2>合計</h2>
+		<table>
+			<tr>
+				<th>受注件数</th>
+				<td>{{ totals.order_count }} 件</td>
+			</tr>
+			<tr>
+				<th>支払い合計金額</th>
+				<td>{{ totals.payment_total_label }} 円</td>
+			</tr>
+		</table>
+	</section>
+
+	<section class="wsrs-report__section">
+		<h2>注文明細</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>注文日</th>
+					<th>注文番号</th>
+					<th>顧客名</th>
+					<th>支払い合計金額</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#orders}}
+				<tr>
+					<td>{{ order_date }}</td>
+					<td>{{ order_number }}</td>
+					<td>{{ customer_name }}</td>
+					<td>{{ payment_total_label }} 円</td>
+				</tr>
+				{{/orders}}
+				{{^orders}}
+				<tr>
+					<td colspan="4">対象期間の注文はありません。</td>
+				</tr>
+				{{/orders}}
+			</tbody>
+		</table>
+	</section>
+
+	<section class="wsrs-report__section">
+		<h2>備考</h2>
+		<p>{{ report.note }}</p>
+	</section>
+</div>
