@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace OmoikaneWorks\WelcartSimpleReportSales;
 
+use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
+use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateSeeder;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -23,6 +26,9 @@ final class Activation {
 	 */
 	public static function activate(): void {
 		self::check_requirements();
+
+		TemplateTable::create();
+		TemplateSeeder::seed();
 
 		update_option( 'wsrs_version', WSRS_VERSION, false );
 	}
