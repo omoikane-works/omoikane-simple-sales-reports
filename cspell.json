@@ -35,7 +35,15 @@
     "unslash",
     "vite",
     "wpcs",
-    "yarnrc"
+    "yarnrc",
+    "wpdb",
+    "longtext",
+    "tinyint",
+    "adminmenumain",
+    "wpadminbar",
+    "wpfooter",
+    "wpcontent",
+    "wpbody"
   ],
   "ignorePaths": [
     "vendor/**",
