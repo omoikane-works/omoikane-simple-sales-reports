@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace OmoikaneWorks\WelcartSimpleReportSales\Admin;
 
+use OmoikaneWorks\WelcartSimpleReportSales\Reports\DummySalesReportData as ReportsDummySalesReportData;
+use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -36,6 +39,22 @@ final class AdminPage {
 	 * @var string
 	 */
 	private const CAPABILITY = 'manage_options';
+
+	/**
+	 * Sales report renderer.
+	 *
+	 * @var SalesReportRenderer
+	 */
+	private SalesReportRenderer $sales_report_renderer;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param   SalesReportRenderer $sales_report_renderer  Sales report renderer.
+	 */
+	public function __construct( SalesReportRenderer $sales_report_renderer ) {
+		$this->sales_report_renderer = $sales_report_renderer;
+	}
 
 	/**
 	 * Register WordPress hooks.
@@ -87,9 +106,25 @@ final class AdminPage {
 			);
 		}
 
+		$view_data   = ReportsDummySalesReportData::build();
+		$report_html = $this->sales_report_renderer->render_default_sales_report( $view_data );
+
 		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( '売上報告書', 'welcart-simple-report-sales' ) . '</h1>';
-		echo '<p>' . esc_html__( 'かんたん売上報告書 for Welcart の管理画面です。', 'welcart-simple-report-sales' ) . '</p>';
+		echo '<h1 class="wsrs-no-print">' . esc_html__( '売上報告書', 'welcart-simple-report-sales' ) . '</h1>';
+
+		echo '<div class="wsrs-no-print" style="margin: 16px 0;">';
+		echo '<button type="button" class="button button-primary" onclick="window.print();">';
+		echo esc_html__( '印刷', 'welcart-simple-report-sales' );
+		echo '</button>';
+		echo '</div>';
+		echo '<p class="description wsrs-no-print">';
+		echo esc_html__( 'PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。', 'welcart-simple-report-sales' );
+		echo '</p>';
+
+		// The report template is rendered from a trusted system template and escaped by Mustache.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $report_html;
+
 		echo '</div>';
 	}
 }

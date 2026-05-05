@@ -43,7 +43,8 @@
     "wpadminbar",
     "wpfooter",
     "wpcontent",
-    "wpbody"
+    "wpbody",
+    "bloginfo"
   ],
   "ignorePaths": [
     "vendor/**",
