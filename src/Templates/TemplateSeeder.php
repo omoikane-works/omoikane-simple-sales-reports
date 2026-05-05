@@ -19,13 +19,6 @@ defined( 'ABSPATH' ) || exit;
 final class TemplateSeeder {
 
 	/**
-	 * Default Template key.
-	 *
-	 * @var string
-	 */
-	private const DEFAULT_TEMPLATE_KEY = 'default_sales_report';
-
-	/**
 	 * Default template file.
 	 *
 	 * @var string
@@ -68,7 +61,7 @@ final class TemplateSeeder {
 			$wpdb->prepare(
 				'SELECT id FROM %i WHERE template_key = %s LIMIT 1',
 				$table_name,
-				self::DEFAULT_TEMPLATE_KEY
+				TemplateKeys::DEFAULT_SALES_REPORT
 			)
 		);
 
@@ -80,7 +73,7 @@ final class TemplateSeeder {
 				$table_name,
 				array(
 					'name'       => '標準 売上報告書',
-					'type'       => 'sales_report',
+					'type'       => TemplateTypes::SALES_REPORT,
 					'content'    => $content,
 					'version'    => WSRS_VERSION,
 					'is_system'  => 1,
@@ -113,9 +106,9 @@ final class TemplateSeeder {
 		$wpdb->insert(
 			$table_name,
 			array(
-				'template_key' => self::DEFAULT_TEMPLATE_KEY,
+				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
 				'name'         => '標準 売上報告書',
-				'type'         => 'sales_report',
+				'type'         => TemplateTypes::SALES_REPORT,
 				'content'      => $content,
 				'version'      => WSRS_VERSION,
 				'is_system'    => 1,
