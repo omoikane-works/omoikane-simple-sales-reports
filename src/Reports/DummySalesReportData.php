@@ -19,13 +19,16 @@ final class DummySalesReportData {
 	/**
 	 * Build dummy view data.
 	 *
+	 * @param   array<string, string> $period Period.
 	 * @return  array<string, mixed>
 	 */
-	public static function build(): array {
+	public static function build( array $period ): array {
+		$period_label = $period['period_label'] ?? '';
+
 		return array(
 			'report' => array(
 				'title'        => '売上報告書',
-				'period_label' => '2026年4月1日 ～ 2026年4月30日',
+				'period_label' => $period_label,
 				'note'         => 'これは初期表示確認用のダミーデータです。',
 			),
 			'store'  => array(

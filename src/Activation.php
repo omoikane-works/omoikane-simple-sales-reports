@@ -73,7 +73,7 @@ final class Activation {
 	}
 
 	/**
-	 * Prevent instantiation
+	 * Prevent instantiation.
 	 */
 	private function __construct() {}
 }
