@@ -44,7 +44,9 @@
     "wpfooter",
     "wpcontent",
     "wpbody",
-    "bloginfo"
+    "bloginfo",
+    "usedpoint",
+    "getpoint"
   ],
   "ignorePaths": [
     "vendor/**",

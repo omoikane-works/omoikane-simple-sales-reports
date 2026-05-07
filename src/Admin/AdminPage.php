@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OmoikaneWorks\WelcartSimpleReportSales\Admin;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\DummySalesReportData;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
+use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
 
 defined( 'ABSPATH' ) || exit;
@@ -71,17 +71,27 @@ final class AdminPage {
 	private ReportPeriodResolver $period_resolver;
 
 	/**
+	 * Sales report builder.
+	 *
+	 * @var SalesReportBuilder
+	 */
+	private SalesReportBuilder $sales_report_builder;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   SalesReportRenderer  $sales_report_renderer Sales report renderer.
 	 * @param   ReportPeriodResolver $period_resolver       Report period resolver.
+	 * @param   SalesReportBuilder   $sales_report_builder  Sales report builder.
 	 */
 	public function __construct(
 		SalesReportRenderer $sales_report_renderer,
 		ReportPeriodResolver $period_resolver,
+		SalesReportBuilder $sales_report_builder,
 	) {
 		$this->sales_report_renderer = $sales_report_renderer;
 		$this->period_resolver       = $period_resolver;
+		$this->sales_report_builder  = $sales_report_builder;
 	}
 
 	/**
@@ -136,7 +146,7 @@ final class AdminPage {
 
 		$request     = $this->get_verified_request();
 		$period      = $this->period_resolver->resolve( $request );
-		$view_data   = DummySalesReportData::build( $period );
+		$view_data   = $this->sales_report_builder->build( $period );
 		$report_html = $this->sales_report_renderer->render_default_sales_report( $view_data );
 
 		echo '<div class="wrap">';

@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OmoikaneWorks\WelcartSimpleReportSales;
 
 use OmoikaneWorks\WelcartSimpleReportSales\Admin\AdminPage;
+use OmoikaneWorks\WelcartSimpleReportSales\Reports\OrderRepository;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
+use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
 use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
 
@@ -86,8 +88,14 @@ final class Plugin {
 		$period_resolver       = new ReportPeriodResolver();
 		$template_repository   = new TemplateRepository();
 		$sales_report_renderer = new SalesReportRenderer( $template_repository );
+		$order_repository      = new OrderRepository();
+		$sales_report_builder  = new SalesReportBuilder( $order_repository );
 
-		$admin_page = new AdminPage( $sales_report_renderer, $period_resolver );
+		$admin_page = new AdminPage(
+			$sales_report_renderer,
+			$period_resolver,
+			$sales_report_builder
+		);
 		$admin_page->register_hooks();
 	}
 
