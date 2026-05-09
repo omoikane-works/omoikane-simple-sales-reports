@@ -48,13 +48,16 @@ final class OrderRepository {
 					order_date,
 					order_name1,
 					order_name2,
+					order_name3,
+					order_name4,
+					order_payment_name,
 					order_item_total_price,
+					order_getpoint,
+					order_usedpoint,
 					order_discount,
 					order_shipping_charge,
 					order_cod_fee,
 					order_tax,
-					order_usedpoint,
-					order_getpoint,
 					order_status
 				FROM %i
 				WHERE order_date >= %s
