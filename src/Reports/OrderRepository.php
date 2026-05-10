@@ -21,10 +21,21 @@ final class OrderRepository {
 	 *
 	 * @return  string
 	 */
-	private function get_table_name(): string {
+	private function get_order_table_name(): string {
 		global $wpdb;
 
 		return $wpdb->prefix . 'usces_order';
+	}
+
+	/**
+	 * Get Welcart order meta table name.
+	 *
+	 * @return  string
+	 */
+	private function get_order_meta_table_name(): string {
+		global $wpdb;
+
+		return $wpdb->prefix . 'usces_order_meta';
 	}
 
 	/**
@@ -38,32 +49,73 @@ final class OrderRepository {
 		global $wpdb;
 
 		$exclusive_end_date = $this->get_exclusive_end_date( $end_date );
-		$table_name         = $this->get_table_name();
+		$order_table        = $this->get_order_table_name();
+		$order_meta_table   = $this->get_order_meta_table_name();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT
-					ID,
-					order_date,
-					order_name1,
-					order_name2,
-					order_name3,
-					order_name4,
-					order_payment_name,
-					order_item_total_price,
-					order_getpoint,
-					order_usedpoint,
-					order_discount,
-					order_shipping_charge,
-					order_cod_fee,
-					order_tax,
-					order_status
-				FROM %i
+					o.ID,
+					o.order_date,
+					o.order_modified,
+					o.order_name1,
+					o.order_name2,
+					o.order_name3,
+					o.order_name4,
+					o.order_payment_name,
+					o.order_item_total_price,
+					o.order_getpoint,
+					o.order_usedpoint,
+					o.order_discount,
+					o.order_shipping_charge,
+					o.order_cod_fee,
+					o.order_tax,
+					o.order_status,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS subtotal_standard,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS subtotal_reduced,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS discount_standard,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS discount_reduced,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS tax_standard,
+					MAX(CASE WHEN om.meta_key = %s THEN om.meta_value END) AS tax_reduced
+				FROM %i AS o
+				LEFT OUTER JOIN %i AS om
+					ON om.order_id = o.ID
+					AND om.meta_key IN ( %s, %s, %s, %s, %s, %s )
 				WHERE order_date >= %s
 				  AND order_date < %s
-				ORDER BY order_date ASC, ID ASC',
-				$table_name,
+				GROUP BY
+					o.ID,
+					o.order_date,
+					o.order_modified,
+					o.order_name1,
+					o.order_name2,
+					o.order_name3,
+					o.order_name4,
+					o.order_payment_name,
+					o.order_item_total_price,
+					o.order_getpoint,
+					o.order_usedpoint,
+					o.order_discount,
+					o.order_shipping_charge,
+					o.order_cod_fee,
+					o.order_tax,
+					o.order_status
+				ORDER BY o.order_date ASC, o.ID ASC',
+				'subtotal_standard',
+				'subtotal_reduced',
+				'discount_standard',
+				'discount_reduced',
+				'tax_standard',
+				'tax_reduced',
+				$order_table,
+				$order_meta_table,
+				'subtotal_standard',
+				'subtotal_reduced',
+				'discount_standard',
+				'discount_reduced',
+				'tax_standard',
+				'tax_reduced',
 				$start_date . ' 00:00:00',
 				$exclusive_end_date . ' 00:00:00'
 			),

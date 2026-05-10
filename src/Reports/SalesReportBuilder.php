@@ -93,14 +93,20 @@ final class SalesReportBuilder {
 	 */
 	private function create_empty_totals(): array {
 		return array(
-			'item_total_amount'    => 0,
-			'tax_amount'           => 0,
-			'shipping_fee_amount'  => 0,
-			'cod_fee_amount'       => 0,
-			'discount_amount'      => 0,
-			'used_points'          => 0,
-			'earned_points'        => 0,
-			'payment_total_amount' => 0,
+			'item_total_amount'        => 0,
+			'standard_subtotal_amount' => 0,
+			'reduced_subtotal_amount'  => 0,
+			'tax_amount'               => 0,
+			'standard_tax_amount'      => 0,
+			'reduced_tax_amount'       => 0,
+			'shipping_fee_amount'      => 0,
+			'cod_fee_amount'           => 0,
+			'discount_amount'          => 0,
+			'standard_discount_amount' => 0,
+			'reduced_discount_amount'  => 0,
+			'used_points'              => 0,
+			'earned_points'            => 0,
+			'payment_total_amount'     => 0,
 		);
 	}
 
@@ -116,14 +122,20 @@ final class SalesReportBuilder {
 			? $order['amounts']
 			: array();
 
-		$totals['item_total_amount']    += $this->get_int_value( $amounts, 'item_total_amount' );
-		$totals['tax_amount']           += $this->get_int_value( $amounts, 'tax_amount' );
-		$totals['shipping_fee_amount']  += $this->get_int_value( $amounts, 'shipping_fee_amount' );
-		$totals['cod_fee_amount']       += $this->get_int_value( $amounts, 'cod_fee_amount' );
-		$totals['discount_amount']      += $this->get_int_value( $amounts, 'discount_amount' );
-		$totals['used_points']          += $this->get_int_value( $amounts, 'used_points' );
-		$totals['earned_points']        += $this->get_int_value( $amounts, 'earned_points' );
-		$totals['payment_total_amount'] += $this->get_int_value( $amounts, 'payment_total_amount' );
+		$totals['item_total_amount']        += $this->get_int_value( $amounts, 'item_total_amount' );
+		$totals['standard_subtotal_amount'] += $this->get_int_value( $amounts, 'standard_subtotal_amount' );
+		$totals['reduced_subtotal_amount']  += $this->get_int_value( $amounts, 'reduced_subtotal_amount' );
+		$totals['tax_amount']               += $this->get_int_value( $amounts, 'tax_amount' );
+		$totals['standard_tax_amount']      += $this->get_int_value( $amounts, 'standard_tax_amount' );
+		$totals['reduced_tax_amount']       += $this->get_int_value( $amounts, 'reduced_tax_amount' );
+		$totals['shipping_fee_amount']      += $this->get_int_value( $amounts, 'shipping_fee_amount' );
+		$totals['cod_fee_amount']           += $this->get_int_value( $amounts, 'cod_fee_amount' );
+		$totals['discount_amount']          += $this->get_int_value( $amounts, 'discount_amount' );
+		$totals['standard_discount_amount'] += $this->get_int_value( $amounts, 'standard_discount_amount' );
+		$totals['reduced_discount_amount']  += $this->get_int_value( $amounts, 'reduced_discount_amount' );
+		$totals['used_points']              += $this->get_int_value( $amounts, 'used_points' );
+		$totals['earned_points']            += $this->get_int_value( $amounts, 'earned_points' );
+		$totals['payment_total_amount']     += $this->get_int_value( $amounts, 'payment_total_amount' );
 	}
 
 	/**
@@ -140,22 +152,38 @@ final class SalesReportBuilder {
 		array $sales_support
 	): array {
 		$amounts = array(
-			'item_total_amount'    => $totals['item_total_amount'],
-			'item_total_label'     => $this->format_amount( $totals['item_total_amount'] ),
-			'tax_amount'           => $totals['tax_amount'],
-			'tax_label'            => $this->format_amount( $totals['tax_amount'] ),
-			'shipping_fee_amount'  => $totals['shipping_fee_amount'],
-			'shipping_fee_label'   => $this->format_amount( $totals['shipping_fee_amount'] ),
-			'cod_fee_amount'       => $totals['cod_fee_amount'],
-			'cod_fee_label'        => $this->format_amount( $totals['cod_fee_amount'] ),
-			'discount_amount'      => $totals['discount_amount'],
-			'discount_label'       => $this->format_amount( $totals['discount_amount'] ),
-			'used_points'          => $totals['used_points'],
-			'used_points_label'    => $this->format_number( $totals['used_points'] ),
-			'earned_points'        => $totals['earned_points'],
-			'earned_points_label'  => $this->format_number( $totals['earned_points'] ),
-			'payment_total_amount' => $totals['payment_total_amount'],
-			'payment_total_label'  => $this->format_amount( $totals['payment_total_amount'] ),
+			'item_total_amount'        => $totals['item_total_amount'],
+			'item_total_label'         => $this->format_amount( $totals['item_total_amount'] ),
+			'standard_subtotal_amount' => $totals['standard_subtotal_amount'],
+			'standard_subtotal_label'  => $this->format_amount( $totals['standard_subtotal_amount'] ),
+			'reduced_subtotal_amount'  => $totals['reduced_subtotal_amount'],
+			'reduced_subtotal_label'   => $this->format_amount( $totals['reduced_subtotal_amount'] ),
+
+			'tax_amount'               => $totals['tax_amount'],
+			'tax_label'                => $this->format_amount( $totals['tax_amount'] ),
+			'standard_tax_amount'      => $totals['standard_tax_amount'],
+			'standard_tax_label'       => $this->format_amount( $totals['standard_tax_amount'] ),
+			'reduced_tax_amount'       => $totals['reduced_tax_amount'],
+			'reduced_tax_label'        => $this->format_amount( $totals['reduced_tax_amount'] ),
+
+			'shipping_fee_amount'      => $totals['shipping_fee_amount'],
+			'shipping_fee_label'       => $this->format_amount( $totals['shipping_fee_amount'] ),
+			'cod_fee_amount'           => $totals['cod_fee_amount'],
+			'cod_fee_label'            => $this->format_amount( $totals['cod_fee_amount'] ),
+
+			'discount_amount'          => $totals['discount_amount'],
+			'discount_label'           => $this->format_amount( $totals['discount_amount'] ),
+			'standard_discount_amount' => $totals['standard_discount_amount'],
+			'standard_discount_label'  => $this->format_amount( $totals['standard_discount_amount'] ),
+			'reduced_discount_amount'  => $totals['reduced_discount_amount'],
+			'reduced_discount_label'   => $this->format_amount( $totals['reduced_discount_amount'] ),
+
+			'used_points'              => $totals['used_points'],
+			'used_points_label'        => $this->format_number( $totals['used_points'] ),
+			'earned_points'            => $totals['earned_points'],
+			'earned_points_label'      => $this->format_number( $totals['earned_points'] ),
+			'payment_total_amount'     => $totals['payment_total_amount'],
+			'payment_total_label'      => $this->format_amount( $totals['payment_total_amount'] ),
 		);
 
 		return array_merge(
@@ -221,14 +249,20 @@ final class SalesReportBuilder {
 	 * @return  array<string, int|string>
 	 */
 	private function build_order_amounts( array $raw_order ): array {
-		$item_total_amount   = $this->get_amount_value( $raw_order, 'order_item_total_price' );
-		$tax_amount          = $this->get_amount_value( $raw_order, 'order_tax' );
-		$shipping_fee_amount = $this->get_amount_value( $raw_order, 'order_shipping_charge' );
-		$cod_fee_amount      = $this->get_amount_value( $raw_order, 'order_cod_fee' );
-		$discount_amount     = $this->get_amount_value( $raw_order, 'order_discount' );
-		$used_points         = $this->get_int_value( $raw_order, 'order_usedpoint' );
-		$earned_points       = $this->get_int_value( $raw_order, 'order_getpoint' );
-		$payment_total       = $this->calculate_payment_total(
+		$item_total_amount        = $this->get_amount_value( $raw_order, 'order_item_total_price' );
+		$standard_subtotal_amount = $this->get_amount_value( $raw_order, 'subtotal_standard' );
+		$reduced_subtotal_amount  = $this->get_amount_value( $raw_order, 'subtotal_reduced' );
+		$tax_amount               = $this->get_amount_value( $raw_order, 'order_tax' );
+		$standard_tax_amount      = $this->get_amount_value( $raw_order, 'tax_standard' );
+		$reduced_tax_amount       = $this->get_amount_value( $raw_order, 'tax_reduced' );
+		$shipping_fee_amount      = $this->get_amount_value( $raw_order, 'order_shipping_charge' );
+		$cod_fee_amount           = $this->get_amount_value( $raw_order, 'order_cod_fee' );
+		$discount_amount          = $this->get_amount_value( $raw_order, 'order_discount' );
+		$standard_discount_amount = $this->get_amount_value( $raw_order, 'discount_standard' );
+		$reduced_discount_amount  = $this->get_amount_value( $raw_order, 'discount_reduced' );
+		$used_points              = $this->get_int_value( $raw_order, 'order_usedpoint' );
+		$earned_points            = $this->get_int_value( $raw_order, 'order_getpoint' );
+		$payment_total            = $this->calculate_payment_total(
 			$item_total_amount,
 			$tax_amount,
 			$shipping_fee_amount,
@@ -238,22 +272,38 @@ final class SalesReportBuilder {
 		);
 
 		return array(
-			'item_total_amount'    => $item_total_amount,
-			'item_total_label'     => $this->format_amount( $item_total_amount ),
-			'tax_amount'           => $tax_amount,
-			'tax_label'            => $this->format_amount( $tax_amount ),
-			'shipping_fee_amount'  => $shipping_fee_amount,
-			'shipping_fee_label'   => $this->format_amount( $shipping_fee_amount ),
-			'cod_fee_amount'       => $cod_fee_amount,
-			'cod_fee_label'        => $this->format_amount( $cod_fee_amount ),
-			'discount_amount'      => $discount_amount,
-			'discount_label'       => $this->format_amount( $discount_amount ),
-			'used_points'          => $used_points,
-			'used_points_label'    => $this->format_number( $used_points ),
-			'earned_points'        => $earned_points,
-			'earned_points_label'  => $this->format_number( $earned_points ),
-			'payment_total_amount' => $payment_total,
-			'payment_total_label'  => $this->format_amount( $payment_total ),
+			'item_total_amount'        => $item_total_amount,
+			'item_total_label'         => $this->format_amount( $item_total_amount ),
+			'standard_subtotal_amount' => $standard_subtotal_amount,
+			'standard_subtotal_label'  => $this->format_amount( $standard_subtotal_amount ),
+			'reduced_subtotal_amount'  => $reduced_subtotal_amount,
+			'reduced_subtotal_label'   => $this->format_amount( $reduced_subtotal_amount ),
+
+			'tax_amount'               => $tax_amount,
+			'tax_label'                => $this->format_amount( $tax_amount ),
+			'standard_tax_amount'      => $standard_tax_amount,
+			'standard_tax_label'       => $this->format_amount( $standard_tax_amount ),
+			'reduced_tax_amount'       => $reduced_tax_amount,
+			'reduced_tax_label'        => $this->format_amount( $reduced_tax_amount ),
+
+			'shipping_fee_amount'      => $shipping_fee_amount,
+			'shipping_fee_label'       => $this->format_amount( $shipping_fee_amount ),
+			'cod_fee_amount'           => $cod_fee_amount,
+			'cod_fee_label'            => $this->format_amount( $cod_fee_amount ),
+
+			'discount_amount'          => $discount_amount,
+			'discount_label'           => $this->format_amount( $discount_amount ),
+			'standard_discount_amount' => $standard_discount_amount,
+			'standard_discount_label'  => $this->format_amount( $standard_discount_amount ),
+			'reduced_discount_amount'  => $reduced_discount_amount,
+			'reduced_discount_label'   => $this->format_amount( $reduced_discount_amount ),
+
+			'used_points'              => $used_points,
+			'used_points_label'        => $this->format_number( $used_points ),
+			'earned_points'            => $earned_points,
+			'earned_points_label'      => $this->format_number( $earned_points ),
+			'payment_total_amount'     => $payment_total,
+			'payment_total_label'      => $this->format_amount( $payment_total ),
 		);
 	}
 
