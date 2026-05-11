@@ -62,10 +62,13 @@ final class SalesReportBuilder {
 		}
 
 		$sales_support = $this->build_sales_support_data(
-			$totals['payment_total_amount'],
-			$totals['shipping_fee_amount'],
-			$totals['cod_fee_amount']
+			$totals['item_total_amount'],
+			$totals['discount_amount'],
+			$totals['tax_amount'],
+			$totals['used_points']
 		);
+
+		$sales_order_count = $this->count_sales_orders( $orders );
 
 		return array(
 			'report' => array(
@@ -81,7 +84,12 @@ final class SalesReportBuilder {
 				'name' => get_bloginfo( 'name' ),
 				'url'  => home_url(),
 			),
-			'totals' => $this->build_totals_view_data( $totals, count( $orders ), $sales_support ),
+			'totals' => $this->build_totals_view_data(
+				$totals,
+				count( $orders ),
+				$sales_order_count,
+				$sales_support
+			),
 			'orders' => $orders,
 		);
 	}
@@ -118,6 +126,10 @@ final class SalesReportBuilder {
 	 * @return  void
 	 */
 	private function add_order_to_totals( array &$totals, array $order ): void {
+		if ( empty( $order['is_sales_counted'] ) ) {
+			return;
+		}
+
 		$amounts = isset( $order['amounts'] ) && is_array( $order['amounts'] )
 			? $order['amounts']
 			: array();
@@ -141,14 +153,16 @@ final class SalesReportBuilder {
 	/**
 	 * Build totals view data.
 	 *
-	 * @param   array<string, int>   $totals         Totals.
-	 * @param   int                  $order_count    Order count.
-	 * @param   array<string, mixed> $sales_support  Sales support data.
+	 * @param   array<string, int>   $totals             Totals.
+	 * @param   int                  $order_count        Order count.
+	 * @param   int                  $sales_order_count  Sales order count.
+	 * @param   array<string, mixed> $sales_support         Sales support data.
 	 * @return  array<string, mixed>
 	 */
 	private function build_totals_view_data(
 		array $totals,
 		int $order_count,
+		int $sales_order_count,
 		array $sales_support
 	): array {
 		$amounts = array(
@@ -188,9 +202,10 @@ final class SalesReportBuilder {
 
 		return array_merge(
 			array(
-				'order_count'   => $order_count,
-				'amounts'       => $amounts,
-				'sales_support' => $sales_support,
+				'order_count'       => $order_count,
+				'sales_order_count' => $sales_order_count,
+				'amounts'           => $amounts,
+				'sales_support'     => $sales_support,
 			),
 			$amounts
 		);
@@ -212,6 +227,7 @@ final class SalesReportBuilder {
 		$payment_method       = $this->get_string_value( $raw_order, 'order_payment_name' );
 		$status_raw           = $this->get_string_value( $raw_order, 'order_status' );
 		$status_label         = $this->build_status_label( $status_raw );
+		$is_sales_counted     = $this->is_sales_counted_status( $status_raw );
 		$amounts              = $this->build_order_amounts( $raw_order );
 		$payment_total_amount = $this->get_int_value( $amounts, 'payment_total_amount' );
 		$payment_total_label  = $this->format_amount( $payment_total_amount );
@@ -230,9 +246,11 @@ final class SalesReportBuilder {
 			'payment'              => array(
 				'method' => $payment_method,
 			),
+			'is_sales_counted'     => $is_sales_counted,
 			'status'               => array(
-				'raw'   => $status_raw,
-				'label' => $status_label,
+				'raw'              => $status_raw,
+				'label'            => $status_label,
+				'is_sales_counted' => $is_sales_counted,
 			),
 			'amounts'              => $amounts,
 
@@ -332,17 +350,19 @@ final class SalesReportBuilder {
 	/**
 	 * Build sales support data.
 	 *
-	 * @param   int $payment_total_amount   Payment total amount.
-	 * @param   int $shipping_fee_amount    Shipping fee amount.
-	 * @param   int $cod_fee_amount         Cash on delivery fee amount.
+	 * @param   int $item_total_amount  Item total amount.
+	 * @param   int $discount_amount    Discount amount.
+	 * @param   int $tax_amount         Tax amount.
+	 * @param   int $used_points        Used points.
 	 * @return  array<string, int|float|string>
 	 */
 	private function build_sales_support_data(
-		int $payment_total_amount,
-		int $shipping_fee_amount,
-		int $cod_fee_amount,
+		int $item_total_amount,
+		int $discount_amount,
+		int $tax_amount,
+		int $used_points,
 	): array {
-		$base_amount = max( 0, $payment_total_amount - $shipping_fee_amount - $cod_fee_amount );
+		$base_amount = max( 0, $item_total_amount + $discount_amount + $tax_amount - $used_points );
 		$rate_label  = $this->format_rate( (float) self::SALES_SUPPORT_RATE );
 		$amount      = (int) ceil( $base_amount * self::SALES_SUPPORT_RATE );
 
@@ -354,7 +374,11 @@ final class SalesReportBuilder {
 			'amount'           => $amount,
 			'amount_label'     => $this->format_amount( $amount ),
 			'calculation_note' => sprintf(
-				'販売支援料は「支払い合計金額 - 送料 - 代引手数料」に対して %s を乗じ、小数点以下を切り上げて算出しています。',
+				// translators: %s: Sales support rate.
+				__(
+					'販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し引いた金額」に対して %s を乗じ、小数点以下を切り上げて算出しています。',
+					'welcart-simple-report-sales'
+				),
 				$rate_label
 			),
 		);
@@ -405,17 +429,85 @@ final class SalesReportBuilder {
 	}
 
 	/**
+	 * Count sales target orders.
+	 *
+	 * @param   array<int, array<string, mixed>> $orders Orders.
+	 * @return  int
+	 */
+	private function count_sales_orders( array $orders ): int {
+		$count = 0;
+
+		foreach ( $orders as $order ) {
+			if ( ! empty( $order['is_sales_counted'] ) ) {
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Parse order statuses.
+	 *
+	 * @param   string $status_raw Raw status.
+	 * @return  array<int, string>
+	 */
+	private function parse_order_statuses( string $status_raw ): array {
+		$statuses = array_map(
+			'trim',
+			explode( ',', $status_raw )
+		);
+
+		$statuses = array_filter(
+			$statuses,
+			static fn ( string $status ): bool => '' !== $status
+		);
+
+		return array_values( $statuses );
+	}
+
+	/**
 	 * Build status label.
 	 *
 	 * @param   string $status_raw Raw status.
 	 * @return  string
 	 */
 	private function build_status_label( string $status_raw ): string {
-		if ( '' === $status_raw ) {
-			return '';
+		$statuses = $this->parse_order_statuses( $status_raw );
+
+		if ( in_array( 'cancel', $statuses, true ) ) {
+			return __( 'キャンセル', 'welcart-simple-report-sales' );
 		}
 
-		return $status_raw;
+		if ( array() === $statuses || in_array( '#none#', $statuses, true ) ) {
+			return __( '新規受付', 'welcart-simple-report-sales' );
+		}
+
+		if ( in_array( 'duringorder', $statuses, true ) ) {
+			return __( '取り寄せ中', 'welcart-simple-report-sales' );
+		}
+
+		if ( in_array( 'completion', $statuses, true ) ) {
+			return __( '発送済み', 'welcart-simple-report-sales' );
+		}
+
+		return implode( ', ', $statuses );
+	}
+
+	/**
+	 * Check whether order should be counted as sales.
+	 *
+	 * @param   string $status_raw Raw status.
+	 * @return  bool
+	 */
+	private function is_sales_counted_status( string $status_raw ): bool {
+		$statuses = $this->parse_order_statuses( $status_raw );
+
+		if ( in_array( 'cancel', $statuses, true ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

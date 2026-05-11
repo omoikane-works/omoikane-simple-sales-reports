@@ -46,7 +46,8 @@
     "wpbody",
     "bloginfo",
     "usedpoint",
-    "getpoint"
+    "getpoint",
+    "duringorder"
   ],
   "ignorePaths": [
     "vendor/**",
