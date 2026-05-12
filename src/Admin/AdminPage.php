@@ -57,6 +57,20 @@ final class AdminPage {
 	private const NONCE_NAME = 'wsrs_nonce';
 
 	/**
+	 * Default admin view.
+	 *
+	 * @var string
+	 */
+	private const DEFAULT_VIEW = 'report';
+
+	/**
+	 * Request parameter name for admin view.
+	 *
+	 * @var string
+	 */
+	private const VIEW_PARAM = 'view';
+
+	/**
 	 * Sales report renderer.
 	 *
 	 * @var SalesReportRenderer
@@ -144,30 +158,29 @@ final class AdminPage {
 			);
 		}
 
-		$request     = $this->get_verified_request();
-		$period      = $this->period_resolver->resolve( $request );
-		$view_data   = $this->sales_report_builder->build( $period );
-		$report_html = $this->sales_report_renderer->render_default_sales_report( $view_data );
+		$current_view = $this->resolve_current_view();
 
 		echo '<div class="wrap">';
 		echo '<h1 class="wsrs-no-print">' . esc_html__( '売上報告書', 'welcart-simple-report-sales' ) . '</h1>';
+		echo '<div class="wsrs-admin-layout" style="display: flex; gap: 24px; align-items: flex-start;">';
 
-		$this->render_period_form( $period );
+		$this->render_inner_navigation( $current_view );
 
-		echo '<div class="wsrs-no-print" style="margin: 16px 0;">';
-		echo '<button type="button" class="button button-primary" onclick="window.print();">';
-		echo esc_html__( '印刷', 'welcart-simple-report-sales' );
-		echo '</button>';
+		echo '<div class="wsrs-admin-main" style="flex: 1; min-width: 0;">';
+
+		if ( self::DEFAULT_VIEW === $current_view ) {
+			$this->render_report_generation_view();
+		} else {
+			/**
+			 * Fires when rendering an extended sales report admin view.
+			 *
+			 * @param   string  $current_view   Current admin view.
+			 */
+			do_action( 'wsrs_render_sales_report_admin_view', $current_view );
+		}
+
 		echo '</div>';
-
-		echo '<p class="description wsrs-no-print">';
-		echo esc_html__( 'PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。', 'welcart-simple-report-sales' );
-		echo '</p>';
-
-		// The report template is rendered from a trusted system template and escaped by Mustache.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $report_html;
-
+		echo '</div>';
 		echo '</div>';
 	}
 
@@ -207,6 +220,7 @@ final class AdminPage {
 
 		echo '<form method="get" class="wsrs-no-print" style="margin: 16px 0 24px; padding: 16px; background: #fff; border: 1px solid #c3c4c7;">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::MENU_SALES_SLUG ) . '" />';
+		echo '<input type="hidden" name="' . esc_attr( self::VIEW_PARAM ) . '" value="' . esc_attr( self::DEFAULT_VIEW ) . '" />';
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		echo '<fieldset>';
 		echo '<legend style="font-weight: 600; margin-bottom: 8px;">' . esc_html__( '期間', 'welcart-simple-report-sales' ) . '</legend>';
@@ -249,5 +263,111 @@ final class AdminPage {
 		echo '<input type="radio" name="period" value="' . esc_attr( $value ) . '" ' . checked( $current_period, $value, false ) . ' />';
 		echo ' ' . esc_html( $label );
 		echo '</label>';
+	}
+
+	/**
+	 * Render inner navigation.
+	 *
+	 * @param   string $current_view   Current view.
+	 * @return  void
+	 */
+	private function render_inner_navigation( string $current_view ): void {
+		$menu_items = $this->get_inner_navigation_items();
+
+		echo '<nav class="wsrs-admin-nav wsrs-no-print" style="margin: 16px 0 24px; width: 220px; background: #fff; border: 1px solid #c3c4c7;">';
+
+		foreach ( $menu_items as $view => $item ) {
+			$label = isset( $item['label'] ) ? (string) $item['label'] : '';
+			$url   = isset( $item['url'] ) ? (string) $item['url'] : '';
+
+			$style = $current_view === $view
+				? 'display: block; padding: 10px 12px; background: #2271b1; color: #fff; text-decoration: none;'
+				: 'display: block; padding: 10px 12px; color: #1d2327; text-decoration: none;';
+
+			echo '<a href="' . esc_url( $url ) . '" style="' . esc_attr( $style ) . '">';
+			echo esc_html( $label );
+			echo '</a>';
+		}
+
+		echo '</nav>';
+	}
+
+	/**
+	 * Get inner navigation items.
+	 *
+	 * @return  array<string, array<string, string>>
+	 */
+	private function get_inner_navigation_items(): array {
+		$items = array(
+			self::DEFAULT_VIEW => array(
+				'label' => __( '報告書生成', 'welcart-simple-report-sales' ),
+				'url'   => add_query_arg(
+					array(
+						'page'           => self::MENU_SALES_SLUG,
+						self::VIEW_PARAM => self::DEFAULT_VIEW,
+					),
+					admin_url( 'admin.php' )
+				),
+			),
+		);
+
+		/**
+		 * Filters sales report admin inner navigation items.
+		 *
+		 * @param   array<string, array<string, string>>    $items  Inner navigation items.
+		 */
+		return apply_filters(
+			'wsrs_sales_report_admin_menu_items',
+			$items
+		);
+	}
+
+	/**
+	 * Resolve current admin view.
+	 *
+	 * @return  string
+	 */
+	private function resolve_current_view(): string {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$view = isset( $_GET[ self::VIEW_PARAM ] )
+			? sanitize_key( wp_unslash( (string) $_GET[ self::VIEW_PARAM ] ) )
+			: self::DEFAULT_VIEW;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		$allowed_views = array_keys( $this->get_inner_navigation_items() );
+
+		if ( ! in_array( $view, $allowed_views, true ) ) {
+			return self::DEFAULT_VIEW;
+		}
+
+		return $view;
+	}
+
+	/**
+	 * Render report generation view.
+	 *
+	 * @return void
+	 */
+	private function render_report_generation_view(): void {
+		$request     = $this->get_verified_request();
+		$period      = $this->period_resolver->resolve( $request );
+		$view_data   = $this->sales_report_builder->build( $period );
+		$report_html = $this->sales_report_renderer->render_default_sales_report( $view_data );
+
+		$this->render_period_form( $period );
+
+		echo '<div class="wsrs-no-print" style="margin: 16px 0;">';
+		echo '<button type="button" class="button button-primary" onclick="window.print();">';
+		echo esc_html__( '印刷', 'welcart-simple-report-sales' );
+		echo '</button>';
+		echo '</div>';
+
+		echo '<p class="description wsrs-no-print">';
+		echo esc_html__( 'PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。', 'welcart-simple-report-sales' );
+		echo '</p>';
+
+		// The report template is rendered from a trusted system template and escaped by Mustache.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $report_html;
 	}
 }
