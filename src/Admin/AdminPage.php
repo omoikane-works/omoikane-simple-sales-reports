@@ -92,6 +92,13 @@ final class AdminPage {
 	private SalesReportBuilder $sales_report_builder;
 
 	/**
+	 * Admin page hooks.
+	 *
+	 * @var array<int, string>
+	 */
+	private array $admin_page_hooks = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   SalesReportRenderer  $sales_report_renderer Sales report renderer.
@@ -118,6 +125,10 @@ final class AdminPage {
 			'admin_menu',
 			array( $this, 'register_admin_menu' )
 		);
+		add_action(
+			'admin_enqueue_scripts',
+			array( $this, 'enqueue_admin_assets' )
+		);
 	}
 
 	/**
@@ -126,23 +137,60 @@ final class AdminPage {
 	 * @return  void
 	 */
 	public function register_admin_menu(): void {
-		add_menu_page(
-			__( 'かんたん報告書', 'welcart-simple-report-sales' ),
-			__( 'かんたん報告書', 'welcart-simple-report-sales' ),
-			self::CAPABILITY,
-			self::MENU_PARENT_SLUG,
-			array( $this, 'render_sales_report_page' ),
-			'dashicons-media-spreadsheet',
-			56
+		$this->add_admin_page_hook(
+			add_menu_page(
+				__( 'かんたん報告書', 'welcart-simple-report-sales' ),
+				__( 'かんたん報告書', 'welcart-simple-report-sales' ),
+				self::CAPABILITY,
+				self::MENU_PARENT_SLUG,
+				array( $this, 'render_sales_report_page' ),
+				'dashicons-media-spreadsheet',
+				56
+			)
 		);
 
-		add_submenu_page(
-			self::MENU_PARENT_SLUG,
-			__( '売上報告書', 'welcart-simple-report-sales' ),
-			__( '売上報告書', 'welcart-simple-report-sales' ),
-			self::CAPABILITY,
-			self::MENU_SALES_SLUG,
-			array( $this, 'render_sales_report_page' )
+		$this->add_admin_page_hook(
+			add_submenu_page(
+				self::MENU_PARENT_SLUG,
+				__( '売上報告書', 'welcart-simple-report-sales' ),
+				__( '売上報告書', 'welcart-simple-report-sales' ),
+				self::CAPABILITY,
+				self::MENU_SALES_SLUG,
+				array( $this, 'render_sales_report_page' )
+			)
+		);
+	}
+
+	/**
+	 * Add admin page hook suffix.
+	 *
+	 * @param   bool|string $hook_suffix    Admin page hook suffix.
+	 * @return  void
+	 */
+	private function add_admin_page_hook( bool|string $hook_suffix ): void {
+		if ( ! is_string( $hook_suffix ) ) {
+			return;
+		}
+
+		$this->admin_page_hooks[] = $hook_suffix;
+	}
+
+	/**
+	 * Enqueue admin assets.
+	 *
+	 * @param   string $hook_suffix    Current page hook suffix.
+	 * @return  void
+	 */
+	public function enqueue_admin_assets( string $hook_suffix ): void {
+		if ( ! in_array( $hook_suffix, $this->admin_page_hooks, true ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'wsrs-admin',
+			plugins_url( 'assets/css/admin.css', WSRS_PLUGIN_FILE ),
+			array(),
+			WSRS_VERSION
 		);
 	}
 
@@ -162,11 +210,11 @@ final class AdminPage {
 
 		echo '<div class="wrap">';
 		echo '<h1 class="wsrs-no-print">' . esc_html__( '売上報告書', 'welcart-simple-report-sales' ) . '</h1>';
-		echo '<div class="wsrs-admin-layout" style="display: flex; gap: 24px; align-items: flex-start;">';
+		echo '<div class="wsrs-admin-layout">';
 
 		$this->render_inner_navigation( $current_view );
 
-		echo '<div class="wsrs-admin-main" style="flex: 1; min-width: 0;">';
+		echo '<div class="wsrs-admin-main">';
 
 		if ( self::DEFAULT_VIEW === $current_view ) {
 			$this->render_report_generation_view();
@@ -209,8 +257,8 @@ final class AdminPage {
 	/**
 	 * Render period form.
 	 *
-	 * @param array<string, string> $period Report period.
-	 * @return void
+	 * @param   array<string, string> $period Report period.
+	 * @return  void
 	 */
 	private function render_period_form( array $period ): void {
 
@@ -218,12 +266,12 @@ final class AdminPage {
 		$start_date     = $period['start_date'] ?? '';
 		$end_date       = $period['end_date'] ?? '';
 
-		echo '<form method="get" class="wsrs-no-print" style="margin: 16px 0 24px; padding: 16px; background: #fff; border: 1px solid #c3c4c7;">';
+		echo '<form method="get" class="wsrs-period-form wsrs-no-print">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::MENU_SALES_SLUG ) . '" />';
 		echo '<input type="hidden" name="' . esc_attr( self::VIEW_PARAM ) . '" value="' . esc_attr( self::DEFAULT_VIEW ) . '" />';
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		echo '<fieldset>';
-		echo '<legend style="font-weight: 600; margin-bottom: 8px;">' . esc_html__( '期間', 'welcart-simple-report-sales' ) . '</legend>';
+		echo '<legend class="wsrs-period-form__legend">' . esc_html__( '期間', 'welcart-simple-report-sales' ) . '</legend>';
 		$this->render_period_radio(
 			ReportPeriods::CURRENT_MONTH,
 			__( '今月', 'welcart-simple-report-sales' ),
@@ -234,7 +282,7 @@ final class AdminPage {
 			__( '前月', 'welcart-simple-report-sales' ),
 			$current_period
 		);
-		echo '<label style="margin-right: 16px;">';
+		echo '<label class="wsrs-period-form__radio">';
 		echo '<input type="radio" name="period" value="' . esc_attr( ReportPeriods::CUSTOM ) . '" ' . checked( $current_period, ReportPeriods::CUSTOM, false ) . ' />';
 		echo ' ' . esc_html__( '期間指定', 'welcart-simple-report-sales' );
 		echo '</label>';
@@ -242,7 +290,7 @@ final class AdminPage {
 		echo ' <span aria-hidden="true">～</span> ';
 		echo '<input type="date" name="end_date" value="' . esc_attr( $end_date ) . '" />';
 		echo '</fieldset>';
-		echo '<p style="margin: 12px 0 0;">';
+		echo '<p class="wsrs-period-form__actions">';
 		echo '<button type="submit" class="button button-secondary">';
 		echo esc_html__( '表示', 'welcart-simple-report-sales' );
 		echo '</button>';
@@ -253,13 +301,13 @@ final class AdminPage {
 	/**
 	 * Render period radio.
 	 *
-	 * @param string $value          Radio value.
-	 * @param string $label          Radio label.
-	 * @param string $current_period Current period.
-	 * @return void
+	 * @param   string $value          Radio value.
+	 * @param   string $label          Radio label.
+	 * @param   string $current_period Current period.
+	 * @return  void
 	 */
 	private function render_period_radio( string $value, string $label, string $current_period ): void {
-		echo '<label style="margin-right: 16px;">';
+		echo '<label class="wsrs-period-form__radio">';
 		echo '<input type="radio" name="period" value="' . esc_attr( $value ) . '" ' . checked( $current_period, $value, false ) . ' />';
 		echo ' ' . esc_html( $label );
 		echo '</label>';
@@ -274,17 +322,19 @@ final class AdminPage {
 	private function render_inner_navigation( string $current_view ): void {
 		$menu_items = $this->get_inner_navigation_items();
 
-		echo '<nav class="wsrs-admin-nav wsrs-no-print" style="margin: 16px 0 24px; width: 220px; background: #fff; border: 1px solid #c3c4c7;">';
+		echo '<nav class="wsrs-admin-nav wsrs-no-print">';
 
 		foreach ( $menu_items as $view => $item ) {
 			$label = isset( $item['label'] ) ? (string) $item['label'] : '';
 			$url   = isset( $item['url'] ) ? (string) $item['url'] : '';
 
-			$style = $current_view === $view
-				? 'display: block; padding: 10px 12px; background: #2271b1; color: #fff; text-decoration: none;'
-				: 'display: block; padding: 10px 12px; color: #1d2327; text-decoration: none;';
+			$class_names = array( 'wsrs-admin-nav__item' );
 
-			echo '<a href="' . esc_url( $url ) . '" style="' . esc_attr( $style ) . '">';
+			if ( $current_view === $view ) {
+				$class_names[] = 'is-active';
+			}
+
+			echo '<a href="' . esc_url( $url ) . '" class="' . esc_attr( implode( ' ', $class_names ) ) . '">';
 			echo esc_html( $label );
 			echo '</a>';
 		}
@@ -356,7 +406,7 @@ final class AdminPage {
 
 		$this->render_period_form( $period );
 
-		echo '<div class="wsrs-no-print" style="margin: 16px 0;">';
+		echo '<div class="wsrs-print-actions wsrs-no-print">';
 		echo '<button type="button" class="button button-primary" onclick="window.print();">';
 		echo esc_html__( '印刷', 'welcart-simple-report-sales' );
 		echo '</button>';
