@@ -1,26 +1,42 @@
 <style>
 	.wsrs-report {
-		font-family: sans-serif;
+		max-width: 1100px;
+		margin: 0 auto;
 		color: #1d2327;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		font-size: 13px;
+		line-height: 1.6;
 	}
 
 	.wsrs-report__header {
 		margin-bottom: 24px;
+		padding-bottom: 16px;
 		border-bottom: 2px solid #1d2327;
 	}
 
 	.wsrs-report__title {
 		margin: 0 0 8px;
 		font-size: 24px;
+		font-weight: 700;
 	}
 
 	.wsrs-report__meta {
-		margin: 0 0 16px;
-		font-size: 13px;
+		margin: 2px 0;
 	}
 
 	.wsrs-report__section {
 		margin-top: 24px;
+	}
+
+	.wsrs-report__section-title {
+		margin: 0 0 8px;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.wsrs-report__orders-table .customer-name {
+		word-break: keep-all;
+		overflow-wrap: anywhere;
 	}
 
 	.wsrs-report table {
@@ -30,30 +46,44 @@
 
 	.wsrs-report th,
 	.wsrs-report td {
-		padding: 8px;
+		padding: 6px 8px;
 		border: 1px solid #c3c4c7;
-		text-align: left;
+		vertical-align: top;
 	}
 
 	.wsrs-report th {
 		background: #f6f7f7;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.wsrs-report .number {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.wsrs-report__summary {
+		max-width: 720px;
+	}
+
+	.wsrs-report__note {
+		margin-top: 8px;
+		color: #646970;
+		font-size: 12px;
 	}
 
 	@media print {
 		@page {
-			size: A4;
+			size: A4 landscape;
 			margin: 12mm;
-		}
-
-		body {
-			background: #fff !important;
 		}
 
 		#adminmenumain,
 		#wpadminbar,
 		#wpfooter,
 		.notice,
-		.update-nag {
+		.update-nag,
+		.wsrs-no-print {
 			display: none !important;
 		}
 
@@ -64,11 +94,21 @@
 		}
 
 		.wsrs-report {
-			color: #000;
+			max-width: none;
+			font-size: 11px;
 		}
 
-		.wsrs-no-print {
-			display: none !important;
+		.wsrs-report thead {
+			display: table-header-group;
+		}
+
+		.wsrs-report tr {
+			break-inside: avoid;
+			page-break-inside: avoid;
+		}
+
+		.wsrs-report__section--orders {
+			break-before: page;
 		}
 	}
 </style>
@@ -76,64 +116,129 @@
 <div class="wsrs-report">
 	<header class="wsrs-report__header">
 		<h1 class="wsrs-report__title">{{ report.title }}</h1>
-		<p class="wsrs-report__meta">{{ report.period_label }}</p>
+		<p class="wsrs-report__meta">対象期間：{{ report.period_label }}</p>
+		<p class="wsrs-report__meta">店舗名：{{ store.name }}</p>
+		<p class="wsrs-report__meta">出力日時：{{ report.generated_at }}</p>
 	</header>
 
 	<section class="wsrs-report__section">
-		<h2>店舗情報</h2>
-		<table>
-			<tr>
-				<th>店舗名</th>
-				<td>{{ store.name }}</td>
-			</tr>
-		</table>
-	</section>
-
-	<section class="wsrs-report__section">
-		<h2>合計</h2>
-		<table>
-			<tr>
-				<th>受注件数</th>
-				<td>{{ totals.order_count }} 件</td>
-			</tr>
-			<tr>
-				<th>支払い合計金額</th>
-				<td>{{ totals.payment_total_label }} 円</td>
-			</tr>
-		</table>
-	</section>
-
-	<section class="wsrs-report__section">
-		<h2>注文明細</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>注文日</th>
-					<th>注文番号</th>
-					<th>顧客名</th>
-					<th>支払い合計金額</th>
-				</tr>
-			</thead>
+		<h2 class="wsrs-report__section-title">集計</h2>
+		<table class="wsrs-report__summary">
 			<tbody>
-				{{#orders}}
 				<tr>
-					<td>{{ order_date }}</td>
-					<td>{{ order_number }}</td>
-					<td>{{ customer_name }}</td>
-					<td>{{ payment_total_label }} 円</td>
+					<th>受注数</th>
+					<td class="number">{{ totals.order_count }} 件</td>
 				</tr>
-				{{/orders}}
-				{{^orders}}
 				<tr>
-					<td colspan="4">対象期間の注文はありません。</td>
+					<th>売上対象数</th>
+					<td class="number">{{ totals.sales_order_count }} 件</td>
 				</tr>
-				{{/orders}}
+				<tr>
+					<th>商品合計</th>
+					<td class="number">{{ totals.item_total_label }} 円</td>
+				</tr>
+				<tr>
+					<th>値引き</th>
+					<td class="number">{{ totals.discount_label }} 円</td>
+				</tr>
+				<tr>
+					<th>消費税</th>
+					<td class="number">{{ totals.tax_label }} 円</td>
+				</tr>
+				<tr>
+					<th>送料</th>
+					<td class="number">{{ totals.shipping_fee_label }} 円</td>
+				</tr>
+				<tr>
+					<th>代引手数料</th>
+					<td class="number">{{ totals.cod_fee_label }} 円</td>
+				</tr>
+				<tr>
+					<th>使用ポイント</th>
+					<td class="number">{{ totals.used_points_label }} pt</td>
+				</tr>
+				<tr>
+					<th>支払い合計金額</th>
+					<td class="number"><strong>{{ totals.payment_total_label }} 円</strong></td>
+				</tr>
 			</tbody>
 		</table>
 	</section>
 
 	<section class="wsrs-report__section">
-		<h2>備考</h2>
-		<p>{{ report.note }}</p>
+		<h2 class="wsrs-report__section-title">税率別内訳</h2>
+		<table class="wsrs-report__summary">
+			<thead>
+				<tr>
+					<th>区分</th>
+					<th>小計</th>
+					<th>値引き</th>
+					<th>消費税</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>標準税率対象</th>
+					<td class="number">{{ totals.standard_subtotal_label }} 円</td>
+					<td class="number">{{ totals.standard_discount_label }} 円</td>
+					<td class="number">{{ totals.standard_tax_label }} 円</td>
+				</tr>
+				<tr>
+					<th>軽減税率対象</th>
+					<td class="number">{{ totals.reduced_subtotal_label }} 円</td>
+					<td class="number">{{ totals.reduced_discount_label }} 円</td>
+					<td class="number">{{ totals.reduced_tax_label }} 円</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section class="wsrs-report__section wsrs-report__section--orders">
+		<h2 class="wsrs-report__section-title">注文明細</h2>
+		<table class="wsrs-report__orders-table">
+			<thead>
+				<tr>
+					<th>注文日</th>
+					<th>注文番号</th>
+					<th>顧客名</th>
+					<th>支払い方法</th>
+					<th>状態</th>
+					<th>商品合計</th>
+					<th>値引き</th>
+					<th>消費税</th>
+					<th>送料</th>
+					<th>代引</th>
+					<th>使用pt</th>
+					<th>支払い合計</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#orders}}
+				<tr>
+					<td class="order-date">{{ order_date }}</td>
+					<td class="order-number">{{ order_number }}</td>
+					<td class="customer-name">{{ customer_name }}</td>
+					<td class="payment-method">{{ payment.method }}</td>
+					<td class="status-label">{{ status.label }}</td>
+					<td class="number">{{ amounts.item_total_label }}</td>
+					<td class="number">{{ amounts.discount_label }}</td>
+					<td class="number">{{ amounts.tax_label }}</td>
+					<td class="number">{{ amounts.shipping_fee_label }}</td>
+					<td class="number">{{ amounts.cod_fee_label }}</td>
+					<td class="number">{{ amounts.used_points_label }}</td>
+					<td class="number">{{ amounts.payment_total_label }}</td>
+				</tr>
+				{{/orders}}
+				{{^orders}}
+				<tr>
+					<td colspan="12">対象期間の注文はありません。</td>
+				</tr>
+				{{/orders}}
+			</tbody>
+		</table>
+
+		<p class="wsrs-report__note">
+			キャンセル注文は明細に表示されますが、売上対象の集計には含まれません。
+		</p>
 	</section>
 </div>
