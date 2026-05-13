@@ -235,7 +235,7 @@ final class AdminPage {
 	/**
 	 * Get verified request parameters.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<string, string>
 	 */
 	private function get_verified_request(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -250,8 +250,21 @@ final class AdminPage {
 			return array();
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return wp_unslash( $_GET );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$request = array(
+			'period'     => isset( $_GET['period'] )
+				? sanitize_key( wp_unslash( (string) $_GET['period'] ) )
+				: '',
+			'start_date' => isset( $_GET['start_date'] )
+				? sanitize_text_field( wp_unslash( (string) $_GET['start_date'] ) )
+				: '',
+			'end_date'   => isset( $_GET['end_date'] )
+				? sanitize_text_field( wp_unslash( (string) $_GET['end_date'] ) )
+				: '',
+		);
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		return $request;
 	}
 
 	/**
