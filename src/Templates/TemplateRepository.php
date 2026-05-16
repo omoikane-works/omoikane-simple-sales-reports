@@ -47,6 +47,7 @@ final class TemplateRepository {
 					name,
 					type,
 					content,
+					content_hash,
 					version,
 					is_system,
 					is_default,
@@ -56,6 +57,7 @@ final class TemplateRepository {
 				FROM %i
 				WHERE template_key = %s
 				AND is_active = 1
+				ORDER BY id DESC
 				LIMIT 1',
 				$table_name,
 				$template_key
@@ -90,6 +92,7 @@ final class TemplateRepository {
 					name,
 					type,
 					content,
+					content_hash,
 					version,
 					is_system,
 					is_default,
@@ -100,7 +103,7 @@ final class TemplateRepository {
 				WHERE type = %s
 				AND is_default = 1
 				AND is_active = 1
-				ORDER BY id ASC
+				ORDER BY id DESC
 				LIMIT 1',
 				$table_name,
 				$type
@@ -128,6 +131,7 @@ final class TemplateRepository {
 			'name'         => isset( $row['name'] ) ? (string) $row['name'] : '',
 			'type'         => isset( $row['type'] ) ? (string) $row['type'] : '',
 			'content'      => isset( $row['content'] ) ? (string) $row['content'] : '',
+			'content_hash' => isset( $row['content_hash'] ) ? (string) $row['content_hash'] : '',
 			'version'      => isset( $row['version'] ) ? (string) $row['version'] : '',
 			'is_system'    => ! empty( $row['is_system'] ),
 			'is_default'   => ! empty( $row['is_default'] ),
