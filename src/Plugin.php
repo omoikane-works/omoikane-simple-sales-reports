@@ -94,7 +94,8 @@ final class Plugin {
 		$admin_page = new AdminPage(
 			$sales_report_renderer,
 			$period_resolver,
-			$sales_report_builder
+			$sales_report_builder,
+			$template_repository,
 		);
 		$admin_page->register_hooks();
 	}

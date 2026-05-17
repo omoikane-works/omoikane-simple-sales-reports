@@ -13,6 +13,8 @@ use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
 use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
+use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
+use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateTypes;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -99,20 +101,37 @@ final class AdminPage {
 	private array $admin_page_hooks = array();
 
 	/**
+	 * Request parameter name for template ID.
+	 *
+	 * @var string
+	 */
+	private const TEMPLATE_ID_PARAM = 'template_id';
+
+	/**
+	 * Template repository.
+	 *
+	 * @var TemplateRepository
+	 */
+	private TemplateRepository $template_repository;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   SalesReportRenderer  $sales_report_renderer Sales report renderer.
 	 * @param   ReportPeriodResolver $period_resolver       Report period resolver.
 	 * @param   SalesReportBuilder   $sales_report_builder  Sales report builder.
+	 * @param   TemplateRepository   $template_repository   Template Repository.
 	 */
 	public function __construct(
 		SalesReportRenderer $sales_report_renderer,
 		ReportPeriodResolver $period_resolver,
 		SalesReportBuilder $sales_report_builder,
+		TemplateRepository $template_repository,
 	) {
 		$this->sales_report_renderer = $sales_report_renderer;
 		$this->period_resolver       = $period_resolver;
 		$this->sales_report_builder  = $sales_report_builder;
+		$this->template_repository   = $template_repository;
 	}
 
 	/**
@@ -252,14 +271,17 @@ final class AdminPage {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$request = array(
-			'period'     => isset( $_GET['period'] )
+			'period'      => isset( $_GET['period'] )
 				? sanitize_key( wp_unslash( (string) $_GET['period'] ) )
 				: '',
-			'start_date' => isset( $_GET['start_date'] )
+			'start_date'  => isset( $_GET['start_date'] )
 				? sanitize_text_field( wp_unslash( (string) $_GET['start_date'] ) )
 				: '',
-			'end_date'   => isset( $_GET['end_date'] )
+			'end_date'    => isset( $_GET['end_date'] )
 				? sanitize_text_field( wp_unslash( (string) $_GET['end_date'] ) )
+				: '',
+			'template_id' => isset( $_GET[ self::TEMPLATE_ID_PARAM ] )
+				? sanitize_text_field( wp_unslash( (string) $_GET[ self::TEMPLATE_ID_PARAM ] ) )
 				: '',
 		);
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
@@ -270,10 +292,14 @@ final class AdminPage {
 	/**
 	 * Render period form.
 	 *
-	 * @param   array<string, string> $period Report period.
+	 * @param   array<string, string> $period               Report period.
+	 * @param   int                   $selected_template_id Selected template ID.
 	 * @return  void
 	 */
-	private function render_period_form( array $period ): void {
+	private function render_period_form(
+		array $period,
+		int $selected_template_id
+	): void {
 
 		$current_period = $period['period'] ?? ReportPeriods::PREVIOUS_MONTH;
 		$start_date     = $period['start_date'] ?? '';
@@ -303,6 +329,9 @@ final class AdminPage {
 		echo ' <span aria-hidden="true">～</span> ';
 		echo '<input type="date" name="end_date" value="' . esc_attr( $end_date ) . '" />';
 		echo '</fieldset>';
+
+		$this->render_template_select( $selected_template_id );
+
 		echo '<p class="wsrs-period-form__actions">';
 		echo '<button type="submit" class="button button-secondary">';
 		echo esc_html__( '表示', 'welcart-simple-report-sales' );
@@ -324,6 +353,47 @@ final class AdminPage {
 		echo '<input type="radio" name="period" value="' . esc_attr( $value ) . '" ' . checked( $current_period, $value, false ) . ' />';
 		echo ' ' . esc_html( $label );
 		echo '</label>';
+	}
+
+	/**
+	 * Render template select.
+	 *
+	 * @param   int $selected_template_id   Selected template ID.
+	 * @return  void
+	 */
+	private function render_template_select( int $selected_template_id ): void {
+		$templates = $this->template_repository->find_selectable_by_type(
+			TemplateTypes::SALES_REPORT
+		);
+
+		if ( array() === $templates ) {
+			return;
+		}
+
+		echo '<fieldset class="wsrs-period-form__template">';
+		echo '<legend class="wsrs-period-form__legend">' . esc_html__( 'テンプレート', 'welcart-simple-report-sales' ) . '</legend>';
+		echo '<select name="' . esc_attr( self::TEMPLATE_ID_PARAM ) . '">';
+
+		foreach ( $templates as $template ) {
+			$id      = isset( $template['id'] ) ? (int) $template['id'] : 0;
+			$name    = isset( $template['name'] ) ? (string) $template['name'] : '';
+			$version = isset( $template['version'] ) ? (string) $template['version'] : '';
+
+			if ( 0 === $id ) {
+				continue;
+			}
+
+			$label = ( '' !== $version )
+				? sprintf( '%s v%s', $name, $version )
+				: $name;
+
+			echo '<option value="' . esc_attr( (string) $id ) . '" ' . selected( $selected_template_id, $id, false ) . '>';
+			echo esc_html( $label );
+			echo '</option>';
+		}
+
+		echo '</select>';
+		echo '</fieldset>';
 	}
 
 	/**
@@ -412,12 +482,16 @@ final class AdminPage {
 	 * @return void
 	 */
 	private function render_report_generation_view(): void {
-		$request     = $this->get_verified_request();
-		$period      = $this->period_resolver->resolve( $request );
-		$view_data   = $this->sales_report_builder->build( $period );
-		$report_html = $this->sales_report_renderer->render_default_sales_report( $view_data );
+		$request              = $this->get_verified_request();
+		$selected_template_id = $this->resolve_selected_template_id( $request );
+		$period               = $this->period_resolver->resolve( $request );
+		$view_data            = $this->sales_report_builder->build( $period );
+		$report_html          = $this->sales_report_renderer->render_sales_report(
+			$view_data,
+			$selected_template_id
+		);
 
-		$this->render_period_form( $period );
+		$this->render_period_form( $period, $selected_template_id );
 
 		echo '<div class="wsrs-print-actions wsrs-no-print">';
 		echo '<button type="button" class="button button-primary" onclick="window.print();">';
@@ -432,5 +506,37 @@ final class AdminPage {
 		// The report template is rendered from a trusted system template and escaped by Mustache.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $report_html;
+	}
+
+	/**
+	 * Resolve selected template ID.
+	 *
+	 * @param   array<string, string> $request    Request parameters.
+	 * @return  int
+	 */
+	private function resolve_selected_template_id( array $request ): int {
+		$template_id = isset( $request[ self::TEMPLATE_ID_PARAM ] )
+		? absint( $request[ self::TEMPLATE_ID_PARAM ] )
+		: 0;
+
+		if ( $template_id > 0 ) {
+			$template = $this->template_repository->find_by_id( $template_id );
+
+			if (
+			null !== $template
+			&& isset( $template['type'] )
+			&& TemplateTypes::SALES_REPORT === (string) $template['type']
+			) {
+				return $template_id;
+			}
+		}
+
+		$default_template = $this->template_repository->find_default_sales_report_template();
+
+		if ( null === $default_template || ! isset( $default_template['id'] ) ) {
+			return 0;
+		}
+
+		return absint( $default_template['id'] );
 	}
 }

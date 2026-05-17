@@ -78,4 +78,36 @@ final class SalesReportRenderer {
 			)
 		);
 	}
+
+	/**
+	 * Render sales report.
+	 *
+	 * @param   array<string, mixed> $view_data      View data.
+	 * @param   int                  $template_id    Template ID.
+	 * @return  string
+	 */
+	public function render_sales_report( array $view_data, int $template_id ): string {
+		$template = $this->template_repository->find_by_id( $template_id );
+
+		if ( null === $template ) {
+			return $this->render_default_sales_report( $view_data );
+		}
+
+		$content = isset( $template['content'] )
+			? (string) $template['content']
+			: '';
+
+		if ( '' === $content ) {
+			return $this->render_default_sales_report( $view_data );
+		}
+
+		$mustache = new Mustache_Engine(
+			array(
+				'entity_flags' => ENT_QUOTES,
+				'charset'      => get_bloginfo( 'charset' ),
+			)
+		);
+
+		return $mustache->render( $content, $view_data );
+	}
 }
