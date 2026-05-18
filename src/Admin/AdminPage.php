@@ -115,6 +115,13 @@ final class AdminPage {
 	private TemplateRepository $template_repository;
 
 	/**
+	 * Selected sales report template option name.
+	 *
+	 * @var string
+	 */
+	private const SELECTED_TEMPLATE_ID_OPTION = 'wsrs_sales_report_template_id';
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   SalesReportRenderer  $sales_report_renderer Sales report renderer.
@@ -515,20 +522,20 @@ final class AdminPage {
 	 * @return  int
 	 */
 	private function resolve_selected_template_id( array $request ): int {
-		$template_id = isset( $request[ self::TEMPLATE_ID_PARAM ] )
-		? absint( $request[ self::TEMPLATE_ID_PARAM ] )
-		: 0;
+		$request_template_id = isset( $request[ self::TEMPLATE_ID_PARAM ] )
+			? absint( $request[ self::TEMPLATE_ID_PARAM ] )
+			: 0;
 
-		if ( $template_id > 0 ) {
-			$template = $this->template_repository->find_by_id( $template_id );
+		if ( $request_template_id > 0 && $this->is_valid_sales_report_template_id( $request_template_id ) ) {
+			update_option( self::SELECTED_TEMPLATE_ID_OPTION, $request_template_id );
 
-			if (
-			null !== $template
-			&& isset( $template['type'] )
-			&& TemplateTypes::SALES_REPORT === (string) $template['type']
-			) {
-				return $template_id;
-			}
+			return $request_template_id;
+		}
+
+		$saved_template_id = absint( get_option( self::SELECTED_TEMPLATE_ID_OPTION, 0 ) );
+
+		if ( $saved_template_id > 0 && $this->is_valid_sales_report_template_id( $saved_template_id ) ) {
+			return $saved_template_id;
 		}
 
 		$default_template = $this->template_repository->find_default_sales_report_template();
@@ -537,6 +544,32 @@ final class AdminPage {
 			return 0;
 		}
 
-		return absint( $default_template['id'] );
+		$default_template_id = absint( $default_template['id'] );
+
+		if ( $default_template_id > 0 ) {
+			update_option( self::SELECTED_TEMPLATE_ID_OPTION, $default_template_id );
+		}
+
+		return $default_template_id;
+	}
+
+	/**
+	 * Check whether template ID is valid sales report template.
+	 *
+	 * @param   int $template_id    Template ID.
+	 * @return  bool
+	 */
+	private function is_valid_sales_report_template_id( int $template_id ): bool {
+		if ( $template_id <= 0 ) {
+			return false;
+		}
+
+		$template = $this->template_repository->find_by_id( $template_id );
+
+		return (
+			null !== $template
+			&& isset( $template['type'] )
+			&& TemplateTypes::SALES_REPORT === (string) $template['type']
+		);
 	}
 }
