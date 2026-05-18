@@ -1,0 +1,177 @@
+# Copyright (C) 2026 Omoikane Works
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Welcart Simple Report Sales 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/welcart-simple-"
+"report-sales\n"
+"POT-Creation-Date: 2026-05-18T09:54:57+00:00\n"
+"PO-Revision-Date: 2026-05-18 19:20+0900\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: welcart-simple-report-sales\n"
+
+#. Plugin Name of the plugin
+#: welcart-simple-report-sales.php
+msgid "Welcart Simple Report Sales"
+msgstr "かんたん売上報告書 for Welcart"
+
+#. Plugin URI of the plugin
+#: welcart-simple-report-sales.php
+msgid "https://github.com/omoikane-works/welcart-simple-report-sales"
+msgstr "https://github.com/omoikane-works/welcart-simple-report-sales"
+
+#. Description of the plugin
+#: welcart-simple-report-sales.php
+msgid "Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。"
+msgstr "Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。"
+
+#. Author of the plugin
+#: welcart-simple-report-sales.php
+msgid "Omoikane Works"
+msgstr "オモイカネ ワークス"
+
+#. Author URI of the plugin
+#: welcart-simple-report-sales.php
+msgid "https://github.com/omoikane-works"
+msgstr "https://github.com/omoikane-works"
+
+#: src/Activation.php:47
+msgid "かんたん売上報告書 for Welcart を利用するには PHP 8.2 以上が必要です。"
+msgstr "かんたん売上報告書 for Welcart を利用するには PHP 8.2 以上が必要です。"
+
+#: src/Activation.php:58
+msgid ""
+"かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要"
+"があります。"
+msgstr ""
+"かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要"
+"があります。"
+
+#: src/Activation.php:67
+msgid ""
+"かんたん売上報告書 for Welcart を利用するには Welcart v2.11.10 以上が必要で"
+"す。"
+msgstr ""
+"かんたん売上報告書 for Welcart を利用するには Welcart v2.11.10 以上が必要で"
+"す。"
+
+#: src/Admin/AdminPage.php:168 src/Admin/AdminPage.php:169
+msgid "かんたん報告書"
+msgstr "かんたん報告書"
+
+#: src/Admin/AdminPage.php:181 src/Admin/AdminPage.php:182
+#: src/Admin/AdminPage.php:238
+msgid "売上報告書"
+msgstr "売上報告書"
+
+#: src/Admin/AdminPage.php:231
+msgid "このページにアクセスする権限がありません。"
+msgstr "このページにアクセスする権限がありません。"
+
+#: src/Admin/AdminPage.php:320
+msgid "期間"
+msgstr "期間"
+
+#: src/Admin/AdminPage.php:323
+msgid "今月"
+msgstr "今月"
+
+#: src/Admin/AdminPage.php:328
+msgid "前月"
+msgstr "前月"
+
+#: src/Admin/AdminPage.php:333
+msgid "期間指定"
+msgstr "期間指定"
+
+#: src/Admin/AdminPage.php:344
+msgid "表示"
+msgstr "表示"
+
+#: src/Admin/AdminPage.php:381
+msgid "テンプレート"
+msgstr "テンプレート"
+
+#: src/Admin/AdminPage.php:443
+msgid "報告書生成"
+msgstr "報告書生成"
+
+#: src/Admin/AdminPage.php:505
+msgid "印刷"
+msgstr "印刷"
+
+#: src/Admin/AdminPage.php:510
+msgid ""
+"PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッ"
+"ター」をオフにしてください。"
+msgstr ""
+"PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッ"
+"ター」をオフにしてください。"
+
+#. translators: 1: start date, 2: end date
+#: src/Reports/ReportPeriodResolver.php:165
+msgid "%1$s ～ %2$s"
+msgstr "%1$s ～ %2$s"
+
+#: src/Reports/ReportPeriodResolver.php:166
+#: src/Reports/ReportPeriodResolver.php:167
+msgid "Y年n月j日"
+msgstr "Y年n月j日"
+
+#. translators: %s: Sales support rate.
+#: src/Reports/SalesReportBuilder.php:378
+msgid ""
+"販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し"
+"引いた金額」に対して %s を乗じ、小数点以下を切り上げて算出しています。"
+msgstr ""
+"販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し"
+"引いた金額」に対して %s を乗じ、小数点以下を切り上げて算出しています。"
+
+#: src/Reports/SalesReportBuilder.php:479
+msgid "キャンセル"
+msgstr "キャンセル"
+
+#: src/Reports/SalesReportBuilder.php:483
+msgid "新規受付"
+msgstr "新規受付"
+
+#: src/Reports/SalesReportBuilder.php:487
+msgid "取り寄せ中"
+msgstr "取り寄せ中"
+
+#: src/Reports/SalesReportBuilder.php:491
+msgid "発送済み"
+msgstr "発送済み"
+
+#: src/Reports/SalesReportRenderer.php:68
+msgid ""
+"売上報告書テンプレートが見つかりません。プラグインを再有効化してください。"
+msgstr ""
+"売上報告書テンプレートが見つかりません。プラグインを再有効化してください。"
+
+#. translators: 1: required PHP version, 2: current PHP version.
+#: welcart-simple-report-sales.php:50
+msgid ""
+"Welcart Simple Report Sales requires PHP version %1$s or later. Your current "
+"PHP version is %2$s."
+msgstr ""
+"かんたん売上報告書 for Welcart を利用するには PHP %1$s 以上が必要です。現在"
+"の PHP バージョンは、%2$s です。"
+
+#: welcart-simple-report-sales.php:71
+msgid "Plugin activation failed."
+msgstr "プラグインの有効化に失敗しました。"
+
+#: welcart-simple-report-sales.php:110
+msgid ""
+"かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer "
+"install を実行してください。"
+msgstr ""
+"かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer "
+"install を実行してください。"
