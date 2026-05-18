@@ -54,14 +54,7 @@ final class SalesReportRenderer {
 			return $this->render_template_not_found_message();
 		}
 
-		$mustache = new Mustache_Engine(
-			array(
-				'entity_flags' => ENT_QUOTES,
-				'charset'      => get_bloginfo( 'charset' ),
-			)
-		);
-
-		return $mustache->render( $content, $view_data );
+		return $this->render_content( $content, $view_data );
 	}
 
 	/**
@@ -101,6 +94,17 @@ final class SalesReportRenderer {
 			return $this->render_default_sales_report( $view_data );
 		}
 
+		return $this->render_content( $content, $view_data );
+	}
+
+	/**
+	 * Render template content.
+	 *
+	 * @param   string               $content    Template content.
+	 * @param   array<string, mixed> $view_data  View data.
+	 * @return  string
+	 */
+	private function render_content( string $content, array $view_data ): string {
 		$mustache = new Mustache_Engine(
 			array(
 				'entity_flags' => ENT_QUOTES,
