@@ -41,7 +41,9 @@
         "phpstan": "phpstan analyse --memory-limit=1G",
         "make-pot": "wp i18n make-pot . languages/welcart-simple-report-sales.pot --exclude=node_modules,vendor,tests",
         "test": "phpunit -c phpunit.xml.dist",
-        "phpunit": "phpunit -c phpunit.xml.dist"
+        "phpunit": "phpunit -c phpunit.xml.dist",
+        "coverage": "XDEBUG_MODE=coverage composer phpunit -- --coverage-text",
+        "coverage-html": "XDEBUG_MODE=coverage phpunit -c phpunit.xml.dist --coverage-html build/coverage"
     },
     "config": {
         "preferred-install": "dist",
