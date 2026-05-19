@@ -89,7 +89,9 @@ if ( ! function_exists( 'current_datetime' ) ) {
 	 * @return  DateTimeImmutable
 	 */
 	function current_datetime(): DateTimeImmutable {
-		return new DateTimeImmutable( '2026-05-18 12:00:00', wp_timezone() );
+		$current_datetime = $GLOBALS['wsrs_test_current_datetime'] ?? '2026-05-18 12:00:00';
+
+		return new DateTimeImmutable( (string) $current_datetime, wp_timezone() );
 	}
 }
 
