@@ -26,16 +26,16 @@ final class SalesReportBuilder {
 	/**
 	 * Order repository.
 	 *
-	 * @var OrderRepository
+	 * @var OrderRepositoryInterface
 	 */
-	private OrderRepository $order_repository;
+	private OrderRepositoryInterface $order_repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   OrderRepository $order_repository   Order repository.
+	 * @param   OrderRepositoryInterface $order_repository   Order repository.
 	 */
-	public function __construct( OrderRepository $order_repository ) {
+	public function __construct( OrderRepositoryInterface $order_repository ) {
 		$this->order_repository = $order_repository;
 	}
 

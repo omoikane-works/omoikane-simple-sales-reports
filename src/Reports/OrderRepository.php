@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Retrieves Welcart orders.
  */
-final class OrderRepository {
+final class OrderRepository implements OrderRepositoryInterface {
 
 	/**
 	 * Get Welcart order table name.
