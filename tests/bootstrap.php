@@ -15,4 +15,114 @@ if ( ! defined( 'WP_CONTENT_DIR' ) ) {
 	define( 'WP_CONTENT_DIR', dirname( __DIR__ ) . '/tests/wp-content' );
 }
 
+if ( ! function_exists( 'sanitize_key' ) ) {
+
+	/**
+	 * Sanitize key.
+	 *
+	 * @param   string $key    Key.
+	 * @return  string
+	 */
+	function sanitize_key( string $key ): string {
+		return strtolower( preg_replace( '/[^a-zA-Z0-9_\-]/', '', $key ) ?? '' );
+	}
+
+}
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+
+	/**
+	 * Remove slashes.
+	 *
+	 * @param   mixed $value  Value.
+	 * @return  mixed
+	 */
+	function wp_unslash( mixed $value ): mixed {
+		if ( is_array( $value ) ) {
+			return array_map( 'wp_unslash', $value );
+		}
+		return is_string( $value ) ? stripslashes( $value ) : $value;
+	}
+
+}
+
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+	/**
+	 * Strip all HTML tags.
+	 *
+	 * @param   string $text   Text.
+	 * @return  string
+	 */
+	function wp_strip_all_tags( string $text ): string {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags
+		return strip_tags( $text );
+	}
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	/**
+	 * Sanitize text field.
+	 *
+	 * @param   string $value  Value.
+	 * @return  string
+	 */
+	function sanitize_text_field( string $value ): string {
+		return trim( wp_unslash( wp_strip_all_tags( $value ) ) );
+	}
+}
+
+if ( ! function_exists( 'wp_timezone' ) ) {
+	/**
+	 * Get WordPress timezone.
+	 *
+	 * @return  DateTimeZone
+	 */
+	function wp_timezone(): DateTimeZone {
+		return new DateTimeZone( 'Asia/Tokyo' );
+	}
+}
+
+if ( ! function_exists( 'current_datetime' ) ) {
+	/**
+	 * Get current datetime.
+	 *
+	 * @return  DateTimeImmutable
+	 */
+	function current_datetime(): DateTimeImmutable {
+		return new DateTimeImmutable( '2026-05-18 12:00:00', wp_timezone() );
+	}
+}
+
+if ( ! function_exists( 'wp_date' ) ) {
+	/**
+	 * Format date.
+	 *
+	 * @param   string $format     Date format.
+	 * @param   int    $timestamp  Timestamp.
+	 * @return  string
+	 */
+	function wp_date( string $format, int $timestamp ): string {
+		return ( new DateTimeImmutable( '@' . $timestamp ) )
+			->setTimezone( wp_timezone() )
+			->format( $format );
+	}
+}
+
+if ( ! function_exists( '__' ) ) {
+	/**
+	 * Translate text.
+	 *
+	 * @param   string $text   Text.
+	 * @param   string $domain Domain.
+	 * @return  string
+	 */
+	function __( string $text, string $domain ): string {
+		unset( $domain );
+
+		return $text;
+	}
+}
+
+
+
 require dirname( __DIR__ ) . '/vendor/autoload.php';
