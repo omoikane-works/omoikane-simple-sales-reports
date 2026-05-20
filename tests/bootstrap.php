@@ -125,6 +125,33 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
+if ( ! function_exists( 'get_bloginfo' ) ) {
+	/**
+	 * Get blog info.
+	 *
+	 * @param   string $show   Blog info key.
+	 * @return  string
+	 */
+	function get_bloginfo( string $show = '' ): string {
+		if ( 'name' === $show ) {
+			return 'Example Store';
+		}
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'home_url' ) ) {
+	/**
+	 * Get home url.
+	 *
+	 * @return  string
+	 */
+	function home_url(): string {
+		return 'https://example.test';
+	}
+}
+
 
 
 require dirname( __DIR__ ) . '/vendor/autoload.php';

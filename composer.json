@@ -34,6 +34,11 @@
             "OmoikaneWorks\\WelcartSimpleReportSales\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "OmoikaneWorks\\WelcartSimpleReportSales\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "lint": "find welcart-simple-report-sales.php src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
         "phpcs": "phpcs -s welcart-simple-report-sales.php src tests",
