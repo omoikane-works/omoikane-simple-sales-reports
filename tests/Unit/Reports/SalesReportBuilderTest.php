@@ -277,4 +277,108 @@ final class SalesReportBuilderTest extends TestCase {
 		$this->assertSame( 6100, $cancelled_order['payment_total_amount'] );
 		$this->assertSame( '6,100', $cancelled_order['payment_total_label'] );
 	}
+
+	/**
+	 * Test build rounds up sales support amount.
+	 *
+	 * @return void
+	 */
+	public function test_build_rounds_up_sales_support_amount(): void {
+		$builder = new SalesReportBuilder(
+			new FakeOrderRepository(
+				array(
+					array(
+						'ID'                     => 1001,
+						'order_date'             => '2026-05-10 14:23:45',
+						'order_name1'            => '山田',
+						'order_name2'            => '太郎',
+						'order_name3'            => 'ヤマダ',
+						'order_name4'            => 'タロウ',
+						'order_payment_name'     => 'クレジットカード',
+						'order_item_total_price' => 10001,
+						'order_getpoint'         => 0,
+						'order_usedpoint'        => 0,
+						'order_discount'         => 0,
+						'order_shipping_charge'  => 0,
+						'order_cod_fee'          => 0,
+						'order_tax'              => 0,
+						'order_status'           => '#none#',
+						'subtotal_standard'      => 10001,
+						'subtotal_reduced'       => 0,
+						'discount_standard'      => 0,
+						'discount_reduced'       => 0,
+						'tax_standard'           => 0,
+						'tax_reduced'            => 0,
+					),
+				)
+			)
+		);
+
+		$result = $builder->build(
+			array(
+				'period'       => ReportPeriods::CURRENT_MONTH,
+				'start_date'   => '2026-05-01',
+				'end_date'     => '2026-05-31',
+				'period_label' => '2026年5月1日 ～ 2026年5月31日',
+			)
+		);
+
+		// ceil( 10,001 * 0.025 ) = ceil( 250.025 ) = 251.
+		$this->assertSame( 10001, $result['totals']['sales_support']['base_amount'] );
+		$this->assertSame( 251, $result['totals']['sales_support']['amount'] );
+		$this->assertSame( '10,001', $result['totals']['sales_support']['base_label'] );
+		$this->assertSame( '251', $result['totals']['sales_support']['amount_label'] );
+	}
+
+	/**
+	 * Test build floors negative sales support base amount to zero.
+	 *
+	 * @return void
+	 */
+	public function test_build_floors_negative_sales_support_base_amount_to_zero(): void {
+		$builder = new SalesReportBuilder(
+			new FakeOrderRepository(
+				array(
+					array(
+						'ID'                     => 1001,
+						'order_date'             => '2026-05-10 14:23:45',
+						'order_name1'            => '山田',
+						'order_name2'            => '太郎',
+						'order_name3'            => 'ヤマダ',
+						'order_name4'            => 'タロウ',
+						'order_payment_name'     => 'クレジットカード',
+						'order_item_total_price' => 1000,
+						'order_getpoint'         => 0,
+						'order_usedpoint'        => 2000,
+						'order_discount'         => -500,
+						'order_shipping_charge'  => 0,
+						'order_cod_fee'          => 0,
+						'order_tax'              => 100,
+						'order_status'           => '#none#',
+						'subtotal_standard'      => 1000,
+						'subtotal_reduced'       => 0,
+						'discount_standard'      => -500,
+						'discount_reduced'       => 0,
+						'tax_standard'           => 100,
+						'tax_reduced'            => 0,
+					),
+				)
+			)
+		);
+
+		$result = $builder->build(
+			array(
+				'period'       => ReportPeriods::CURRENT_MONTH,
+				'start_date'   => '2026-05-01',
+				'end_date'     => '2026-05-31',
+				'period_label' => '2026年5月1日 ～ 2026年5月31日',
+			)
+		);
+
+		// max( 0, 1,000 - 500 + 100 - 2,000 ) = 0.
+		$this->assertSame( 0, $result['totals']['sales_support']['base_amount'] );
+		$this->assertSame( 0, $result['totals']['sales_support']['amount'] );
+		$this->assertSame( '0', $result['totals']['sales_support']['base_label'] );
+		$this->assertSame( '0', $result['totals']['sales_support']['amount_label'] );
+	}
 }
