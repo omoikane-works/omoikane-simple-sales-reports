@@ -160,4 +160,121 @@ final class SalesReportBuilderTest extends TestCase {
 		$this->assertSame( 10200, $order['amounts']['payment_total_amount'] );
 		$this->assertSame( '10,200', $order['amounts']['payment_total_label'] );
 	}
+
+	/**
+	 * Test build excludes cancelled orders from sales totals.
+	 *
+	 * @return  void
+	 */
+	public function test_build_excludes_cancelled_orders_from_sales_totals(): void {
+		$builder = new SalesReportBuilder(
+			new FakeOrderRepository(
+				array(
+					array(
+						'ID'                     => 1001,
+						'order_date'             => '2026-05-10 14:23:45',
+						'order_name1'            => '山田',
+						'order_name2'            => '太郎',
+						'order_name3'            => 'ヤマダ',
+						'order_name4'            => 'タロウ',
+						'order_payment_name'     => 'クレジットカード',
+						'order_item_total_price' => 10000,
+						'order_getpoint'         => 100,
+						'order_usedpoint'        => 500,
+						'order_discount'         => -1000,
+						'order_shipping_charge'  => 800,
+						'order_cod_fee'          => 0,
+						'order_tax'              => 900,
+						'order_status'           => '#none#',
+						'subtotal_standard'      => 8000,
+						'subtotal_reduced'       => 2000,
+						'discount_standard'      => -800,
+						'discount_reduced'       => -200,
+						'tax_standard'           => 800,
+						'tax_reduced'            => 100,
+					),
+					array(
+						'ID'                     => 1002,
+						'order_date'             => '2026-05-11 09:10:11',
+						'order_name1'            => '佐藤',
+						'order_name2'            => '花子',
+						'order_name3'            => 'サトウ',
+						'order_name4'            => 'ハナコ',
+						'order_payment_name'     => '銀行振込',
+						'order_item_total_price' => 5000,
+						'order_getpoint'         => 50,
+						'order_usedpoint'        => 0,
+						'order_discount'         => 0,
+						'order_shipping_charge'  => 600,
+						'order_cod_fee'          => 0,
+						'order_tax'              => 500,
+						'order_status'           => 'cancel',
+						'subtotal_standard'      => 5000,
+						'subtotal_reduced'       => 0,
+						'discount_standard'      => 0,
+						'discount_reduced'       => 0,
+						'tax_standard'           => 500,
+						'tax_reduced'            => 0,
+					),
+				)
+			)
+		);
+
+		$result = $builder->build(
+			array(
+				'period'       => ReportPeriods::CURRENT_MONTH,
+				'start_date'   => '2026-05-01',
+				'end_date'     => '2026-05-31',
+				'period_label' => '2026年5月1日 ～ 2026年5月31日',
+			)
+		);
+
+		$this->assertSame( 2, $result['totals']['order_count'] );
+		$this->assertSame( 1, $result['totals']['sales_order_count'] );
+
+		// Totals should include only the non-cancelled order.
+		$this->assertSame( 10000, $result['totals']['item_total_amount'] );
+		$this->assertSame( 8000, $result['totals']['standard_subtotal_amount'] );
+		$this->assertSame( 2000, $result['totals']['reduced_subtotal_amount'] );
+		$this->assertSame( 900, $result['totals']['tax_amount'] );
+		$this->assertSame( 800, $result['totals']['standard_tax_amount'] );
+		$this->assertSame( 100, $result['totals']['reduced_tax_amount'] );
+		$this->assertSame( 800, $result['totals']['shipping_fee_amount'] );
+		$this->assertSame( 0, $result['totals']['cod_fee_amount'] );
+		$this->assertSame( -1000, $result['totals']['discount_amount'] );
+		$this->assertSame( -800, $result['totals']['standard_discount_amount'] );
+		$this->assertSame( -200, $result['totals']['reduced_discount_amount'] );
+		$this->assertSame( 500, $result['totals']['used_points'] );
+		$this->assertSame( 100, $result['totals']['earned_points'] );
+		$this->assertSame( 10200, $result['totals']['payment_total_amount'] );
+
+		// max( 0, 10,000 - 1,000 + 900 - 500 ) = 9,400.
+		$this->assertSame( 9400, $result['totals']['sales_support']['base_amount'] );
+		$this->assertSame( 235, $result['totals']['sales_support']['amount'] );
+
+		$this->assertCount( 2, $result['orders'] );
+
+		$sales_order     = $result['orders'][0];
+		$cancelled_order = $result['orders'][1];
+
+		$this->assertTrue( $sales_order['is_sales_counted'] );
+		$this->assertSame( '#none#', $sales_order['status']['raw'] );
+		$this->assertSame( '新規受付', $sales_order['status']['label'] );
+		$this->assertTrue( $sales_order['status']['is_sales_counted'] );
+
+		$this->assertFalse( $cancelled_order['is_sales_counted'] );
+		$this->assertSame( 'cancel', $cancelled_order['status']['raw'] );
+		$this->assertSame( 'キャンセル', $cancelled_order['status']['label'] );
+		$this->assertFalse( $cancelled_order['status']['is_sales_counted'] );
+
+		// The cancelled order should remain in the order list for display.
+		$this->assertSame( 1002, $cancelled_order['id'] );
+		$this->assertSame( '1002', $cancelled_order['order_number'] );
+		$this->assertSame( '佐藤 花子', $cancelled_order['customer_name'] );
+		$this->assertSame( '銀行振込', $cancelled_order['payment']['method'] );
+
+		// But its amounts should not affect totals.
+		$this->assertSame( 6100, $cancelled_order['payment_total_amount'] );
+		$this->assertSame( '6,100', $cancelled_order['payment_total_label'] );
+	}
 }
