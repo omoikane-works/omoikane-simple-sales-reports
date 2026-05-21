@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Handles template queries.
  */
-final class TemplateRepository {
+final class TemplateRepository implements TemplateRepositoryInterface {
 
 	/**
 	 * Find default sales report template.

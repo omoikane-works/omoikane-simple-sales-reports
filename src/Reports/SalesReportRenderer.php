@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OmoikaneWorks\WelcartSimpleReportSales\Reports;
 
 use Mustache_Engine;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
+use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepositoryInterface;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,16 +22,16 @@ final class SalesReportRenderer {
 	/**
 	 * Template repository.
 	 *
-	 * @var TemplateRepository
+	 * @var TemplateRepositoryInterface
 	 */
-	private TemplateRepository $template_repository;
+	private TemplateRepositoryInterface $template_repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param   TemplateRepository $template_repository    Template repository.
+	 * @param   TemplateRepositoryInterface $template_repository    Template repository.
 	 */
-	public function __construct( TemplateRepository $template_repository ) {
+	public function __construct( TemplateRepositoryInterface $template_repository ) {
 		$this->template_repository = $template_repository;
 	}
 
