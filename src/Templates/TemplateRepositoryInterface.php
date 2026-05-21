@@ -2,7 +2,7 @@
 /**
  * Template repository interface.
  *
- * @package WelcartSimpleReportSale
+ * @package WelcartSimpleReportSales
  */
 
 declare(strict_types=1);

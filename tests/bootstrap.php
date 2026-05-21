@@ -125,6 +125,21 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
+if ( ! function_exists( 'esc_html__' ) ) {
+	/**
+	 * Translate and escape text.
+	 *
+	 * @param   string $text   Text.
+	 * @param   string $domain Text domain.
+	 * @return  string
+	 */
+	function esc_html__( string $text, string $domain = 'default' ): string {
+		unset( $domain );
+
+		return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+
 if ( ! function_exists( 'get_bloginfo' ) ) {
 	/**
 	 * Get blog info.
@@ -135,6 +150,10 @@ if ( ! function_exists( 'get_bloginfo' ) ) {
 	function get_bloginfo( string $show = '' ): string {
 		if ( 'name' === $show ) {
 			return 'Example Store';
+		}
+
+		if ( 'charset' === $show ) {
+			return 'UTF-8';
 		}
 
 		return '';
