@@ -47,7 +47,8 @@
     "bloginfo",
     "usedpoint",
     "getpoint",
-    "duringorder"
+    "duringorder",
+    "isdf"
   ],
   "ignorePaths": [
     "vendor/**",

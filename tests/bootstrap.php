@@ -15,6 +15,10 @@ if ( ! defined( 'WP_CONTENT_DIR' ) ) {
 	define( 'WP_CONTENT_DIR', dirname( __DIR__ ) . '/tests/wp-content' );
 }
 
+if ( ! defined( 'ARRAY_A' ) ) {
+	define( 'ARRAY_A', 'ARRAYA' );
+}
+
 if ( ! function_exists( 'sanitize_key' ) ) {
 
 	/**
@@ -170,7 +174,5 @@ if ( ! function_exists( 'home_url' ) ) {
 		return 'https://example.test';
 	}
 }
-
-
 
 require dirname( __DIR__ ) . '/vendor/autoload.php';
