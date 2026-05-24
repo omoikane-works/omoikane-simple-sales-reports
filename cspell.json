@@ -48,7 +48,8 @@
     "usedpoint",
     "getpoint",
     "duringorder",
-    "isdf"
+    "isdf",
+    "ARRAYA"
   ],
   "ignorePaths": [
     "vendor/**",
