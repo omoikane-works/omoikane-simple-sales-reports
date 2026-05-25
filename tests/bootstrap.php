@@ -19,6 +19,10 @@ if ( ! defined( 'ARRAY_A' ) ) {
 	define( 'ARRAY_A', 'ARRAYA' );
 }
 
+if ( ! defined( 'WSRS_PLUGIN_DIR' ) ) {
+	define( 'WSRS_PLUGIN_DIR', dirname( __DIR__ ) . '/' );
+}
+
 if ( ! function_exists( 'sanitize_key' ) ) {
 
 	/**
@@ -96,6 +100,20 @@ if ( ! function_exists( 'current_datetime' ) ) {
 		$current_datetime = $GLOBALS['wsrs_test_current_datetime'] ?? '2026-05-18 12:00:00';
 
 		return new DateTimeImmutable( (string) $current_datetime, wp_timezone() );
+	}
+}
+
+if ( ! function_exists( 'current_time' ) ) {
+	/**
+	 * Get current time.
+	 *
+	 * @param   string $type   Time type.
+	 * @return  string
+	 */
+	function current_time( string $type ): string {
+		unset( $type );
+
+		return '2026-05-24 12:34:56';
 	}
 }
 

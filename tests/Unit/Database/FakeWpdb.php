@@ -43,6 +43,20 @@ final class FakeWpdb {
 	private string $last_query = '';
 
 	/**
+	 * Value returned by get_var()
+	 *
+	 * @var mixed
+	 */
+	private mixed $var = null;
+
+	/**
+	 * Inserted rows.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $inserted_rows = array();
+
+	/**
 	 * Set row.
 	 *
 	 * @param   array<string, mixed>|null $row    Row.
@@ -132,5 +146,53 @@ final class FakeWpdb {
 		}
 
 		return "'" . addslashes( (string) $arg ) . "'";
+	}
+
+	/**
+	 * Set var.
+	 *
+	 * @param   mixed $value    Value.
+	 * @return  void
+	 */
+	public function set_var( mixed $value ): void {
+		$this->var = $value;
+	}
+
+	/**
+	 * Get var.
+	 *
+	 * @param   string $query  Query.
+	 * @return  mixed
+	 */
+	public function get_var( string $query ): mixed {
+		$this->last_query = $query;
+
+		return $this->var;
+	}
+
+	/**
+	 * Insert row.
+	 *
+	 * @param   string               $table  Table name.
+	 * @param   array<string, mixed> $data   Data.
+	 * @param   array<int, string>   $format Format.
+	 * @return  int|false
+	 */
+	public function insert( string $table, array $data, array $format = array() ): int|bool {
+		unset( $format );
+
+		$this->last_query      = 'INSERT INTO ' . $table;
+		$this->inserted_rows[] = $data;
+
+		return 1;
+	}
+
+	/**
+	 * Get inserted rows.
+	 *
+	 * @return  array<int, array<string, mixed>>
+	 */
+	public function get_inserted_rows(): array {
+		return $this->inserted_rows;
 	}
 }
