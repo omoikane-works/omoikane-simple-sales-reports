@@ -48,7 +48,8 @@
         "test": "phpunit -c phpunit.xml.dist",
         "phpunit": "phpunit -c phpunit.xml.dist",
         "coverage": "XDEBUG_MODE=coverage composer phpunit -- --coverage-text",
-        "coverage-html": "XDEBUG_MODE=coverage phpunit -c phpunit.xml.dist --coverage-html build/coverage"
+        "coverage-html": "XDEBUG_MODE=coverage phpunit -c phpunit.xml.dist --coverage-html build/coverage",
+        "build": "bash bin/build-zip.sh"
     },
     "config": {
         "preferred-install": "dist",
