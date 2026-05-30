@@ -35,6 +35,11 @@ command -v zip >/dev/null 2>&1 || {
 	exit 1
 }
 
+command -v unzip >/dev/null 2>&1 || {
+	echo "Error: unzip is required."
+	exit 1
+}
+
 rm -rf "${BUILD_DIR}"
 mkdir -p "${PACKAGE_DIR}"
 
@@ -60,7 +65,8 @@ rsync -av \
 	--exclude='phpstan-bootstrap.php' \
 	--exclude='phpunit.xml.dist' \
 	--exclude='*.bak' \
-    --exclude='bin' \
+	--exclude='bin' \
+	--exclude='.wordpress-org' \
 	"${ROOT_DIR}/" "${PACKAGE_DIR}/"
 
 cd "${PACKAGE_DIR}"
