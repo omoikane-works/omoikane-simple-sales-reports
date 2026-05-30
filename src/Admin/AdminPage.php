@@ -185,6 +185,8 @@ final class AdminPage {
 				array( $this, 'render_sales_report_page' )
 			)
 		);
+
+		remove_submenu_page( self::MENU_PARENT_SLUG, self::MENU_PARENT_SLUG );
 	}
 
 	/**
