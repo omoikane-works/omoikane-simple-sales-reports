@@ -53,6 +53,9 @@ tests/_support/_generated/
 .phpunit.result.cache
 .phpunit.cache/
 
+# coverage
+build/coverage/
+
 # PHPStan cache (if you enable it)
 phpstan-cache/
 .phpstan-cache/

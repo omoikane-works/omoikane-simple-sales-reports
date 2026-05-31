@@ -4,10 +4,10 @@
 
 	<file>welcart-simple-report-sales.php</file>
 	<file>src</file>
+	<file>tests</file>
 
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
-	<exclude-pattern>*/tests/*</exclude-pattern>
 
 	<arg name="extensions" value="php" />
 	<arg name="parallel" value="8" />

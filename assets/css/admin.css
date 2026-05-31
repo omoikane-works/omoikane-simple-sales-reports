@@ -1,0 +1,71 @@
+.wsrs-admin-layout {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.wsrs-admin-nav {
+	width: 220px;
+	margin: 16px 0 24px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+}
+
+.wsrs-admin-nav__item {
+	display: block;
+	padding: 10px 12px;
+	color: #1d2327;
+	text-decoration: none;
+}
+
+.wsrs-admin-nav__item:hover,
+.wsrs-admin-nav__item:focus {
+	color: #1d2327;
+	background: #f0f0f1;
+	box-shadow: none;
+	outline: 1px solid transparent;
+}
+
+.wsrs-admin-nav__item.is-active {
+	background: #2271b1;
+	color: #fff;
+}
+
+.wsrs-admin-nav__item.is-active:hover,
+.wsrs-admin-nav__item.is-active:focus {
+	background: #135e96;
+	color: #fff;
+}
+
+.wsrs-admin-main {
+	flex: 1;
+	min-width: 0;
+}
+
+.wsrs-period-form {
+	margin: 16px 0 24px;
+	padding: 16px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+}
+
+.wsrs-period-form__legend {
+	margin-bottom: 8px;
+	font-weight: 600;
+}
+
+.wsrs-period-form__radio {
+	margin-right: 16px;
+}
+
+.wsrs-period-form__actions {
+	margin: 12px 0 0;
+}
+
+.wsrs-period-form__template {
+    margin-top: 12px;
+}
+
+.wsrs-print-actions {
+	margin: 16px 0;
+}
