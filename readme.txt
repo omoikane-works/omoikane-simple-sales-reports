@@ -1,75 +1,76 @@
-=== かんたん売上報告書 for Welcart ===
+=== Welcart Simple Report Sales ===
 Contributors: omoikaneworks
 Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.2
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Welcart の受注データをもとに、売上報告書をかんたんに作成・印刷できるプラグインです。
+Create and print simple sales reports based on Welcart order data.
 
 == Description ==
 
-かんたん売上報告書 for Welcart は、Welcart の受注データをもとに、売上報告書を作成・印刷するためのプラグインです。
+Welcart Simple Report Sales is a WordPress plugin for creating printable sales reports based on Welcart order data.
 
-分析ダッシュボードではなく、月次報告や取引先への提出などに使いやすい、印刷向けのシンプルな報告書作成を目的としています。
+It is designed for simple monthly reports and client submissions, rather than analytical dashboards.
 
-主な機能:
+Features:
 
-* 売上報告書の生成
-* 今月・前月・期間指定による集計
-* 注文ごとの明細表示
-* 税率内訳の表示
-* キャンセル注文の集計除外
-* A4 横向き印刷を想定した標準テンプレート
-* 複数の標準テンプレートからの選択
-* 前回使用した標準テンプレートの保存
+* Generate sales reports
+* Aggregate data for the current month, previous month, or a custom date range
+* Display order details
+* Display tax rate breakdowns
+* Exclude canceled orders from sales totals
+* Use a standard template designed for A4 landscape printing
+* Select from standard report templates
+* Save the previously used standard template
 
-= Powerup Kit について =
+= Future Extensions =
 
-本プラグインは、基本的な売上報告書の作成・印刷に対応しています。
+This plugin supports basic sales report creation and printing.
 
-将来的には、テンプレート編集、PDF出力、より詳細な帳票設定など、業務に合わせた拡張機能の提供も検討しています。
+Future extensions may include template editing, PDF output, and more detailed report settings for business use.
 
 == Installation ==
 
-1. WordPress 管理画面の「プラグイン」から本プラグインをインストールします。
-2. プラグインを有効化します。
-3. Welcart が有効化されていることを確認します。
-4. 管理画面の「かんたん報告書」から「売上報告書」を開きます。
+1. Install this plugin from the "Plugins" section in the WordPress admin.
+2. Activate the plugin.
+3. Make sure Welcart is enabled.
+4. Open "Sales Report" from the "Simple Reports" menu in the WordPress admin.
 
 == Frequently Asked Questions ==
 
-= Welcart は必要ですか？ =
+= Is Welcart required? =
 
-はい。本プラグインを利用するには Welcart が必要です。
+Yes. Welcart is required to use this plugin.
 
-= PDF ファイルを直接出力できますか？ =
+= Can I export PDF files directly? =
 
-現時点では、ブラウザの印刷機能を利用した印刷・PDF保存を想定しています。
+Currently, the plugin is designed to use the browser's print function for printing or saving as a PDF.
 
-= キャンセル注文は集計されますか？ =
+= Are canceled orders included in the sales total? =
 
-キャンセル注文は明細には表示されますが、売上集計からは除外されます。
+Canceled orders are shown in the order details, but they are excluded from the sales total.
 
-= テンプレートは編集できますか？ =
+= Can templates be edited? =
 
-無料版では標準テンプレートの選択に対応しています。テンプレート編集機能は、今後提供予定の Powerup Kit での対応を検討しています。
+This plugin supports selecting from standard templates.
+Template editing is being considered for a future extension.
 
 == Screenshots ==
 
-1. 売上報告書の集計、税率別内訳、注文明細を管理画面上で確認できます。
-2. 今月・前月・期間指定と、使用する報告書テンプレートを選択できます。
-3. ブラウザの印刷機能を使って、印刷またはPDF保存できます。
+1. View sales reports, tax rate breakdowns, and order details in the WordPress admin.
+2. Select the current month, previous month, or a custom date range, and choose a report template.
+3. Print or save as a PDF using the browser's print function.
 
 == Changelog ==
 
 = 1.0.0 =
-* 初回リリース。
+* Initial release.
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-初回リリースです。
+Initial release.

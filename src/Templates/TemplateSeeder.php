@@ -31,7 +31,7 @@ final class TemplateSeeder {
 			'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
 			'name'         => '標準 売上報告書',
 			'type'         => TemplateTypes::SALES_REPORT,
-			'file'         => 'templates/default-sales-report@1.0.0.mustache',
+			'file'         => 'templates/default-sales-report-1.0.0.mustache',
 			'version'      => '1.0.0',
 		),
 	);
