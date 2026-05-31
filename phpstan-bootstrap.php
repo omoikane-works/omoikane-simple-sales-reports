@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'WSRS_VERSION' ) ) {
-	define( 'WSRS_VERSION', '0.1.0' );
+	define( 'WSRS_VERSION', '1.0.0' );
 }
 
 if ( ! defined( 'WSRS_PLUGIN_FILE' ) ) {

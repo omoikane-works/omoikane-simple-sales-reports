@@ -84,5 +84,5 @@ if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|
 fi
 
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/vendor/autoload.php" >/dev/null
-unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/templates/default-sales-report@0.1.0.mustache" >/dev/null
+unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/templates/default-sales-report@1.0.0.mustache" >/dev/null
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/welcart-simple-report-sales-ja.mo" >/dev/null

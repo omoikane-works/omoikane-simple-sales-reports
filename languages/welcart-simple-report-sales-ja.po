@@ -2,11 +2,11 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Welcart Simple Report Sales 0.1.0\n"
+"Project-Id-Version: Welcart Simple Report Sales 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/welcart-simple-"
 "report-sales\n"
 "POT-Creation-Date: 2026-05-18T09:54:57+00:00\n"
-"PO-Revision-Date: 2026-05-18 19:20+0900\n"
+"PO-Revision-Date: 2026-05-31 12:49+0900\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"

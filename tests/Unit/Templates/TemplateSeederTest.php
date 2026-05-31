@@ -81,7 +81,7 @@ final class TemplateSeederTest extends TestCase {
 		$this->assertSame( TemplateKeys::DEFAULT_SALES_REPORT, $row['template_key'] );
 		$this->assertSame( '標準 売上報告書', $row['name'] );
 		$this->assertSame( TemplateTypes::SALES_REPORT, $row['type'] );
-		$this->assertSame( '0.1.0', $row['version'] );
+		$this->assertSame( '1.0.0', $row['version'] );
 		$this->assertNotSame( '', $row['content'] );
 		$this->assertSame( hash( 'sha256', (string) $row['content'] ), $row['content_hash'] );
 		$this->assertSame( 1, $row['is_system'] );
