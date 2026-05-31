@@ -3,7 +3,7 @@
  * Plugin Name:       Welcart Simple Report Sales
  * Plugin URI:        https://github.com/omoikane-works/welcart-simple-report-sales
  * Description:       Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Author:            Omoikane Works
@@ -23,7 +23,7 @@ use OmoikaneWorks\WelcartSimpleReportSales\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WSRS_VERSION', '0.1.0' );
+define( 'WSRS_VERSION', '1.0.0' );
 define( 'WSRS_PLUGIN_FILE', __FILE__ );
 define( 'WSRS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WSRS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
