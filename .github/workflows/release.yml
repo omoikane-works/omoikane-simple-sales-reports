@@ -1,0 +1,50 @@
+name: Build Release Zip
+
+on:
+    push:
+        tags:
+            - "v*.*.*"
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        name: Build release zip
+        runs-on: ubuntu-latest
+
+        env:
+            PLUGIN_SLUG: welcart-simple-report-sales
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Extract version
+              id: version
+              run: |
+                  VERSION="${GITHUB_REF_NAME#v}"
+                  echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.2"
+                  tools: composer:v2
+                  coverage: none
+
+            - name: Build release zip
+              run: composer build
+
+            - name: Copy versioned zip
+              run: |
+                  cp "build/${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}-${{ steps.version.outputs.version }}.zip"
+
+            - name: Create GitHub Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release create "${GITHUB_REF_NAME}" \
+                    "${PLUGIN_SLUG}-${{ steps.version.outputs.version }}.zip" \
+                    --title "${GITHUB_REF_NAME}" \
+                    --notes "Release ${GITHUB_REF_NAME}"

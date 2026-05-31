@@ -1,5 +1,7 @@
 # Welcart Simple Report Sales
 
+[![CI](https://github.com/omoikane-works/welcart-simple-report-sales/actions/workflows/ci.yml/badge.svg)](https://github.com/omoikane-works/welcart-simple-report-sales/actions/workflows/ci.yml)
+
 `Welcart Simple Report Sales` (かんたん売上報告書 for Welcart) は、Welcart の受注データをもとに、売上報告書をかんたんに作成・印刷するための WordPress プラグインです。
 
 ## 概要
