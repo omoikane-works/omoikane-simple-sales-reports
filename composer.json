@@ -44,7 +44,7 @@
         "phpcs": "phpcs -s welcart-simple-report-sales.php src tests",
         "phpcbf": "phpcbf welcart-simple-report-sales.php src tests",
         "phpstan": "phpstan analyse --memory-limit=1G",
-        "make-pot": "wp i18n make-pot . languages/welcart-simple-report-sales.pot --exclude=node_modules,vendor,tests",
+        "make-pot": "wp i18n make-pot . languages/welcart-simple-report-sales.pot --exclude=node_modules,vendor,tests,build",
         "test": "phpunit -c phpunit.xml.dist",
         "phpunit": "phpunit -c phpunit.xml.dist",
         "coverage": "XDEBUG_MODE=coverage composer phpunit -- --coverage-text",
@@ -55,6 +55,9 @@
         "preferred-install": "dist",
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "platform": {
+            "php": "8.2.31"
         },
         "sort-packages": true
     },
