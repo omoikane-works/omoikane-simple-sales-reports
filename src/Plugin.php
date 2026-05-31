@@ -62,21 +62,7 @@ final class Plugin {
 
 		$this->booted = true;
 
-		$this->load_textdomain();
 		$this->register_hooks();
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 *
-	 * @return  void
-	 */
-	private function load_textdomain(): void {
-		load_plugin_textdomain(
-			'welcart-simple-report-sales',
-			false,
-			dirname( WSRS_PLUGIN_BASENAME ) . '/languages'
-		);
 	}
 
 	/**
