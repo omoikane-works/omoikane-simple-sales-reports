@@ -2,17 +2,17 @@
 /**
  * Template repository test.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Templates;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateKeys;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateTypes;
-use OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Database\FakeWpdb;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateKeys;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
+use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database\FakeWpdb;
 use PHPUnit\Framework\TestCase;
 
 /**

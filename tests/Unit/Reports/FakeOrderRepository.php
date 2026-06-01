@@ -2,14 +2,14 @@
 /**
  * Sales report builder test.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\OrderRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Reports\OrderRepositoryInterface;
 
 /**
  * Fake order repository.

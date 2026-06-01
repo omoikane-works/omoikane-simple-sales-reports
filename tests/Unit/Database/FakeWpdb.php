@@ -2,12 +2,12 @@
 /**
  * Fake wpdb for unit tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Database;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database;
 
 /**
  * Fake wpdb.

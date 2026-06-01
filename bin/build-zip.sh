@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-PLUGIN_SLUG="welcart-simple-report-sales"
+PLUGIN_SLUG="omoikane-simple-sales-reports"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/build"
 PACKAGE_DIR="${BUILD_DIR}/${PLUGIN_SLUG}"
@@ -10,7 +10,7 @@ ZIP_FILE="${BUILD_DIR}/${PLUGIN_SLUG}.zip"
 
 cd "${ROOT_DIR}"
 
-if [[ ! -f "${ROOT_DIR}/welcart-simple-report-sales.php" ]]; then
+if [[ ! -f "${ROOT_DIR}/omoikane-simple-sales-reports.php" ]]; then
 	echo "Error: plugin main file not found."
 	exit 1
 fi
@@ -72,17 +72,25 @@ rsync -av \
 cd "${PACKAGE_DIR}"
 composer install --no-dev --optimize-autoloader --no-interaction
 
+rm -rf \
+	"${PACKAGE_DIR}/vendor/mustache/mustache/.github" \
+	"${PACKAGE_DIR}/vendor/mustache/mustache/spec"
+
+find "${PACKAGE_DIR}/vendor" -name ".git" -type d -prune -exec rm -rf {} +
+find "${PACKAGE_DIR}/vendor" -name ".gitignore" -type f -delete
+find "${PACKAGE_DIR}/vendor" -name ".gitattributes" -type f -delete
+
 cd "${BUILD_DIR}"
 rm -f "${ZIP_FILE}"
 zip -r "${ZIP_FILE}" "${PLUGIN_SLUG}"
 
 echo "Built: ${ZIP_FILE}"
 
-if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|node_modules'; then
+if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|node_modules|\.github|\.git|\.gitignore|\.gitattributes'; then
 	echo "Error: unwanted files found in zip."
 	exit 1
 fi
 
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/vendor/autoload.php" >/dev/null
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/templates/default-sales-report-1.0.0.mustache" >/dev/null
-unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/welcart-simple-report-sales-ja.mo" >/dev/null
+unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/omoikane-simple-sales-reports-ja.mo" >/dev/null

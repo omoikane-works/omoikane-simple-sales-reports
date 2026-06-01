@@ -1,4 +1,4 @@
-=== Welcart Simple Report Sales ===
+=== Omoikane Simple Sales Reports for Welcart ===
 Contributors: omoikaneworks
 Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
@@ -12,7 +12,7 @@ Create and print simple sales reports based on Welcart order data.
 
 == Description ==
 
-Welcart Simple Report Sales is a WordPress plugin for creating printable sales reports based on Welcart order data.
+Omoikane Simple Sales Reports for Welcart is a WordPress plugin for creating printable sales reports based on Welcart order data.
 
 It is designed for simple monthly reports and client submissions, rather than analytical dashboards.
 

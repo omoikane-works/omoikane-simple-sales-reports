@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<ruleset name="Welcart Simple Report Sales">
-	<description>PHPCS rules for Welcart Simple Report Sales.</description>
+<ruleset name="Omoikane Simple Sales Reports for Welcart">
+	<description>PHPCS rules for Omoikane Simple Sales Reports for Welcart.</description>
 
-	<file>welcart-simple-report-sales.php</file>
+	<file>omoikane-simple-sales-reports.php</file>
 	<file>src</file>
 	<file>tests</file>
 

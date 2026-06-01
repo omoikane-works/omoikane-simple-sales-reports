@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            PLUGIN_SLUG: welcart-simple-report-sales
+            PLUGIN_SLUG: omoikane-simple-sales-reports
 
         steps:
             - name: Checkout

@@ -2,15 +2,15 @@
 /**
  * Activation handler.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales;
+namespace OmoikaneWorks\SimpleSalesReports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateSeeder;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSeeder;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,7 +30,7 @@ final class Activation {
 		TemplateTable::create();
 		TemplateSeeder::seed();
 
-		update_option( 'wsrs_version', WSRS_VERSION, false );
+		update_option( 'ossr_version', OSSR_VERSION, false );
 	}
 
 	/**
@@ -41,32 +41,32 @@ final class Activation {
 	private static function check_requirements(): void {
 		// @phpstan-ignore-next-line Runtime requirement check for plugin activation.
 		if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(
-					'かんたん売上報告書 for Welcart を利用するには PHP 8.2 以上が必要です。',
-					'welcart-simple-report-sales'
+					'Omoikane Simple Sales Reports for Welcart requires PHP 8.2 or later.',
+					'omoikane-simple-sales-reports'
 				)
 			);
 		}
 
 		if ( ! defined( 'USCES_VERSION' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(
-					'かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要があります。',
-					'welcart-simple-report-sales'
+					'Omoikane Simple Sales Reports for Welcart requires Welcart to be activated.',
+					'omoikane-simple-sales-reports'
 				)
 			);
 		} elseif ( version_compare( \USCES_VERSION, '2.11.10', '<' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(
-					'かんたん売上報告書 for Welcart を利用するには Welcart v2.11.10 以上が必要です。',
-					'welcart-simple-report-sales'
+					'Omoikane Simple Sales Reports for Welcart requires Welcart 2.11.10 or later.',
+					'omoikane-simple-sales-reports'
 				)
 			);
 		}

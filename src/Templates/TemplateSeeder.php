@@ -2,14 +2,14 @@
 /**
  * Template seeder.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Templates;
+namespace OmoikaneWorks\SimpleSalesReports\Templates;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -57,7 +57,7 @@ final class TemplateSeeder {
 		global $wpdb;
 
 		$table_name    = TemplateTable::get_table_name();
-		$template_path = WSRS_PLUGIN_DIR . $template['file'];
+		$template_path = OSSR_PLUGIN_DIR . $template['file'];
 
 		if ( ! file_exists( $template_path ) ) {
 			return;
