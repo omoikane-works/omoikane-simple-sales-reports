@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Omoikane Simple Sales Reports for Welcart
  * Plugin URI:        https://github.com/omoikane-works/omoikane-simple-sales-reports
- * Description:       Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。
+ * Description:       Create simple sales reports for Welcart stores.
  * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
@@ -108,7 +108,7 @@ if ( ! file_exists( $ossr_autoload ) ) {
 
 			echo '<div class="notice notice-error"><p>';
 			echo esc_html__(
-				'かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer install を実行してください。',
+				'Required libraries for Omoikane Simple Sales Reports for Welcart were not found. Please run composer install.',
 				'omoikane-simple-sales-reports'
 			);
 			echo '</p></div>';

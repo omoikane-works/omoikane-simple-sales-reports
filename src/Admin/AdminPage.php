@@ -165,8 +165,8 @@ final class AdminPage {
 	public function register_admin_menu(): void {
 		$this->add_admin_page_hook(
 			add_menu_page(
-				__( 'かんたん報告書', 'omoikane-simple-sales-reports' ),
-				__( 'かんたん報告書', 'omoikane-simple-sales-reports' ),
+				__( 'Simple Reports', 'omoikane-simple-sales-reports' ),
+				__( 'Simple Reports', 'omoikane-simple-sales-reports' ),
 				self::CAPABILITY,
 				self::MENU_PARENT_SLUG,
 				array( $this, 'render_sales_report_page' ),
@@ -178,8 +178,8 @@ final class AdminPage {
 		$this->add_admin_page_hook(
 			add_submenu_page(
 				self::MENU_PARENT_SLUG,
-				__( '売上報告書', 'omoikane-simple-sales-reports' ),
-				__( '売上報告書', 'omoikane-simple-sales-reports' ),
+				__( 'Sales Reports', 'omoikane-simple-sales-reports' ),
+				__( 'Sales Reports', 'omoikane-simple-sales-reports' ),
 				self::CAPABILITY,
 				self::MENU_SALES_SLUG,
 				array( $this, 'render_sales_report_page' )
@@ -230,14 +230,14 @@ final class AdminPage {
 	public function render_sales_report_page(): void {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				esc_html__( 'このページにアクセスする権限がありません。', 'omoikane-simple-sales-reports' )
+				esc_html__( 'You do not have permission to access this page.', 'omoikane-simple-sales-reports' )
 			);
 		}
 
 		$current_view = $this->resolve_current_view();
 
 		echo '<div class="wrap">';
-		echo '<h1 class="ossr-no-print">' . esc_html__( '売上報告書', 'omoikane-simple-sales-reports' ) . '</h1>';
+		echo '<h1 class="ossr-no-print">' . esc_html__( 'Sales Reports', 'omoikane-simple-sales-reports' ) . '</h1>';
 		echo '<div class="ossr-admin-layout">';
 
 		$this->render_inner_navigation( $current_view );
@@ -319,20 +319,20 @@ final class AdminPage {
 		echo '<input type="hidden" name="' . esc_attr( self::VIEW_PARAM ) . '" value="' . esc_attr( self::DEFAULT_VIEW ) . '" />';
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		echo '<fieldset>';
-		echo '<legend class="ossr-period-form__legend">' . esc_html__( '期間', 'omoikane-simple-sales-reports' ) . '</legend>';
+		echo '<legend class="ossr-period-form__legend">' . esc_html__( 'Period', 'omoikane-simple-sales-reports' ) . '</legend>';
 		$this->render_period_radio(
 			ReportPeriods::CURRENT_MONTH,
-			__( '今月', 'omoikane-simple-sales-reports' ),
+			__( 'This month', 'omoikane-simple-sales-reports' ),
 			$current_period
 		);
 		$this->render_period_radio(
 			ReportPeriods::PREVIOUS_MONTH,
-			__( '前月', 'omoikane-simple-sales-reports' ),
+			__( 'Previous month', 'omoikane-simple-sales-reports' ),
 			$current_period
 		);
 		echo '<label class="ossr-period-form__radio">';
 		echo '<input type="radio" name="period" value="' . esc_attr( ReportPeriods::CUSTOM ) . '" ' . checked( $current_period, ReportPeriods::CUSTOM, false ) . ' />';
-		echo ' ' . esc_html__( '期間指定', 'omoikane-simple-sales-reports' );
+		echo ' ' . esc_html__( 'Custom Period', 'omoikane-simple-sales-reports' );
 		echo '</label>';
 		echo '<input type="date" name="start_date" value="' . esc_attr( $start_date ) . '" />';
 		echo ' <span aria-hidden="true">～</span> ';
@@ -343,7 +343,7 @@ final class AdminPage {
 
 		echo '<p class="ossr-period-form__actions">';
 		echo '<button type="submit" class="button button-secondary">';
-		echo esc_html__( '表示', 'omoikane-simple-sales-reports' );
+		echo esc_html__( 'Show', 'omoikane-simple-sales-reports' );
 		echo '</button>';
 		echo '</p>';
 		echo '</form>';
@@ -380,7 +380,7 @@ final class AdminPage {
 		}
 
 		echo '<fieldset class="ossr-period-form__template">';
-		echo '<legend class="ossr-period-form__legend">' . esc_html__( 'テンプレート', 'omoikane-simple-sales-reports' ) . '</legend>';
+		echo '<legend class="ossr-period-form__legend">' . esc_html__( 'Template', 'omoikane-simple-sales-reports' ) . '</legend>';
 		echo '<select name="' . esc_attr( self::TEMPLATE_ID_PARAM ) . '">';
 
 		foreach ( $templates as $template ) {
@@ -442,7 +442,7 @@ final class AdminPage {
 	private function get_inner_navigation_items(): array {
 		$items = array(
 			self::DEFAULT_VIEW => array(
-				'label' => __( '報告書生成', 'omoikane-simple-sales-reports' ),
+				'label' => __( 'Generate report', 'omoikane-simple-sales-reports' ),
 				'url'   => add_query_arg(
 					array(
 						'page'           => self::MENU_SALES_SLUG,
@@ -504,12 +504,12 @@ final class AdminPage {
 
 		echo '<div class="ossr-print-actions ossr-no-print">';
 		echo '<button type="button" class="button button-primary" onclick="window.print();">';
-		echo esc_html__( '印刷', 'omoikane-simple-sales-reports' );
+		echo esc_html__( 'Print', 'omoikane-simple-sales-reports' );
 		echo '</button>';
 		echo '</div>';
 
 		echo '<p class="description ossr-no-print">';
-		echo esc_html__( 'PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。', 'omoikane-simple-sales-reports' );
+		echo esc_html__( 'If dates or URLs appear when saving as PDF, turn off "Headers and footers" in the print dialog.', 'omoikane-simple-sales-reports' );
 		echo '</p>';
 
 		// The report template is rendered from a trusted system template and escaped by Mustache.

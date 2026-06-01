@@ -47,7 +47,7 @@ final class SalesReportBuilderTest extends TestCase {
 				'period'       => ReportPeriods::CURRENT_MONTH,
 				'start_date'   => '2026-05-01',
 				'end_date'     => '2026-05-31',
-				'period_label' => '2026年5月1日 ～ 2026年5月31日',
+				'period_label' => 'May 1, 2026 - May 1, 2026',
 			)
 		);
 
@@ -56,7 +56,7 @@ final class SalesReportBuilderTest extends TestCase {
 		$this->assertSame( ReportPeriods::CURRENT_MONTH, $result['report']['period'] );
 		$this->assertSame( '2026-05-01', $result['report']['start_date'] );
 		$this->assertSame( '2026-05-31', $result['report']['end_date'] );
-		$this->assertSame( '2026年5月1日 ～ 2026年5月31日', $result['report']['period_label'] );
+		$this->assertSame( 'May 1, 2026 - May 1, 2026', $result['report']['period_label'] );
 		$this->assertSame( '2026/05/19 12:34:56', $result['report']['generated_at'] );
 		$this->assertSame( 'Example Store', $result['store']['name'] );
 		$this->assertSame( 'https://example.test', $result['store']['url'] );
@@ -153,7 +153,7 @@ final class SalesReportBuilderTest extends TestCase {
 		$this->assertSame( 'クレジットカード', $order['payment']['method'] );
 		$this->assertTrue( $order['is_sales_counted'] );
 		$this->assertSame( '#none#', $order['status']['raw'] );
-		$this->assertSame( '新規受付', $order['status']['label'] );
+		$this->assertSame( 'New Order', $order['status']['label'] );
 		$this->assertTrue( $order['status']['is_sales_counted'] );
 		$this->assertSame( 10200, $order['payment_total_amount'] );
 		$this->assertSame( '10,200', $order['payment_total_label'] );
@@ -259,12 +259,12 @@ final class SalesReportBuilderTest extends TestCase {
 
 		$this->assertTrue( $sales_order['is_sales_counted'] );
 		$this->assertSame( '#none#', $sales_order['status']['raw'] );
-		$this->assertSame( '新規受付', $sales_order['status']['label'] );
+		$this->assertSame( 'New Order', $sales_order['status']['label'] );
 		$this->assertTrue( $sales_order['status']['is_sales_counted'] );
 
 		$this->assertFalse( $cancelled_order['is_sales_counted'] );
 		$this->assertSame( 'cancel', $cancelled_order['status']['raw'] );
-		$this->assertSame( 'キャンセル', $cancelled_order['status']['label'] );
+		$this->assertSame( 'Canceled', $cancelled_order['status']['label'] );
 		$this->assertFalse( $cancelled_order['status']['is_sales_counted'] );
 
 		// The cancelled order should remain in the order list for display.

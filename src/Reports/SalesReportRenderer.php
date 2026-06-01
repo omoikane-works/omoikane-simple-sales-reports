@@ -66,7 +66,7 @@ final class SalesReportRenderer {
 		return sprintf(
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
-				'売上報告書テンプレートが見つかりません。プラグインを再有効化してください。',
+				'The sales report template was not found. Please reactivate the plugin.',
 				'omoikane-simple-sales-reports'
 			)
 		);
