@@ -72,13 +72,21 @@ rsync -av \
 cd "${PACKAGE_DIR}"
 composer install --no-dev --optimize-autoloader --no-interaction
 
+rm -rf \
+	"${PACKAGE_DIR}/vendor/mustache/mustache/.github" \
+	"${PACKAGE_DIR}/vendor/mustache/mustache/spec"
+
+find "${PACKAGE_DIR}/vendor" -name ".git" -type d -prune -exec rm -rf {} +
+find "${PACKAGE_DIR}/vendor" -name ".gitignore" -type f -delete
+find "${PACKAGE_DIR}/vendor" -name ".gitattributes" -type f -delete
+
 cd "${BUILD_DIR}"
 rm -f "${ZIP_FILE}"
 zip -r "${ZIP_FILE}" "${PLUGIN_SLUG}"
 
 echo "Built: ${ZIP_FILE}"
 
-if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|node_modules'; then
+if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|node_modules|\.github|\.git|\.gitignore|\.gitattributes'; then
 	echo "Error: unwanted files found in zip."
 	exit 1
 fi
