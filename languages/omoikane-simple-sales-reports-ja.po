@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Omoikane Simple Sales Reports for Welcart 1.0.0\n"
+"Project-Id-Version: Omoikane Simple Sales Reports for Welcart 1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/omoikane-simple-sales-reports\n"
 "POT-Creation-Date: 2026-06-01T11:52:08+00:00\n"
 "PO-Revision-Date: 2026-06-01 21:28+0900\n"
