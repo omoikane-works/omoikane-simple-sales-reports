@@ -162,9 +162,9 @@ final class ReportPeriodResolver {
 
 		return sprintf(
 			/* translators: 1: start date, 2: end date */
-			__( '%1$s ～ %2$s', 'welcart-simple-report-sales' ),
-			wp_date( __( 'Y年n月j日', 'welcart-simple-report-sales' ), $start->getTimestamp() ),
-			wp_date( __( 'Y年n月j日', 'welcart-simple-report-sales' ), $end->getTimestamp() )
+			__( '%1$s ～ %2$s', 'omoikane-simple-sales-reports' ),
+			wp_date( __( 'Y年n月j日', 'omoikane-simple-sales-reports' ), $start->getTimestamp() ),
+			wp_date( __( 'Y年n月j日', 'omoikane-simple-sales-reports' ), $end->getTimestamp() )
 		);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Welcart Simple Report Sales
- * Plugin URI:        https://github.com/omoikane-works/welcart-simple-report-sales
+ * Plugin URI:        https://github.com/omoikane-works/omoikane-simple-sales-reports
  * Description:       Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。
  * Version:           1.0.0
  * Requires at least: 6.6
@@ -10,7 +10,7 @@
  * Author URI:        https://github.com/omoikane-works
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       welcart-simple-report-sales
+ * Text Domain:       omoikane-simple-sales-reports
  * Domain Path:       /languages
  *
  * @package WelcartSimpleReportSales
@@ -49,7 +49,7 @@ function wsrs_get_unsupported_php_version_message(): string {
 		// translators: 1: required PHP version, 2: current PHP version.
 		__(
 			'Welcart Simple Report Sales requires PHP version %1$s or later. Your current PHP version is %2$s.',
-			'welcart-simple-report-sales'
+			'omoikane-simple-sales-reports'
 		),
 		WSRS_MINIMUM_PHP_VERSION,
 		PHP_VERSION
@@ -68,7 +68,7 @@ function wsrs_activate_php_version_guard(): void {
 
 	wp_die(
 		esc_html( wsrs_get_unsupported_php_version_message() ),
-		esc_html__( 'Plugin activation failed.', 'welcart-simple-report-sales' ),
+		esc_html__( 'Plugin activation failed.', 'omoikane-simple-sales-reports' ),
 		array(
 			'back_link' => true,
 		)
@@ -109,7 +109,7 @@ if ( ! file_exists( $wsrs_autoload ) ) {
 			echo '<div class="notice notice-error"><p>';
 			echo esc_html__(
 				'かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer install を実行してください。',
-				'welcart-simple-report-sales'
+				'omoikane-simple-sales-reports'
 			);
 			echo '</p></div>';
 		}

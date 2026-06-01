@@ -16,7 +16,7 @@ if ( ! defined( 'WSRS_VERSION' ) ) {
 }
 
 if ( ! defined( 'WSRS_PLUGIN_FILE' ) ) {
-	define( 'WSRS_PLUGIN_FILE', __DIR__ . '/welcart-simple-report-sales.php' );
+	define( 'WSRS_PLUGIN_FILE', __DIR__ . '/omoikane-simple-sales-reports.php' );
 }
 
 if ( ! defined( 'WSRS_PLUGIN_DIR' ) ) {
@@ -24,9 +24,9 @@ if ( ! defined( 'WSRS_PLUGIN_DIR' ) ) {
 }
 
 if ( ! defined( 'WSRS_PLUGIN_URL' ) ) {
-	define( 'WSRS_PLUGIN_URL', 'https://example.test/wp-content/plugins/welcart-simple-report-sales/' );
+	define( 'WSRS_PLUGIN_URL', 'https://example.test/wp-content/plugins/omoikane-simple-sales-reports/' );
 }
 
 if ( ! defined( 'WSRS_PLUGIN_BASENAME' ) ) {
-	define( 'WSRS_PLUGIN_BASENAME', 'welcart-simple-report-sales/welcart-simple-report-sales.php' );
+	define( 'WSRS_PLUGIN_BASENAME', 'omoikane-simple-sales-reports/omoikane-simple-sales-reports.php' );
 }

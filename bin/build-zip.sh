@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-PLUGIN_SLUG="welcart-simple-report-sales"
+PLUGIN_SLUG="omoikane-simple-sales-reports"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/build"
 PACKAGE_DIR="${BUILD_DIR}/${PLUGIN_SLUG}"
@@ -10,7 +10,7 @@ ZIP_FILE="${BUILD_DIR}/${PLUGIN_SLUG}.zip"
 
 cd "${ROOT_DIR}"
 
-if [[ ! -f "${ROOT_DIR}/welcart-simple-report-sales.php" ]]; then
+if [[ ! -f "${ROOT_DIR}/omoikane-simple-sales-reports.php" ]]; then
 	echo "Error: plugin main file not found."
 	exit 1
 fi
@@ -85,4 +85,4 @@ fi
 
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/vendor/autoload.php" >/dev/null
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/templates/default-sales-report-1.0.0.mustache" >/dev/null
-unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/welcart-simple-report-sales-ja.mo" >/dev/null
+unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/omoikane-simple-sales-reports-ja.mo" >/dev/null

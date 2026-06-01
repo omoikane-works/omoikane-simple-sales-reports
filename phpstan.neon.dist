@@ -5,7 +5,7 @@ parameters:
     level: 8
 
     paths:
-        - welcart-simple-report-sales.php
+        - omoikane-simple-sales-reports.php
         - src
 
     bootstrapFiles:

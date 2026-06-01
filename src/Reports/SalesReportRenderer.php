@@ -67,7 +67,7 @@ final class SalesReportRenderer {
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
 				'売上報告書テンプレートが見つかりません。プラグインを再有効化してください。',
-				'welcart-simple-report-sales'
+				'omoikane-simple-sales-reports'
 			)
 		);
 	}

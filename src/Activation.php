@@ -46,7 +46,7 @@ final class Activation {
 			wp_die(
 				esc_html__(
 					'かんたん売上報告書 for Welcart を利用するには PHP 8.2 以上が必要です。',
-					'welcart-simple-report-sales'
+					'omoikane-simple-sales-reports'
 				)
 			);
 		}
@@ -57,7 +57,7 @@ final class Activation {
 			wp_die(
 				esc_html__(
 					'かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要があります。',
-					'welcart-simple-report-sales'
+					'omoikane-simple-sales-reports'
 				)
 			);
 		} elseif ( version_compare( \USCES_VERSION, '2.11.10', '<' ) ) {
@@ -66,7 +66,7 @@ final class Activation {
 			wp_die(
 				esc_html__(
 					'かんたん売上報告書 for Welcart を利用するには Welcart v2.11.10 以上が必要です。',
-					'welcart-simple-report-sales'
+					'omoikane-simple-sales-reports'
 				)
 			);
 		}

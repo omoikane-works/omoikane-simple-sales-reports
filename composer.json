@@ -1,6 +1,6 @@
 {
-    "name": "omoikane-works/welcart-simple-report-sales",
-    "description": "Generates simple printable sales reports for Welcart.",
+    "name": "omoikane-works/omoikane-simple-sales-reports",
+    "description": "Generates simple sales reports for Welcart.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -40,11 +40,11 @@
         }
     },
     "scripts": {
-        "lint": "find welcart-simple-report-sales.php src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
-        "phpcs": "phpcs -s welcart-simple-report-sales.php src tests",
-        "phpcbf": "phpcbf welcart-simple-report-sales.php src tests",
+        "lint": "find omoikane-simple-sales-reports.php src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
+        "phpcs": "phpcs -s omoikane-simple-sales-reports.php src tests",
+        "phpcbf": "phpcbf omoikane-simple-sales-reports.php src tests",
         "phpstan": "phpstan analyse --memory-limit=1G",
-        "make-pot": "wp i18n make-pot . languages/welcart-simple-report-sales.pot --exclude=node_modules,vendor,tests,build",
+        "make-pot": "wp i18n make-pot . languages/omoikane-simple-sales-reports.pot --exclude=node_modules,vendor,tests,build",
         "test": "phpunit -c phpunit.xml.dist",
         "phpunit": "phpunit -c phpunit.xml.dist",
         "coverage": "XDEBUG_MODE=coverage composer phpunit -- --coverage-text",

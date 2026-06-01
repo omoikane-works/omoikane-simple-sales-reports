@@ -2,7 +2,7 @@
 <ruleset name="Welcart Simple Report Sales">
 	<description>PHPCS rules for Welcart Simple Report Sales.</description>
 
-	<file>welcart-simple-report-sales.php</file>
+	<file>omoikane-simple-sales-reports.php</file>
 	<file>src</file>
 	<file>tests</file>
 
