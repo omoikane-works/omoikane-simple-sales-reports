@@ -2,14 +2,14 @@
 /**
  * Template seeder.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Templates;
+namespace OmoikaneWorks\SimpleSalesReports\Templates;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
 
 defined( 'ABSPATH' ) || exit;
 

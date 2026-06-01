@@ -2,12 +2,12 @@
 /**
  * Template types.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Templates;
+namespace OmoikaneWorks\SimpleSalesReports\Templates;
 
 defined( 'ABSPATH' ) || exit;
 

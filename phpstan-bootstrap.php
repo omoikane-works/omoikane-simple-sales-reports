@@ -2,7 +2,7 @@
 /**
  * PHPStan bootstrap for plugin constants.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);

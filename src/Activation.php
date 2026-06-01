@@ -2,15 +2,15 @@
 /**
  * Activation handler.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales;
+namespace OmoikaneWorks\SimpleSalesReports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateSeeder;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSeeder;
 
 defined( 'ABSPATH' ) || exit;
 

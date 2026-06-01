@@ -2,16 +2,16 @@
 /**
  * Sales report builder test.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
-use OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports\FakeOrderRepository;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriods;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportBuilder;
+use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
 
 /**

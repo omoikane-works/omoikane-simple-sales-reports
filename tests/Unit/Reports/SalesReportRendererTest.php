@@ -2,15 +2,15 @@
 /**
  * Sales report renderer tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
-use OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Templates\FakeTemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates\FakeTemplateRepository;
 use PHPUnit\Framework\TestCase;
 
 /**

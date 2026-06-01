@@ -2,12 +2,12 @@
 /**
  * Sales report builder.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Reports;
 
 defined( 'ABSPATH' ) || exit;
 

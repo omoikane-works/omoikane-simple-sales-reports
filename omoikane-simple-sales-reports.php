@@ -13,13 +13,13 @@
  * Text Domain:       omoikane-simple-sales-reports
  * Domain Path:       /languages
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-use OmoikaneWorks\WelcartSimpleReportSales\Activation;
-use OmoikaneWorks\WelcartSimpleReportSales\Plugin;
+use OmoikaneWorks\SimpleSalesReports\Activation;
+use OmoikaneWorks\SimpleSalesReports\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 

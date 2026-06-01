@@ -2,12 +2,12 @@
 /**
  * Template table definition.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Database;
+namespace OmoikaneWorks\SimpleSalesReports\Database;
 
 defined( 'ABSPATH' ) || exit;
 

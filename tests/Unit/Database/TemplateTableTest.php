@@ -2,14 +2,14 @@
 /**
  * Template table tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Database;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -2,15 +2,15 @@
 /**
  * Report period resolver tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriods;
 use PHPUnit\Framework\TestCase;
 
 /**

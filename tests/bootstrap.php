@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);

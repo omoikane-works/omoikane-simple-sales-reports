@@ -2,19 +2,19 @@
 /**
  * Admin page handler.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Admin;
+namespace OmoikaneWorks\SimpleSalesReports\Admin;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateTypes;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriods;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportBuilder;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -2,15 +2,15 @@
 /**
  * Sales report renderer.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Reports;
 
 use Mustache_Engine;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
 
 defined( 'ABSPATH' ) || exit;
 

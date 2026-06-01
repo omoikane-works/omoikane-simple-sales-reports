@@ -2,19 +2,19 @@
 /**
  * Main plugin class.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales;
+namespace OmoikaneWorks\SimpleSalesReports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Admin\AdminPage;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\OrderRepository;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportBuilder;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Admin\AdminPage;
+use OmoikaneWorks\SimpleSalesReports\Reports\OrderRepository;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportBuilder;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
 
 defined( 'ABSPATH' ) || exit;
 

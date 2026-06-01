@@ -31,12 +31,12 @@
     },
     "autoload": {
         "psr-4": {
-            "OmoikaneWorks\\WelcartSimpleReportSales\\": "src/"
+            "OmoikaneWorks\\SimpleSalesReports\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "OmoikaneWorks\\WelcartSimpleReportSales\\Tests\\": "tests/"
+            "OmoikaneWorks\\SimpleSalesReports\\Tests\\": "tests/"
         }
     },
     "scripts": {
