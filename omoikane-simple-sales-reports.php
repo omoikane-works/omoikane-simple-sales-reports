@@ -23,20 +23,20 @@ use OmoikaneWorks\SimpleSalesReports\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WSRS_VERSION', '1.0.0' );
-define( 'WSRS_PLUGIN_FILE', __FILE__ );
-define( 'WSRS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WSRS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'WSRS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'WSRS_MINIMUM_PHP_VERSION', '8.2' );
+define( 'OSSR_VERSION', '1.0.0' );
+define( 'OSSR_PLUGIN_FILE', __FILE__ );
+define( 'OSSR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'OSSR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'OSSR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'OSSR_MINIMUM_PHP_VERSION', '8.2' );
 
 /**
  * Check whether the current PHP version is supported.
  *
  * @return  bool
  */
-function wsrs_is_supported_php_version(): bool {
-	return version_compare( PHP_VERSION, WSRS_MINIMUM_PHP_VERSION, '>=' );
+function ossr_is_supported_php_version(): bool {
+	return version_compare( PHP_VERSION, OSSR_MINIMUM_PHP_VERSION, '>=' );
 }
 
 /**
@@ -44,14 +44,14 @@ function wsrs_is_supported_php_version(): bool {
  *
  * @return  string
  */
-function wsrs_get_unsupported_php_version_message(): string {
+function ossr_get_unsupported_php_version_message(): string {
 	return sprintf(
 		// translators: 1: required PHP version, 2: current PHP version.
 		__(
 			'Omoikane Simple Sales Reports for Welcart requires PHP version %1$s or later. Your current PHP version is %2$s.',
 			'omoikane-simple-sales-reports'
 		),
-		WSRS_MINIMUM_PHP_VERSION,
+		OSSR_MINIMUM_PHP_VERSION,
 		PHP_VERSION
 	);
 }
@@ -61,13 +61,13 @@ function wsrs_get_unsupported_php_version_message(): string {
  *
  * @return  void
  */
-function wsrs_activate_php_version_guard(): void {
-	if ( wsrs_is_supported_php_version() ) {
+function ossr_activate_php_version_guard(): void {
+	if ( ossr_is_supported_php_version() ) {
 		return;
 	}
 
 	wp_die(
-		esc_html( wsrs_get_unsupported_php_version_message() ),
+		esc_html( ossr_get_unsupported_php_version_message() ),
 		esc_html__( 'Plugin activation failed.', 'omoikane-simple-sales-reports' ),
 		array(
 			'back_link' => true,
@@ -77,10 +77,10 @@ function wsrs_activate_php_version_guard(): void {
 
 register_activation_hook(
 	__FILE__,
-	'wsrs_activate_php_version_guard'
+	'ossr_activate_php_version_guard'
 );
 
-if ( ! wsrs_is_supported_php_version() ) {
+if ( ! ossr_is_supported_php_version() ) {
 	add_action(
 		'admin_notices',
 		static function (): void {
@@ -88,7 +88,7 @@ if ( ! wsrs_is_supported_php_version() ) {
 				return;
 			}
 			echo '<div class="notice notice-error"><p>';
-			echo esc_html( wsrs_get_unsupported_php_version_message() );
+			echo esc_html( ossr_get_unsupported_php_version_message() );
 			echo '</p></div>';
 		}
 	);
@@ -96,9 +96,9 @@ if ( ! wsrs_is_supported_php_version() ) {
 	return;
 }
 
-$wsrs_autoload = WSRS_PLUGIN_DIR . 'vendor/autoload.php';
+$ossr_autoload = OSSR_PLUGIN_DIR . 'vendor/autoload.php';
 
-if ( ! file_exists( $wsrs_autoload ) ) {
+if ( ! file_exists( $ossr_autoload ) ) {
 	add_action(
 		'admin_notices',
 		static function (): void {
@@ -118,7 +118,7 @@ if ( ! file_exists( $wsrs_autoload ) ) {
 	return;
 }
 
-require_once $wsrs_autoload;
+require_once $ossr_autoload;
 
 register_activation_hook(
 	__FILE__,

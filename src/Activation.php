@@ -30,7 +30,7 @@ final class Activation {
 		TemplateTable::create();
 		TemplateSeeder::seed();
 
-		update_option( 'wsrs_version', WSRS_VERSION, false );
+		update_option( 'ossr_version', OSSR_VERSION, false );
 	}
 
 	/**
@@ -41,7 +41,7 @@ final class Activation {
 	private static function check_requirements(): void {
 		// @phpstan-ignore-next-line Runtime requirement check for plugin activation.
 		if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(
@@ -52,7 +52,7 @@ final class Activation {
 		}
 
 		if ( ! defined( 'USCES_VERSION' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(
@@ -61,7 +61,7 @@ final class Activation {
 				)
 			);
 		} elseif ( version_compare( \USCES_VERSION, '2.11.10', '<' ) ) {
-			deactivate_plugins( WSRS_PLUGIN_BASENAME );
+			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
 			wp_die(
 				esc_html__(

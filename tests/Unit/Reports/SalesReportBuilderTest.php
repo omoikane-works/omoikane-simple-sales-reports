@@ -25,7 +25,7 @@ final class SalesReportBuilderTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		unset( $GLOBALS['wsrs_test_current_datetime'] );
+		unset( $GLOBALS['ossr_test_current_datetime'] );
 
 		parent::tearDown();
 	}
@@ -36,7 +36,7 @@ final class SalesReportBuilderTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_build_returns_empty_report_data_when_no_orders_exist(): void {
-		$GLOBALS['wsrs_test_current_datetime'] = '2026-05-19 12:34:56';
+		$GLOBALS['ossr_test_current_datetime'] = '2026-05-19 12:34:56';
 
 		$builder = new SalesReportBuilder(
 			new FakeOrderRepository( array() )

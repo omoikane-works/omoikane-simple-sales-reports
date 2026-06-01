@@ -57,7 +57,7 @@ final class TemplateSeeder {
 		global $wpdb;
 
 		$table_name    = TemplateTable::get_table_name();
-		$template_path = WSRS_PLUGIN_DIR . $template['file'];
+		$template_path = OSSR_PLUGIN_DIR . $template['file'];
 
 		if ( ! file_exists( $template_path ) ) {
 			return;

@@ -49,14 +49,14 @@ final class AdminPage {
 	 *
 	 * @var string
 	 */
-	private const NONCE_ACTION = 'wsrs_view_sales_report';
+	private const NONCE_ACTION = 'rssr_view_sales_report';
 
 	/**
 	 * Nonce name.
 	 *
 	 * @var string
 	 */
-	private const NONCE_NAME = 'wsrs_nonce';
+	private const NONCE_NAME = 'ossr_nonce';
 
 	/**
 	 * Default admin view.
@@ -119,7 +119,7 @@ final class AdminPage {
 	 *
 	 * @var string
 	 */
-	private const SELECTED_TEMPLATE_ID_OPTION = 'wsrs_sales_report_template_id';
+	private const SELECTED_TEMPLATE_ID_OPTION = 'ossr_sales_report_template_id';
 
 	/**
 	 * Constructor.
@@ -215,10 +215,10 @@ final class AdminPage {
 		}
 
 		wp_enqueue_style(
-			'wsrs-admin',
-			plugins_url( 'assets/css/admin.css', WSRS_PLUGIN_FILE ),
+			'ossr-admin',
+			plugins_url( 'assets/css/admin.css', OSSR_PLUGIN_FILE ),
 			array(),
-			WSRS_VERSION
+			OSSR_VERSION
 		);
 	}
 
@@ -237,12 +237,12 @@ final class AdminPage {
 		$current_view = $this->resolve_current_view();
 
 		echo '<div class="wrap">';
-		echo '<h1 class="wsrs-no-print">' . esc_html__( '売上報告書', 'omoikane-simple-sales-reports' ) . '</h1>';
-		echo '<div class="wsrs-admin-layout">';
+		echo '<h1 class="ossr-no-print">' . esc_html__( '売上報告書', 'omoikane-simple-sales-reports' ) . '</h1>';
+		echo '<div class="ossr-admin-layout">';
 
 		$this->render_inner_navigation( $current_view );
 
-		echo '<div class="wsrs-admin-main">';
+		echo '<div class="ossr-admin-main">';
 
 		if ( self::DEFAULT_VIEW === $current_view ) {
 			$this->render_report_generation_view();
@@ -252,7 +252,7 @@ final class AdminPage {
 			 *
 			 * @param   string  $current_view   Current admin view.
 			 */
-			do_action( 'wsrs_render_sales_report_admin_view', $current_view );
+			do_action( 'ossr_render_sales_report_admin_view', $current_view );
 		}
 
 		echo '</div>';
@@ -314,12 +314,12 @@ final class AdminPage {
 		$start_date     = $period['start_date'] ?? '';
 		$end_date       = $period['end_date'] ?? '';
 
-		echo '<form method="get" class="wsrs-period-form wsrs-no-print">';
+		echo '<form method="get" class="ossr-period-form ossr-no-print">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::MENU_SALES_SLUG ) . '" />';
 		echo '<input type="hidden" name="' . esc_attr( self::VIEW_PARAM ) . '" value="' . esc_attr( self::DEFAULT_VIEW ) . '" />';
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		echo '<fieldset>';
-		echo '<legend class="wsrs-period-form__legend">' . esc_html__( '期間', 'omoikane-simple-sales-reports' ) . '</legend>';
+		echo '<legend class="ossr-period-form__legend">' . esc_html__( '期間', 'omoikane-simple-sales-reports' ) . '</legend>';
 		$this->render_period_radio(
 			ReportPeriods::CURRENT_MONTH,
 			__( '今月', 'omoikane-simple-sales-reports' ),
@@ -330,7 +330,7 @@ final class AdminPage {
 			__( '前月', 'omoikane-simple-sales-reports' ),
 			$current_period
 		);
-		echo '<label class="wsrs-period-form__radio">';
+		echo '<label class="ossr-period-form__radio">';
 		echo '<input type="radio" name="period" value="' . esc_attr( ReportPeriods::CUSTOM ) . '" ' . checked( $current_period, ReportPeriods::CUSTOM, false ) . ' />';
 		echo ' ' . esc_html__( '期間指定', 'omoikane-simple-sales-reports' );
 		echo '</label>';
@@ -341,7 +341,7 @@ final class AdminPage {
 
 		$this->render_template_select( $selected_template_id );
 
-		echo '<p class="wsrs-period-form__actions">';
+		echo '<p class="ossr-period-form__actions">';
 		echo '<button type="submit" class="button button-secondary">';
 		echo esc_html__( '表示', 'omoikane-simple-sales-reports' );
 		echo '</button>';
@@ -358,7 +358,7 @@ final class AdminPage {
 	 * @return  void
 	 */
 	private function render_period_radio( string $value, string $label, string $current_period ): void {
-		echo '<label class="wsrs-period-form__radio">';
+		echo '<label class="ossr-period-form__radio">';
 		echo '<input type="radio" name="period" value="' . esc_attr( $value ) . '" ' . checked( $current_period, $value, false ) . ' />';
 		echo ' ' . esc_html( $label );
 		echo '</label>';
@@ -379,8 +379,8 @@ final class AdminPage {
 			return;
 		}
 
-		echo '<fieldset class="wsrs-period-form__template">';
-		echo '<legend class="wsrs-period-form__legend">' . esc_html__( 'テンプレート', 'omoikane-simple-sales-reports' ) . '</legend>';
+		echo '<fieldset class="ossr-period-form__template">';
+		echo '<legend class="ossr-period-form__legend">' . esc_html__( 'テンプレート', 'omoikane-simple-sales-reports' ) . '</legend>';
 		echo '<select name="' . esc_attr( self::TEMPLATE_ID_PARAM ) . '">';
 
 		foreach ( $templates as $template ) {
@@ -414,13 +414,13 @@ final class AdminPage {
 	private function render_inner_navigation( string $current_view ): void {
 		$menu_items = $this->get_inner_navigation_items();
 
-		echo '<nav class="wsrs-admin-nav wsrs-no-print">';
+		echo '<nav class="ossr-admin-nav ossr-no-print">';
 
 		foreach ( $menu_items as $view => $item ) {
 			$label = isset( $item['label'] ) ? (string) $item['label'] : '';
 			$url   = isset( $item['url'] ) ? (string) $item['url'] : '';
 
-			$class_names = array( 'wsrs-admin-nav__item' );
+			$class_names = array( 'ossr-admin-nav__item' );
 
 			if ( $current_view === $view ) {
 				$class_names[] = 'is-active';
@@ -459,7 +459,7 @@ final class AdminPage {
 		 * @param   array<string, array<string, string>>    $items  Inner navigation items.
 		 */
 		return apply_filters(
-			'wsrs_sales_report_admin_menu_items',
+			'ossr_sales_report_admin_menu_items',
 			$items
 		);
 	}
@@ -502,13 +502,13 @@ final class AdminPage {
 
 		$this->render_period_form( $period, $selected_template_id );
 
-		echo '<div class="wsrs-print-actions wsrs-no-print">';
+		echo '<div class="ossr-print-actions ossr-no-print">';
 		echo '<button type="button" class="button button-primary" onclick="window.print();">';
 		echo esc_html__( '印刷', 'omoikane-simple-sales-reports' );
 		echo '</button>';
 		echo '</div>';
 
-		echo '<p class="description wsrs-no-print">';
+		echo '<p class="description ossr-no-print">';
 		echo esc_html__( 'PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。', 'omoikane-simple-sales-reports' );
 		echo '</p>';
 

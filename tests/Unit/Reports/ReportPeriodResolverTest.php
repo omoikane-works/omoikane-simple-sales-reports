@@ -24,7 +24,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		unset( $GLOBALS['wsrs_test_current_datetime'] );
+		unset( $GLOBALS['ossr_test_current_datetime'] );
 
 		parent::tearDown();
 	}
@@ -172,7 +172,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_previous_month_period_across_year_boundary(): void {
-		$GLOBALS['wsrs_test_current_datetime'] = '2026-01-15 12:00:00';
+		$GLOBALS['ossr_test_current_datetime'] = '2026-01-15 12:00:00';
 
 		$resolver = new ReportPeriodResolver();
 
@@ -194,7 +194,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_previous_month_period_for_leap_year_february(): void {
-		$GLOBALS['wsrs_test_current_datetime'] = '2024-03-10 12:00:00';
+		$GLOBALS['ossr_test_current_datetime'] = '2024-03-10 12:00:00';
 
 		$resolver = new ReportPeriodResolver();
 

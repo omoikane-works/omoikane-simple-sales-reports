@@ -24,7 +24,7 @@ final class TemplateTable {
 	public static function get_table_name(): string {
 		global $wpdb;
 
-		return $wpdb->prefix . 'wsrs_templates';
+		return $wpdb->prefix . 'ossr_templates';
 	}
 
 	/**

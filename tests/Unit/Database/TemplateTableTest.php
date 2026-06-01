@@ -71,7 +71,7 @@ final class TemplateTableTest extends TestCase {
 		$this->wpdb->prefix = 'wp_test_';
 
 		$this->assertSame(
-			'wp_test_wsrs_templates',
+			'wp_test_ossr_templates',
 			TemplateTable::get_table_name()
 		);
 	}
