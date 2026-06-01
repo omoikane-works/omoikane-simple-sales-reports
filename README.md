@@ -1,8 +1,8 @@
-# Welcart Simple Report Sales
+# Omoikane Simple Sales Reports for Welcart
 
 [![CI](https://github.com/omoikane-works/omoikane-simple-sales-reports/actions/workflows/ci.yml/badge.svg)](https://github.com/omoikane-works/omoikane-simple-sales-reports/actions/workflows/ci.yml)
 
-`Welcart Simple Report Sales` (かんたん売上報告書 for Welcart) は、Welcart の受注データをもとに、売上報告書をかんたんに作成・印刷するための WordPress プラグインです。
+`Omoikane Simple Sales Reports for Welcart` (かんたん売上報告書 for Welcart) は、Welcart の受注データをもとに、売上報告書をかんたんに作成・印刷するための WordPress プラグインです。
 
 ## 概要
 

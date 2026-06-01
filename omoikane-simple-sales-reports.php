@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Welcart Simple Report Sales
+ * Plugin Name:       Omoikane Simple Sales Reports for Welcart
  * Plugin URI:        https://github.com/omoikane-works/omoikane-simple-sales-reports
  * Description:       Welcart の売上報告書をかんたんに作成・印刷できるプラグインです。
  * Version:           1.0.0
@@ -48,7 +48,7 @@ function wsrs_get_unsupported_php_version_message(): string {
 	return sprintf(
 		// translators: 1: required PHP version, 2: current PHP version.
 		__(
-			'Welcart Simple Report Sales requires PHP version %1$s or later. Your current PHP version is %2$s.',
+			'Omoikane Simple Sales Reports for Welcart requires PHP version %1$s or later. Your current PHP version is %2$s.',
 			'omoikane-simple-sales-reports'
 		),
 		WSRS_MINIMUM_PHP_VERSION,
