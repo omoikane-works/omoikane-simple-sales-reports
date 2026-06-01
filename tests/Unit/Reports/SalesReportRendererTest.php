@@ -2,15 +2,15 @@
 /**
  * Sales report renderer tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\SalesReportRenderer;
-use OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Templates\FakeTemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates\FakeTemplateRepository;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,7 +90,7 @@ final class SalesReportRendererTest extends TestCase {
 		);
 		$result   = $renderer->render_default_sales_report( array() );
 		$this->assertSame(
-			'<div class="notice notice-error"><p>売上報告書テンプレートが見つかりません。プラグインを再有効化してください。</p></div>',
+			'<div class="notice notice-error"><p>The sales report template was not found. Please reactivate the plugin.</p></div>',
 			$result
 		);
 	}
@@ -112,7 +112,7 @@ final class SalesReportRendererTest extends TestCase {
 		);
 		$result   = $renderer->render_default_sales_report( array() );
 		$this->assertSame(
-			'<div class="notice notice-error"><p>売上報告書テンプレートが見つかりません。プラグインを再有効化してください。</p></div>',
+			'<div class="notice notice-error"><p>The sales report template was not found. Please reactivate the plugin.</p></div>',
 			$result
 		);
 	}

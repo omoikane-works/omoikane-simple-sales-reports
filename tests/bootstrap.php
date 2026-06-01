@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
@@ -19,8 +19,8 @@ if ( ! defined( 'ARRAY_A' ) ) {
 	define( 'ARRAY_A', 'ARRAYA' );
 }
 
-if ( ! defined( 'WSRS_PLUGIN_DIR' ) ) {
-	define( 'WSRS_PLUGIN_DIR', dirname( __DIR__ ) . '/' );
+if ( ! defined( 'OSSR_PLUGIN_DIR' ) ) {
+	define( 'OSSR_PLUGIN_DIR', dirname( __DIR__ ) . '/' );
 }
 
 if ( ! function_exists( 'sanitize_key' ) ) {
@@ -97,7 +97,7 @@ if ( ! function_exists( 'current_datetime' ) ) {
 	 * @return  DateTimeImmutable
 	 */
 	function current_datetime(): DateTimeImmutable {
-		$current_datetime = $GLOBALS['wsrs_test_current_datetime'] ?? '2026-05-18 12:00:00';
+		$current_datetime = $GLOBALS['ossr_test_current_datetime'] ?? '2026-05-18 12:00:00';
 
 		return new DateTimeImmutable( (string) $current_datetime, wp_timezone() );
 	}

@@ -1,18 +1,18 @@
-=== Welcart Simple Report Sales ===
+=== Omoikane Simple Sales Reports for Welcart ===
 Contributors: omoikaneworks
 Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create and print simple sales reports based on Welcart order data.
+Create simple sales reports based on Welcart order data.
 
 == Description ==
 
-Welcart Simple Report Sales is a WordPress plugin for creating printable sales reports based on Welcart order data.
+Omoikane Simple Sales Reports for Welcart is a WordPress plugin for creating simple sales reports based on Welcart order data.
 
 It is designed for simple monthly reports and client submissions, rather than analytical dashboards.
 
@@ -24,7 +24,7 @@ Features:
 * Display tax rate breakdowns
 * Exclude canceled orders from sales totals
 * Use a standard template designed for A4 landscape printing
-* Select from standard report templates
+* Select a standard report template
 * Save the previously used standard template
 
 = Future Extensions =
@@ -67,10 +67,19 @@ Template editing is being considered for a future extension.
 
 == Changelog ==
 
+= 1.0.1 =
+* Renamed the plugin to Omoikane Simple Sales Reports for Welcart.
+* Updated the plugin slug, text domain, namespace, and internal prefixes.
+* Updated Mustache to 3.2.0.
+* Updated source strings and Japanese translation files.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Renamed the plugin and updated dependencies for WordPress.org review.
 
 = 1.0.0 =
 Initial release.

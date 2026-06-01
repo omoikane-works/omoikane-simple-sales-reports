@@ -2,15 +2,15 @@
 /**
  * Sales report renderer test.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Templates;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepositoryInterface;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateTypes;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
 
 /**
  * Fake Template repository.

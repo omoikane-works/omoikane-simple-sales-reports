@@ -2,12 +2,12 @@
 /**
  * Sales report builder.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Reports;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -376,8 +376,8 @@ final class SalesReportBuilder {
 			'calculation_note' => sprintf(
 				// translators: %s: Sales support rate.
 				__(
-					'販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し引いた金額」に対して %s を乗じ、小数点以下を切り上げて算出しています。',
-					'welcart-simple-report-sales'
+					'The sales support fee is calculated by multiplying %s by the amount after applying discounts to the product total, adding tax, and subtracting used points. Fractions are rounded up.',
+					'omoikane-simple-sales-reports'
 				),
 				$rate_label
 			),
@@ -476,19 +476,19 @@ final class SalesReportBuilder {
 		$statuses = $this->parse_order_statuses( $status_raw );
 
 		if ( in_array( 'cancel', $statuses, true ) ) {
-			return __( 'キャンセル', 'welcart-simple-report-sales' );
+			return __( 'Canceled', 'omoikane-simple-sales-reports' );
 		}
 
 		if ( array() === $statuses || in_array( '#none#', $statuses, true ) ) {
-			return __( '新規受付', 'welcart-simple-report-sales' );
+			return __( 'New Order', 'omoikane-simple-sales-reports' );
 		}
 
 		if ( in_array( 'duringorder', $statuses, true ) ) {
-			return __( '取り寄せ中', 'welcart-simple-report-sales' );
+			return __( 'On Backorder', 'omoikane-simple-sales-reports' );
 		}
 
 		if ( in_array( 'completion', $statuses, true ) ) {
-			return __( '発送済み', 'welcart-simple-report-sales' );
+			return __( 'Shipped', 'omoikane-simple-sales-reports' );
 		}
 
 		return implode( ', ', $statuses );

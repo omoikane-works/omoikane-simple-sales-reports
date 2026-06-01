@@ -2,15 +2,15 @@
 /**
  * Report period resolver tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Reports;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriodResolver;
-use OmoikaneWorks\WelcartSimpleReportSales\Reports\ReportPeriods;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
+use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriods;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,7 +24,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		unset( $GLOBALS['wsrs_test_current_datetime'] );
+		unset( $GLOBALS['ossr_test_current_datetime'] );
 
 		parent::tearDown();
 	}
@@ -53,7 +53,7 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::PREVIOUS_MONTH, $result['period'] );
 		$this->assertSame( '2026-04-01', $result['start_date'] );
 		$this->assertSame( '2026-04-30', $result['end_date'] );
-		$this->assertSame( '2026年4月1日 ～ 2026年4月30日', $result['period_label'] );
+		$this->assertSame( 'April 1, 2026 - April 30, 2026', $result['period_label'] );
 	}
 
 	/**
@@ -72,7 +72,7 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::CURRENT_MONTH, $result['period'] );
 		$this->assertSame( '2026-05-01', $result['start_date'] );
 		$this->assertSame( '2026-05-31', $result['end_date'] );
-		$this->assertSame( '2026年5月1日 ～ 2026年5月31日', $result['period_label'] );
+		$this->assertSame( 'May 1, 2026 - May 31, 2026', $result['period_label'] );
 	}
 
 	/**
@@ -109,7 +109,7 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::CUSTOM, $result['period'] );
 		$this->assertSame( '2026-01-10', $result['start_date'] );
 		$this->assertSame( '2026-01-20', $result['end_date'] );
-		$this->assertSame( '2026年1月10日 ～ 2026年1月20日', $result['period_label'] );
+		$this->assertSame( 'January 10, 2026 - January 20, 2026', $result['period_label'] );
 	}
 
 	/**
@@ -172,7 +172,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_previous_month_period_across_year_boundary(): void {
-		$GLOBALS['wsrs_test_current_datetime'] = '2026-01-15 12:00:00';
+		$GLOBALS['ossr_test_current_datetime'] = '2026-01-15 12:00:00';
 
 		$resolver = new ReportPeriodResolver();
 
@@ -185,7 +185,7 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::PREVIOUS_MONTH, $result['period'] );
 		$this->assertSame( '2025-12-01', $result['start_date'] );
 		$this->assertSame( '2025-12-31', $result['end_date'] );
-		$this->assertSame( '2025年12月1日 ～ 2025年12月31日', $result['period_label'] );
+		$this->assertSame( 'December 1, 2025 - December 31, 2025', $result['period_label'] );
 	}
 
 	/**
@@ -194,7 +194,7 @@ final class ReportPeriodResolverTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_previous_month_period_for_leap_year_february(): void {
-		$GLOBALS['wsrs_test_current_datetime'] = '2024-03-10 12:00:00';
+		$GLOBALS['ossr_test_current_datetime'] = '2024-03-10 12:00:00';
 
 		$resolver = new ReportPeriodResolver();
 
@@ -207,7 +207,7 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::PREVIOUS_MONTH, $result['period'] );
 		$this->assertSame( '2024-02-01', $result['start_date'] );
 		$this->assertSame( '2024-02-29', $result['end_date'] );
-		$this->assertSame( '2024年2月1日 ～ 2024年2月29日', $result['period_label'] );
+		$this->assertSame( 'February 1, 2024 - February 29, 2024', $result['period_label'] );
 	}
 
 	/**
@@ -229,6 +229,6 @@ final class ReportPeriodResolverTest extends TestCase {
 		$this->assertSame( ReportPeriods::CUSTOM, $result['period'] );
 		$this->assertSame( '2026-05-01', $result['start_date'] );
 		$this->assertSame( '2026-05-01', $result['end_date'] );
-		$this->assertSame( '2026年5月1日 ～ 2026年5月1日', $result['period_label'] );
+		$this->assertSame( 'May 1, 2026 - May 1, 2026', $result['period_label'] );
 	}
 }

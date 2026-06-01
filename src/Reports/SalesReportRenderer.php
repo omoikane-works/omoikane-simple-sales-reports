@@ -2,15 +2,15 @@
 /**
  * Sales report renderer.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Reports;
+namespace OmoikaneWorks\SimpleSalesReports\Reports;
 
 use Mustache_Engine;
-use OmoikaneWorks\WelcartSimpleReportSales\Templates\TemplateRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -66,8 +66,8 @@ final class SalesReportRenderer {
 		return sprintf(
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
-				'売上報告書テンプレートが見つかりません。プラグインを再有効化してください。',
-				'welcart-simple-report-sales'
+				'The sales report template was not found. Please reactivate the plugin.',
+				'omoikane-simple-sales-reports'
 			)
 		);
 	}

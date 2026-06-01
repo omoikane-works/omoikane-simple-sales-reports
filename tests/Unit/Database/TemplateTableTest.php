@@ -2,14 +2,14 @@
 /**
  * Template table tests.
  *
- * @package WelcartSimpleReportSales
+ * @package SimpleSalesReports
  */
 
 declare(strict_types=1);
 
-namespace OmoikaneWorks\WelcartSimpleReportSales\Tests\Unit\Database;
+namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database;
 
-use OmoikaneWorks\WelcartSimpleReportSales\Database\TemplateTable;
+use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -71,7 +71,7 @@ final class TemplateTableTest extends TestCase {
 		$this->wpdb->prefix = 'wp_test_';
 
 		$this->assertSame(
-			'wp_test_wsrs_templates',
+			'wp_test_ossr_templates',
 			TemplateTable::get_table_name()
 		);
 	}
