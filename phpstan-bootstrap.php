@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'OSSR_VERSION' ) ) {
-	define( 'OSSR_VERSION', '1.0.0' );
+	define( 'OSSR_VERSION', '1.0.1' );
 }
 
 if ( ! defined( 'OSSR_PLUGIN_FILE' ) ) {
