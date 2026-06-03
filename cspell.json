@@ -52,7 +52,10 @@
     "duringorder",
     "isdf",
     "ARRAYA",
-    "shivammathur"
+    "shivammathur",
+    "Backorder",
+    "nowrap",
+    "Segoe"
   ],
   "ignorePaths": [
     "vendor/**",

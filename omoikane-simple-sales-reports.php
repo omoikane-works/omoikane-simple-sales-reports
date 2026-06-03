@@ -29,6 +29,7 @@ define( 'OSSR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OSSR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'OSSR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'OSSR_MINIMUM_PHP_VERSION', '8.2' );
+define( 'OSSR_MINIMUM_USCES_VERSION', '2.11.10' );
 
 /**
  * Check whether the current PHP version is supported.
@@ -53,6 +54,22 @@ function ossr_get_unsupported_php_version_message(): string {
 		),
 		OSSR_MINIMUM_PHP_VERSION,
 		PHP_VERSION
+	);
+}
+
+/**
+ * Get unsupported Welcart version message.
+ *
+ * @return  string
+ */
+function ossr_get_unsupported_welcart_version_message(): string {
+	return sprintf(
+		// translators: %s: required Welcart version.
+		__(
+			'Omoikane Simple Sales Reports for Welcart requires Welcart %s or later.',
+			'omoikane-simple-sales-reports'
+		),
+		OSSR_MINIMUM_USCES_VERSION
 	);
 }
 
