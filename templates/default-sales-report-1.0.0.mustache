@@ -93,6 +93,17 @@
 			padding-left: 0 !important;
 		}
 
+		.notice,
+		.update-nag,
+		.error,
+		.updated,
+		.notice-error,
+		.notice-warning,
+		.usces_admin_message,
+		.usces_admin_error {
+			display: none !important;
+		}
+
 		.ossr-report {
 			max-width: none;
 			font-size: 11px;
@@ -135,31 +146,31 @@
 				</tr>
 				<tr>
 					<th>商品合計</th>
-					<td class="number">{{ totals.item_total_label }} 円</td>
+					<td class="number">{{ totals.amounts.item_total.label }} 円</td>
 				</tr>
 				<tr>
 					<th>値引き</th>
-					<td class="number">{{ totals.discount_label }} 円</td>
+					<td class="number">{{ totals.amounts.discount.label }} 円</td>
 				</tr>
 				<tr>
 					<th>消費税</th>
-					<td class="number">{{ totals.tax_label }} 円</td>
+					<td class="number">{{ totals.amounts.tax.label }} 円</td>
 				</tr>
 				<tr>
 					<th>送料</th>
-					<td class="number">{{ totals.shipping_fee_label }} 円</td>
+					<td class="number">{{ totals.amounts.shipping_fee.label }} 円</td>
 				</tr>
 				<tr>
 					<th>代引手数料</th>
-					<td class="number">{{ totals.cod_fee_label }} 円</td>
+					<td class="number">{{ totals.amounts.cod_fee.label }} 円</td>
 				</tr>
 				<tr>
 					<th>使用ポイント</th>
-					<td class="number">{{ totals.used_points_label }} pt</td>
+					<td class="number">{{ totals.amounts.used_points.label }} 円</td>
 				</tr>
 				<tr>
 					<th>支払い合計金額</th>
-					<td class="number"><strong>{{ totals.payment_total_label }} 円</strong></td>
+					<td class="number"><strong>{{ totals.amounts.payment_total.label }} 円</strong></td>
 				</tr>
 			</tbody>
 		</table>
@@ -179,15 +190,15 @@
 			<tbody>
 				<tr>
 					<th>標準税率対象</th>
-					<td class="number">{{ totals.standard_subtotal_label }} 円</td>
-					<td class="number">{{ totals.standard_discount_label }} 円</td>
-					<td class="number">{{ totals.standard_tax_label }} 円</td>
+					<td class="number">{{ totals.amounts.item_total.standard.label }} 円</td>
+					<td class="number">{{ totals.amounts.discount.standard.label }} 円</td>
+					<td class="number">{{ totals.amounts.tax.standard.label }} 円</td>
 				</tr>
 				<tr>
 					<th>軽減税率対象</th>
-					<td class="number">{{ totals.reduced_subtotal_label }} 円</td>
-					<td class="number">{{ totals.reduced_discount_label }} 円</td>
-					<td class="number">{{ totals.reduced_tax_label }} 円</td>
+					<td class="number">{{ totals.amounts.item_total.reduced.label }} 円</td>
+					<td class="number">{{ totals.amounts.discount.reduced.label }} 円</td>
+					<td class="number">{{ totals.amounts.tax.reduced.label }} 円</td>
 				</tr>
 			</tbody>
 		</table>
@@ -217,16 +228,16 @@
 				<tr>
 					<td class="order-date">{{ order_date }}</td>
 					<td class="order-number">{{ order_number }}</td>
-					<td class="customer-name">{{ customer_name }}</td>
+					<td class="customer-name">{{ customer.name }}</td>
 					<td class="payment-method">{{ payment.method }}</td>
 					<td class="status-label">{{ status.label }}</td>
-					<td class="number">{{ amounts.item_total_label }}</td>
-					<td class="number">{{ amounts.discount_label }}</td>
-					<td class="number">{{ amounts.tax_label }}</td>
-					<td class="number">{{ amounts.shipping_fee_label }}</td>
-					<td class="number">{{ amounts.cod_fee_label }}</td>
-					<td class="number">{{ amounts.used_points_label }}</td>
-					<td class="number">{{ amounts.payment_total_label }}</td>
+					<td class="number">{{ amounts.item_total.label }}</td>
+					<td class="number">{{ amounts.discount.label }}</td>
+					<td class="number">{{ amounts.tax.label }}</td>
+					<td class="number">{{ amounts.shipping_fee.label }}</td>
+					<td class="number">{{ amounts.cod_fee.label }}</td>
+					<td class="number">{{ amounts.used_points.label }}</td>
+					<td class="number">{{ amounts.payment_total.label }}</td>
 				</tr>
 				{{/orders}}
 				{{^orders}}
