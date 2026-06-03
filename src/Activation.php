@@ -40,15 +40,11 @@ final class Activation {
 	 */
 	private static function check_requirements(): void {
 		// @phpstan-ignore-next-line Runtime requirement check for plugin activation.
-		if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+		if ( version_compare( PHP_VERSION, OSSR_MINIMUM_PHP_VERSION, '<' ) ) {
 			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
-			wp_die(
-				esc_html__(
-					'Omoikane Simple Sales Reports for Welcart requires PHP 8.2 or later.',
-					'omoikane-simple-sales-reports'
-				)
-			);
+			$message = ossr_get_unsupported_php_version_message();
+			wp_die( esc_html( $message ) );
 		}
 
 		if ( ! defined( 'USCES_VERSION' ) ) {
@@ -60,15 +56,11 @@ final class Activation {
 					'omoikane-simple-sales-reports'
 				)
 			);
-		} elseif ( version_compare( \USCES_VERSION, '2.11.10', '<' ) ) {
+		} elseif ( version_compare( \USCES_VERSION, OSSR_MINIMUM_USCES_VERSION, '<' ) ) {
 			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
-			wp_die(
-				esc_html__(
-					'Omoikane Simple Sales Reports for Welcart requires Welcart 2.11.10 or later.',
-					'omoikane-simple-sales-reports'
-				)
-			);
+			$message = ossr_get_unsupported_welcart_version_message();
+			wp_die( esc_html( $message ) );
 		}
 	}
 
