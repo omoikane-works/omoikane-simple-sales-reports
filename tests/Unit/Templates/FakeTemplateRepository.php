@@ -25,6 +25,55 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	private ?array $template;
 
 	/**
+	 * Inserted data.
+	 *
+	 * @var array<string, mixed>|null
+	 */
+	public ?array $inserted_data = null;
+
+	/**
+	 * Updated data.
+	 *
+	 * @var array<string, mixed>|null
+	 */
+	public ?array $updated_data = null;
+
+	/**
+	 * Deactivated id.
+	 *
+	 * @var int|null
+	 */
+	public ?int $deactivated_id = null;
+
+	/**
+	 * Name exists result.
+	 *
+	 * @var bool
+	 */
+	public bool $name_exists_result = false;
+
+	/**
+	 * Insert result.
+	 *
+	 * @var int
+	 */
+	public int $insert_result = 1;
+
+	/**
+	 * Update result.
+	 *
+	 * @var bool
+	 */
+	public bool $update_result = true;
+
+	/**
+	 * Deactivate result.
+	 *
+	 * @var bool
+	 */
+	public bool $deactivate_result = true;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   array<string, mixed>|null $template   Template.
@@ -92,5 +141,58 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 		}
 
 		return array( $this->template );
+	}
+
+	/**
+	 * Check name exists.
+	 *
+	 * @param   string   $name        Name.
+	 * @param   int|null $exclude_id  Exclude id.
+	 * @return  bool
+	 */
+	public function name_exists( string $name, ?int $exclude_id = null ): bool {
+		unset( $name, $exclude_id );
+
+		return $this->name_exists_result;
+	}
+
+	/**
+	 * Insert data.
+	 *
+	 * @param   array<string, mixed> $data Data.
+	 * @return  int
+	 */
+	public function insert( array $data ): int {
+		$this->inserted_data = $data;
+
+		return $this->insert_result;
+	}
+
+	/**
+	 * Update data.
+	 *
+	 * @param   int                  $id   ID.
+	 * @param   array<string, mixed> $data Data.
+	 * @return  bool
+	 */
+	public function update( int $id, array $data ): bool {
+		$this->updated_data = array(
+			'id'   => $id,
+			'data' => $data,
+		);
+
+		return $this->update_result;
+	}
+
+	/**
+	 * Deactivate template.
+	 *
+	 * @param   int $id ID.
+	 * @return  bool
+	 */
+	public function deactivate( int $id ): bool {
+		$this->deactivated_id = $id;
+
+		return $this->deactivate_result;
 	}
 }

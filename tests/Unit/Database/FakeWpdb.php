@@ -57,6 +57,27 @@ final class FakeWpdb {
 	private array $inserted_rows = array();
 
 	/**
+	 * Insert ID.
+	 *
+	 * @var int
+	 */
+	public int $insert_id = 0;
+
+	/**
+	 * Updated rows.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $updated_rows = array();
+
+	/**
+	 * Updated where clauses.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $updated_where_clauses = array();
+
+	/**
 	 * Set row.
 	 *
 	 * @param   array<string, mixed>|null $row    Row.
@@ -183,6 +204,7 @@ final class FakeWpdb {
 
 		$this->last_query      = 'INSERT INTO ' . $table;
 		$this->inserted_rows[] = $data;
+		$this->insert_id       = count( $this->inserted_rows );
 
 		return 1;
 	}
@@ -194,5 +216,49 @@ final class FakeWpdb {
 	 */
 	public function get_inserted_rows(): array {
 		return $this->inserted_rows;
+	}
+
+	/**
+	 * Update row.
+	 *
+	 * @param   string               $table          Table name.
+	 * @param   array<string, mixed> $data           Data.
+	 * @param   array<string, mixed> $where          Where.
+	 * @param   array<int, string>   $format         Format.
+	 * @param   array<int, string>   $where_format   Where format.
+	 * @return  int|false
+	 */
+	public function update(
+		string $table,
+		array $data,
+		array $where,
+		array $format = array(),
+		array $where_format = array()
+	): int|bool {
+		unset( $format, $where_format );
+
+		$this->last_query              = 'UPDATE ' . $table;
+		$this->updated_rows[]          = $data;
+		$this->updated_where_clauses[] = $where;
+
+		return 1;
+	}
+
+	/**
+	 * Get updated rows.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_updated_rows(): array {
+		return $this->updated_rows;
+	}
+
+	/**
+	 * Get updated where clauses.
+	 *
+	 * @return array>int, array<string, mixed>>
+	 */
+	public function get_updated_where_clauses(): array {
+		return $this->updated_where_clauses;
 	}
 }

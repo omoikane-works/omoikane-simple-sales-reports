@@ -300,4 +300,142 @@ final class TemplateRepositoryTest extends TestCase {
 
 		$this->assertNull( $result );
 	}
+
+	/**
+	 * Test name exists returns true when name exists.
+	 *
+	 * @return void
+	 */
+	public function test_name_exists_returns_true_when_name_exists(): void {
+		$this->wpdb->set_var( '1' );
+
+		$repository = new TemplateRepository();
+
+		$result = $repository->name_exists( 'Custom Sales Report' );
+
+		$this->assertTrue( $result );
+		$this->assertStringContainsString( 'name = ', $this->wpdb->get_last_query() );
+	}
+
+	/**
+	 * Test name exists returns false when name does not exist.
+	 *
+	 * @return void
+	 */
+	public function test_name_exists_returns_false_when_name_does_not_exist(): void {
+		$this->wpdb->set_var( '0' );
+
+		$repository = new TemplateRepository();
+
+		$result = $repository->name_exists( 'New Template' );
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test name exists excludes specified id.
+	 *
+	 * @return void
+	 */
+	public function test_name_exists_excludes_specified_id(): void {
+		$this->wpdb->set_var( '0' );
+
+		$repository = new TemplateRepository();
+
+		$result = $repository->name_exists( 'Custom Sales Report', 10 );
+
+		$this->assertFalse( $result );
+		$this->assertStringContainsString( 'id <> 10', $this->wpdb->get_last_query() );
+	}
+
+	/**
+	 * Test insert creates custom sales report template.
+	 *
+	 * @return void
+	 */
+	public function test_insert_creates_custom_sales_report_template(): void {
+		$repository = new TemplateRepository();
+
+		$result = $repository->insert(
+			array(
+				'template_key' => 'custom_template_key',
+				'name'         => 'Custom Sales Report',
+				'content'      => '<h1>{{ report.title }}</h1>',
+				'content_hash' => 'hash-custom',
+				'version'      => '1.0.0',
+			)
+		);
+
+		$this->assertSame( 1, $result );
+
+		$inserted_rows = $this->wpdb->get_inserted_rows();
+
+		$this->assertCount( 1, $inserted_rows );
+		$this->assertSame( 'custom_template_key', $inserted_rows[0]['template_key'] );
+		$this->assertSame( 'Custom Sales Report', $inserted_rows[0]['name'] );
+		$this->assertSame( TemplateTypes::SALES_REPORT, $inserted_rows[0]['type'] );
+		$this->assertSame( '<h1>{{ report.title }}</h1>', $inserted_rows[0]['content'] );
+		$this->assertSame( 'hash-custom', $inserted_rows[0]['content_hash'] );
+		$this->assertSame( '1.0.0', $inserted_rows[0]['version'] );
+		$this->assertSame( 0, $inserted_rows[0]['is_system'] );
+		$this->assertSame( 0, $inserted_rows[0]['is_default'] );
+		$this->assertSame( 1, $inserted_rows[0]['is_active'] );
+		$this->assertArrayHasKey( 'created_at', $inserted_rows[0] );
+		$this->assertArrayHasKey( 'updated_at', $inserted_rows[0] );
+	}
+
+	/**
+	 * Test update updates template content.
+	 *
+	 * @return void
+	 */
+	public function test_update_updates_template_content(): void {
+		$repository = new TemplateRepository();
+
+		$result = $repository->update(
+			10,
+			array(
+				'name'         => 'Updated Template',
+				'content'      => '<p>Updated</p>',
+				'content_hash' => 'hash-updated',
+			)
+		);
+
+		$this->assertTrue( $result );
+
+		$updated_rows = $this->wpdb->get_updated_rows();
+		$where        = $this->wpdb->get_updated_where_clauses();
+
+		$this->assertCount( 1, $updated_rows );
+		$this->assertSame( 'Updated Template', $updated_rows[0]['name'] );
+		$this->assertSame( '<p>Updated</p>', $updated_rows[0]['content'] );
+		$this->assertSame( 'hash-updated', $updated_rows[0]['content_hash'] );
+		$this->assertArrayHasKey( 'updated_at', $updated_rows[0] );
+
+		$this->assertSame( 10, $where[0]['id'] );
+		$this->assertSame( 1, $where[0]['is_active'] );
+	}
+
+	/**
+	 * Test deactivate marks template as inactivate.
+	 *
+	 * @return void
+	 */
+	public function test_deactivate_marks_template_as_inactive(): void {
+		$repository = new TemplateRepository();
+
+		$result = $repository->deactivate( 10 );
+
+		$this->assertTrue( $result );
+
+		$updated_rows = $this->wpdb->get_updated_rows();
+		$where        = $this->wpdb->get_updated_where_clauses();
+
+		$this->assertCount( 1, $updated_rows );
+		$this->assertSame( 0, $updated_rows[0]['is_active'] );
+		$this->assertArrayHasKey( 'updated_at', $updated_rows[0] );
+
+		$this->assertSame( 10, $where[0]['id'] );
+		$this->assertSame( 1, $where[0]['is_active'] );
+	}
 }

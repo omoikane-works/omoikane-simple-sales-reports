@@ -235,4 +235,164 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 			'updated_at'   => isset( $row['updated_at'] ) ? (string) $row['updated_at'] : '',
 		);
 	}
+
+	/**
+	 * Check name exists.
+	 *
+	 * @param   string   $name       Name.
+	 * @param   int|null $exclude_id Exclude id.
+	 * @return  bool
+	 */
+	public function name_exists( string $name, ?int $exclude_id = null ): bool {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+
+		if ( null !== $exclude_id ) {
+			$query = $wpdb->prepare(
+				'SELECT EXISTS(SELECT 1 FROM %i WHERE name = %s AND is_active = 1 AND id <> %d)',
+				$table_name,
+				$name,
+				$exclude_id
+			);
+		} else {
+			$query = $wpdb->prepare(
+				'SELECT EXISTS(SELECT 1 FROM %i WHERE name = %s AND is_active = 1)',
+				$table_name,
+				$name,
+			);
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$result = $wpdb->get_var( $query );
+
+		return ( '1' === (string) $result );
+	}
+
+	/**
+	 * Insert data.
+	 *
+	 * @param   array<string, mixed> $data   Data.
+	 * @return  int
+	 * @phpstan-param   array{
+	 *  template_key: string,
+	 *  name: string,
+	 *  content: string,
+	 *  content_hash: string,
+	 *  version: string
+	 * }    $data
+	 */
+	public function insert( array $data ): int {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+		$now        = current_time( 'mysql' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->insert(
+			$table_name,
+			array(
+				'template_key' => $data['template_key'],
+				'name'         => $data['name'],
+				'type'         => TemplateTypes::SALES_REPORT,
+				'content'      => $data['content'],
+				'content_hash' => $data['content_hash'],
+				'version'      => $data['version'],
+				'is_system'    => 0,
+				'is_default'   => 0,
+				'is_active'    => 1,
+				'created_at'   => $now,
+				'updated_at'   => $now,
+			),
+			array(
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%d',
+				'%d',
+				'%d',
+				'%s',
+				'%s',
+			)
+		);
+
+		if ( false === $result ) {
+			return 0;
+		}
+
+		return (int) $wpdb->insert_id;
+	}
+
+	/**
+	 * Update data.
+	 *
+	 * @param   int                  $id     ID.
+	 * @param   array<string, mixed> $data   Data.
+	 * @return  bool
+	 * @phpstan-param   array{
+	 *  name: string,
+	 *  content: string,
+	 *  content_hash: string
+	 * }    $data
+	 */
+	public function update( int $id, array $data ): bool {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+
+		$now = current_time( 'mysql' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->update(
+			$table_name,
+			array(
+				'name'         => $data['name'],
+				'content'      => $data['content'],
+				'content_hash' => $data['content_hash'],
+				'updated_at'   => $now,
+			),
+			array(
+				'id'        => $id,
+				'is_active' => 1,
+			),
+			array( '%s', '%s', '%s', '%s' ),
+			array( '%d', '%d' )
+		);
+
+		return ( false !== $result ) ? true : false;
+	}
+
+	/**
+	 * Deactivate template.
+	 *
+	 * @param   int $id ID.
+	 * @return  bool
+	 */
+	public function deactivate( int $id ): bool {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+
+		$now = current_time( 'mysql' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->update(
+			$table_name,
+			array(
+				'is_active'  => 0,
+				'updated_at' => $now,
+			),
+			array(
+				'id'        => $id,
+				'is_active' => 1,
+			),
+			array( '%d', '%s' ),
+			array( '%d', '%d' ),
+		);
+
+		return ( false !== $result ) ? true : false;
+	}
 }
