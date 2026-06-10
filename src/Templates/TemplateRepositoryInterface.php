@@ -54,4 +54,51 @@ interface TemplateRepositoryInterface {
 	 * @return  array<int, array<string, mixed>>
 	 */
 	public function find_selectable_by_type( string $type ): array;
+
+	/**
+	 * Check name exists.
+	 *
+	 * @param   string   $name       Name.
+	 * @param   int|null $exclude_id Exclude id.
+	 * @return  bool
+	 */
+	public function name_exists( string $name, ?int $exclude_id ): bool;
+
+	/**
+	 * Insert data.
+	 *
+	 * @param   array<string, mixed> $data   Data.
+	 * @return  int
+	 * @phpstan-param   array{
+	 *  template_key: string,
+	 *  name: string,
+	 *  content: string,
+	 *  content_hash: string,
+	 *  version: string
+	 * }    $data
+	 */
+	public function insert( array $data ): int;
+
+	/**
+	 * Update data.
+	 *
+	 * @param   int                  $id     ID.
+	 * @param   array<string, mixed> $data   Data.
+	 * @return  bool
+	 * @phpstan-param   array{
+	 *  name?: string,
+	 *  content?: string,
+	 *  content_hash?: string,
+	 *  updated_at?: string
+	 * }    $data
+	 */
+	public function update( int $id, array $data ): bool;
+
+	/**
+	 * Deactivate template.
+	 *
+	 * @param   int $id ID.
+	 * @return  bool
+	 */
+	public function deactivate( int $id ): bool;
 }
