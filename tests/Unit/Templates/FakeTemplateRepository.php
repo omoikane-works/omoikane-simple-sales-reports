@@ -1,6 +1,6 @@
 <?php
 /**
- * Sales report renderer test.
+ * Fake template repository.
  *
  * @package SimpleSalesReports
  */
@@ -13,7 +13,7 @@ use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
 
 /**
- * Fake Template repository.
+ * Fake template repository.
  */
 final class FakeTemplateRepository implements TemplateRepositoryInterface {
 
@@ -34,7 +34,7 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	/**
 	 * Updated data.
 	 *
-	 * @var array<string, mixed>|null
+	 * @var array{id: int, data: array<string, mixed>}|null
 	 */
 	public ?array $updated_data = null;
 
@@ -78,12 +78,12 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   array<string, mixed>|null $template   Template.
 	 */
-	public function __construct( ?array $template ) {
+	public function __construct( ?array $template = null ) {
 		$this->template = $template;
 	}
 
 	/**
-	 * Find default sale report template.
+	 * Find default sales report template.
 	 *
 	 * @return  array<string, mixed>|null
 	 */
@@ -98,7 +98,13 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	 * @return  array<string, mixed>|null
 	 */
 	public function find_by_key( string $template_key ): ?array {
-		unset( $template_key );
+		if ( null === $this->template ) {
+			return null;
+		}
+
+		if ( $template_key !== (string) $this->template['template_key'] ) {
+			return null;
+		}
 
 		return $this->template;
 	}
@@ -110,7 +116,17 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	 * @return  array<string, mixed>|null
 	 */
 	public function find_active_default_by_type( string $type = TemplateTypes::SALES_REPORT ): ?array {
-		unset( $type );
+		if ( null === $this->template ) {
+			return null;
+		}
+
+		if ( $type !== (string) $this->template['type'] ) {
+			return null;
+		}
+
+		if ( empty( $this->template['is_default'] ) || empty( $this->template['is_active'] ) ) {
+			return null;
+		}
 
 		return $this->template;
 	}
@@ -122,7 +138,13 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	 * @return  array<string, mixed>|null
 	 */
 	public function find_by_id( int $id ): ?array {
-		unset( $id );
+		if ( null === $this->template ) {
+			return null;
+		}
+
+		if ( $id !== (int) $this->template['id'] ) {
+			return null;
+		}
 
 		return $this->template;
 	}
@@ -134,9 +156,15 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 	 * @return  array<int, array<string, mixed>>
 	 */
 	public function find_selectable_by_type( string $type ): array {
-		unset( $type );
-
 		if ( null === $this->template ) {
+			return array();
+		}
+
+		if ( $type !== (string) $this->template['type'] ) {
+			return array();
+		}
+
+		if ( empty( $this->template['is_active'] ) ) {
 			return array();
 		}
 

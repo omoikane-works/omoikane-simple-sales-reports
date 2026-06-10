@@ -193,4 +193,15 @@ if ( ! function_exists( 'home_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_generate_uuid4' ) ) {
+	/**
+	 * Generate uuid.
+	 *
+	 * @return  string
+	 */
+	function wp_generate_uuid4(): string {
+		return '00000000-0000-4000-8000-000000000000';
+	}
+}
+
 require dirname( __DIR__ ) . '/vendor/autoload.php';

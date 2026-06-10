@@ -72,13 +72,9 @@ interface TemplateRepositoryInterface {
 	 * @phpstan-param   array{
 	 *  template_key: string,
 	 *  name: string,
-	 *  type: string,
 	 *  content: string,
 	 *  content_hash: string,
-	 *  version: string,
-	 *  is_system: int,
-	 *  is_default: int,
-	 *  is_active: int
+	 *  version: string
 	 * }    $data
 	 */
 	public function insert( array $data ): int;
