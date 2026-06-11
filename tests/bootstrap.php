@@ -204,4 +204,20 @@ if ( ! function_exists( 'wp_generate_uuid4' ) ) {
 	}
 }
 
+if ( ! function_exists( 'absint' ) ) {
+	/**
+	 * Convert a value to non-negative integer.
+	 *
+	 * @param   mixed $maybeint   Maybe integer.
+	 * @return  int
+	 */
+	function absint( mixed $maybeint ): int {
+		return abs( (int) $maybeint );
+	}
+}
+
+require __DIR__ . '/Support/WP_REST_Response.php';
+require __DIR__ . '/Support/WP_Error.php';
+require __DIR__ . '/Support/WP_REST_Request.php';
+
 require dirname( __DIR__ ) . '/vendor/autoload.php';

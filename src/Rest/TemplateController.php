@@ -1,0 +1,144 @@
+<?php
+/**
+ * Template REST Controller.
+ *
+ * @package SimpleSalesReports
+ */
+
+declare(strict_types=1);
+
+namespace OmoikaneWorks\SimpleSalesReports\Rest;
+
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
+use WP_Error;
+use WP_REST_Request;
+use WP_REST_Response;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Template REST Controller.
+ */
+final class TemplateController {
+
+	/**
+	 * REST namespace.
+	 *
+	 * @var string
+	 */
+	private const NAMESPACE = 'ossr/v1';
+
+	/**
+	 * Template service.
+	 *
+	 * @var TemplateService
+	 */
+	private TemplateService $template_service;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param   TemplateService $template_service   Template service.
+	 */
+	public function __construct( TemplateService $template_service ) {
+		$this->template_service = $template_service;
+	}
+
+	/**
+	 * Register routes.
+	 *
+	 * @return  void
+	 */
+	public function register_routes(): void {
+		register_rest_route(
+			self::NAMESPACE,
+			'/templates',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_items' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/templates/(?P<id>\d+)',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_item' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+				'args'                => array(
+					'id' => array(
+						'required'          => true,
+						'validate_callback' => array( $this, 'validate_id' ),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Check permissions.
+	 *
+	 * @return  bool
+	 */
+	public function check_permissions(): bool {
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Validate ID.
+	 *
+	 * @param   mixed $value  Value.
+	 * @return  bool
+	 */
+	public function validate_id( mixed $value ): bool {
+		return 0 < absint( $value );
+	}
+
+	/**
+	 * Get templates.
+	 *
+	 * @return  WP_REST_Response
+	 */
+	public function get_items(): WP_REST_Response {
+		$templates = $this->template_service->list_templates();
+
+		return new WP_REST_Response(
+			array(
+				'items' => $templates,
+			),
+			200
+		);
+	}
+
+	/**
+	 * Get template.
+	 *
+	 * @param   WP_REST_Request $request    REST request.
+	 * @return  WP_REST_Response|WP_Error
+	 */
+	public function get_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		try {
+			$template_id = absint( $request['id'] );
+			$template    = $this->template_service->get_template( $template_id );
+
+			return new WP_REST_Response(
+				array(
+					'item' => $template,
+				),
+				200
+			);
+		} catch ( \InvalidArgumentException $exception ) {
+			unset( $exception );
+
+			return new WP_Error(
+				'ossr_template_not_found',
+				'Template not found.',
+				array(
+					'status' => 404,
+				)
+			);
+		}
+	}
+}

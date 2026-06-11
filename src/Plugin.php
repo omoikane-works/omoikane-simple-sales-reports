@@ -14,7 +14,9 @@ use OmoikaneWorks\SimpleSalesReports\Reports\OrderRepository;
 use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
 use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportBuilder;
 use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Rest\TemplateController;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -73,6 +75,7 @@ final class Plugin {
 	public function register_hooks(): void {
 		$period_resolver       = new ReportPeriodResolver();
 		$template_repository   = new TemplateRepository();
+		$template_service      = new TemplateService( $template_repository );
 		$sales_report_renderer = new SalesReportRenderer( $template_repository );
 		$order_repository      = new OrderRepository();
 		$sales_report_builder  = new SalesReportBuilder( $order_repository );
@@ -84,6 +87,14 @@ final class Plugin {
 			$template_repository,
 		);
 		$admin_page->register_hooks();
+
+		add_action(
+			'rest_api_init',
+			static function () use ( $template_service ): void {
+				$controller = new TemplateController( $template_service );
+				$controller->register_routes();
+			}
+		);
 	}
 
 	/**
