@@ -70,11 +70,15 @@ rsync -av \
 	"${ROOT_DIR}/" "${PACKAGE_DIR}/"
 
 cd "${PACKAGE_DIR}"
-composer install --no-dev --optimize-autoloader --no-interaction
+composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
 rm -rf \
 	"${PACKAGE_DIR}/vendor/mustache/mustache/.github" \
 	"${PACKAGE_DIR}/vendor/mustache/mustache/spec"
+
+rm -f \
+	"${PACKAGE_DIR}/composer.json" \
+	"${PACKAGE_DIR}/composer.lock"
 
 find "${PACKAGE_DIR}/vendor" -name ".git" -type d -prune -exec rm -rf {} +
 find "${PACKAGE_DIR}/vendor" -name ".gitignore" -type f -delete
@@ -86,7 +90,9 @@ zip -r "${ZIP_FILE}" "${PLUGIN_SLUG}"
 
 echo "Built: ${ZIP_FILE}"
 
-if unzip -l "${ZIP_FILE}" | grep -E 'DS_Store|debug|phpunit|phpstan|phpcs|tests|node_modules|\.github|\.git|\.gitignore|\.gitattributes'; then
+UNWANTED_PATTERN="DS_Store|debug|phpunit|phpstan|phpcs|wpcs|phpcompatibility|react|promise|tests|node_modules|${PLUGIN_SLUG}/composer\.json|${PLUGIN_SLUG}/composer\.lock|composer\.phar|\.github|\.git|\.gitignore|\.gitattributes"
+
+if unzip -l "${ZIP_FILE}" | grep -E "${UNWANTED_PATTERN}"; then
 	echo "Error: unwanted files found in zip."
 	exit 1
 fi
