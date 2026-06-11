@@ -3,7 +3,7 @@
  * Plugin Name:       Omoikane Simple Sales Reports for Welcart
  * Plugin URI:        https://github.com/omoikane-works/omoikane-simple-sales-reports
  * Description:       Create simple sales reports for Welcart stores.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Author:            Omoikane Works
@@ -23,7 +23,7 @@ use OmoikaneWorks\SimpleSalesReports\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OSSR_VERSION', '1.0.1' );
+define( 'OSSR_VERSION', '1.0.2' );
 define( 'OSSR_PLUGIN_FILE', __FILE__ );
 define( 'OSSR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OSSR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

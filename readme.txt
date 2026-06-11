@@ -4,7 +4,7 @@ Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,10 @@ Template editing is being considered for a future extension.
 
 == Changelog ==
 
+= 1.0.2 =
+* Improved the release package to include production dependencies only.
+* Removed unnecessary development and Composer metadata files from the distributed ZIP.
+
 = 1.0.1 =
 * Renamed the plugin to Omoikane Simple Sales Reports for Welcart.
 * Updated the plugin slug, text domain, namespace, and internal prefixes.
@@ -77,6 +81,9 @@ Template editing is being considered for a future extension.
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Updated the release package to include production dependencies only.
 
 = 1.0.1 =
 Renamed the plugin and updated dependencies for WordPress.org review.
