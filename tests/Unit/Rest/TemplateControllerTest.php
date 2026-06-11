@@ -129,6 +129,146 @@ final class TemplateControllerTest extends TestCase {
 	}
 
 	/**
+	 * Test duplicate item returns created template id.
+	 *
+	 * @return  void
+	 */
+	public function test_duplicate_item_returns_created_template_id(): void {
+		$template = $this->create_template_row(
+			array(
+				'id'           => 10,
+				'template_key' => 'default_sales_report',
+				'name'         => 'default_sales_report',
+				'content'      => 'Hello {{name}}',
+				'is_system'    => true,
+			)
+		);
+
+		$repository                = new FakeTemplateRepository( $template );
+		$repository->insert_result = 123;
+
+		$controller = $this->create_controller_with_repository( $repository );
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'id', '10' );
+		$request->set_param( 'name', 'Custom Sales Report' );
+
+		$response = $controller->duplicate_item( $request );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( array( 'id' => 123 ), $response->get_data() );
+		$this->assertIsArray( $repository->inserted_data );
+		$this->assertSame( 'Custom Sales Report', $repository->inserted_data['name'] );
+		$this->assertSame( 'Hello {{name}}', $repository->inserted_data['content'] );
+	}
+
+	/**
+	 * Test duplicate item returns error when template is not found.
+	 *
+	 * @return  void
+	 */
+	public function test_duplicate_item_returns_error_when_template_is_not_found(): void {
+		$template = $this->create_template_row(
+			array(
+				'id'           => 10,
+				'template_key' => 'default_sales_report',
+				'name'         => 'default_sales_report',
+				'content'      => 'Hello {{name}}',
+				'is_system'    => true,
+			)
+		);
+
+		$repository                = new FakeTemplateRepository( $template );
+		$repository->insert_result = 123;
+
+		$controller = $this->create_controller_with_repository( $repository );
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'id', '999' );
+		$request->set_param( 'name', 'Custom Sales Report' );
+
+		$response = $controller->duplicate_item( $request );
+
+		$this->assertInstanceOf( WP_Error::class, $response );
+		$this->assertSame( 'ossr_template_not_found', $response->get_error_code() );
+
+		$error_data = $response->get_error_data();
+
+		$this->assertIsArray( $error_data );
+		$this->assertSame( 404, $error_data['status'] );
+	}
+
+	/**
+	 * Test duplicate item returns error when template name already exists.
+	 *
+	 * @return  void
+	 */
+	public function test_duplicate_item_returns_error_when_name_already_exists(): void {
+		$template = $this->create_template_row(
+			array(
+				'id'           => 10,
+				'template_key' => 'default_sales_report',
+				'name'         => 'default_sales_report',
+				'content'      => 'Hello {{name}}',
+				'is_system'    => true,
+			)
+		);
+
+		$repository                     = new FakeTemplateRepository( $template );
+		$repository->name_exists_result = true;
+
+		$controller = $this->create_controller_with_repository( $repository );
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'id', '10' );
+		$request->set_param( 'name', 'Custom Sales Report' );
+
+		$response = $controller->duplicate_item( $request );
+
+		$this->assertInstanceOf( WP_Error::class, $response );
+		$this->assertSame( 'ossr_template_invalid_request', $response->get_error_code() );
+
+		$error_data = $response->get_error_data();
+
+		$this->assertIsArray( $error_data );
+		$this->assertSame( 400, $error_data['status'] );
+	}
+
+	/**
+	 * Test duplicate item returns error when duplicate fails.
+	 *
+	 * @return  void
+	 */
+	public function test_duplicate_item_returns_error_when_duplicate_fails(): void {
+		$template = $this->create_template_row(
+			array(
+				'id'      => 10,
+				'content' => 'Hello {{name}}',
+			)
+		);
+
+		$repository                = new FakeTemplateRepository( $template );
+		$repository->insert_result = 0;
+
+		$controller = $this->create_controller_with_repository( $repository );
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'id', '10' );
+		$request->set_param( 'name', 'Custom Sales Report' );
+
+		$response = $controller->duplicate_item( $request );
+
+		$this->assertInstanceOf( WP_Error::class, $response );
+		$this->assertSame( 'ossr_template_duplicate_failed', $response->get_error_code() );
+
+		$error_data = $response->get_error_data();
+
+		$this->assertIsArray( $error_data );
+		$this->assertSame( 500, $error_data['status'] );
+	}
+
+	/**
 	 * Create controller.
 	 *
 	 * @param array<string, mixed>|null $template Template.
@@ -139,6 +279,18 @@ final class TemplateControllerTest extends TestCase {
 			new TemplateService(
 				new FakeTemplateRepository( $template )
 			)
+		);
+	}
+
+	/**
+	 * Create controller with repository.
+	 *
+	 * @param   FakeTemplateRepository $template_repository    Template repository.
+	 * @return  TemplateController
+	 */
+	private function create_controller_with_repository( FakeTemplateRepository $template_repository ): TemplateController {
+		return new TemplateController(
+			new TemplateService( $template_repository )
 		);
 	}
 

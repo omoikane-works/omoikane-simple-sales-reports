@@ -56,7 +56,8 @@
     "Backorder",
     "nowrap",
     "Segoe",
-    "maybeint"
+    "maybeint",
+    "phar"
   ],
   "ignorePaths": [
     "vendor/**",

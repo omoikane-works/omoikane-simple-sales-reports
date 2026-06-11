@@ -75,6 +75,27 @@ final class TemplateController {
 				),
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/templates/(?P<id>\d+)/duplicate',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'duplicate_item' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+				'args'                => array(
+					'id'   => array(
+						'required'          => true,
+						'validate_callback' => array( $this, 'validate_id' ),
+					),
+					'name' => array(
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+						'validate_callback' => array( $this, 'validate_name' ),
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -94,6 +115,16 @@ final class TemplateController {
 	 */
 	public function validate_id( mixed $value ): bool {
 		return 0 < absint( $value );
+	}
+
+	/**
+	 * Validate template name.
+	 *
+	 * @param   mixed $value  Value.
+	 * @return  bool
+	 */
+	public function validate_name( mixed $value ): bool {
+		return is_string( $value ) && '' !== trim( $value );
 	}
 
 	/**
@@ -138,6 +169,55 @@ final class TemplateController {
 				array(
 					'status' => 404,
 				)
+			);
+		}
+	}
+
+	/**
+	 * Duplicate item.
+	 *
+	 * @param   WP_REST_Request $request    Request.
+	 * @return  WP_REST_Response|WP_Error
+	 */
+	public function duplicate_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$template_id = absint( $request['id'] );
+		$name        = (string) $request['name'];
+
+		try {
+			$duplicated_id = $this->template_service->duplicate_template(
+				$template_id,
+				$name
+			);
+
+			return new WP_REST_Response(
+				array(
+					'id' => $duplicated_id,
+				),
+				201
+			);
+		} catch ( \InvalidArgumentException $exception ) {
+			$message = $exception->getMessage();
+
+			if ( 'Template not found.' === $message ) {
+				return new WP_Error(
+					'ossr_template_not_found',
+					'Template not found.',
+					array( 'status' => 404 )
+				);
+			}
+
+			return new WP_Error(
+				'ossr_template_invalid_request',
+				$message,
+				array( 'status' => 400 )
+			);
+		} catch ( \RuntimeException $exception ) {
+			unset( $exception );
+
+			return new WP_Error(
+				'ossr_template_duplicate_failed',
+				'Failed to duplicate template.',
+				array( 'status' => 500 )
 			);
 		}
 	}
