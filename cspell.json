@@ -55,7 +55,9 @@
     "shivammathur",
     "Backorder",
     "nowrap",
-    "Segoe"
+    "Segoe",
+    "maybeint",
+    "phar"
   ],
   "ignorePaths": [
     "vendor/**",

@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
-use OmoikaneWorks\SimpleSalesReports\Templates\TemplateKeys;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
-use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
+use OmoikaneWorks\SimpleSalesReports\Tests\Support\CreatesTemplateRows;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,18 +18,25 @@ use PHPUnit\Framework\TestCase;
  */
 final class TemplateServiceTest extends TestCase {
 
+	use CreatesTemplateRows;
+
 	/**
 	 * Test list templates returns repository templates.
 	 *
 	 * @return  void
 	 */
 	public function test_list_templates_returns_repository_templates(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'   => 10,
+				'name' => 'Default Sales Report',
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'   => 1,
-					'name' => 'Default Sales Report',
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -39,7 +45,7 @@ final class TemplateServiceTest extends TestCase {
 		$result = $service->list_templates();
 
 		$this->assertCount( 1, $result );
-		$this->assertSame( 1, $result[0]['id'] );
+		$this->assertSame( 10, $result[0]['id'] );
 		$this->assertSame( 'Default Sales Report', $result[0]['name'] );
 	}
 
@@ -49,12 +55,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_get_template_returns_repository_template(): void {
-		$repository = new fakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'   => 10,
-					'name' => 'Custom Template',
-				)
+		$template    = $this->create_template_row(
+			array(
+				'id'   => 10,
+				'name' => 'Custom Template',
+			)
+		);
+		$template_id = (int) $template['id'];
+
+		$repository = new FakeTemplateRepository(
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -88,12 +99,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_duplicate_template_inserts_copied_template(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'   => 10,
+				'name' => 'Default Sales Report',
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'   => 10,
-					'name' => 'Default Sales Report',
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->insert_result = 20;
@@ -105,8 +121,8 @@ final class TemplateServiceTest extends TestCase {
 		$this->assertSame( 20, $result );
 		$this->assertIsArray( $repository->inserted_data );
 		$this->assertSame( 'Copied Template', $repository->inserted_data['name'] );
-		$this->assertSame( '<h1>{{report.title}}</h1>', $repository->inserted_data['content'] );
-		$this->assertSame( hash( 'sha256', '<h1>{{report.title}}</h1>' ), $repository->inserted_data['content_hash'] );
+		$this->assertSame( '<h1>{{ report.title }}</h1>', $repository->inserted_data['content'] );
+		$this->assertSame( hash( 'sha256', '<h1>{{ report.title }}</h1>' ), $repository->inserted_data['content_hash'] );
 		$this->assertSame( '1.0.0', $repository->inserted_data['version'] );
 		$this->assertStringStartswith( 'custom_', $repository->inserted_data['template_key'] );
 	}
@@ -117,11 +133,16 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_duplicate_template_throws_exception_when_name_exists(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id' => 10,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                     = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id' => 10,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->name_exists_result = true;
@@ -140,12 +161,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_duplicate_template_throws_exception_when_insert_fails(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => true,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => true,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->insert_result = 0;
@@ -164,11 +190,16 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_duplicate_template_throws_exception_when_name_is_empty(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id' => 10,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id' => 10,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -186,12 +217,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_updates_custom_template(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -212,12 +248,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_template_is_system_template(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => true,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => true,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -235,12 +276,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_template_name_already_exists(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                     = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->name_exists_result = true;
@@ -259,12 +305,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_update_fails(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->update_result = false;
@@ -283,12 +334,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_name_is_empty(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -306,12 +362,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_content_is_empty(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -329,12 +390,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_throws_exception_when_content_syntax_is_invalid(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -352,12 +418,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_delete_template_deactivates_custom_template(): void {
-		$repository = new FakeTEmplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
+		$repository = new FakeTemplateRepository(
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -374,12 +445,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_delete_template_throws_exception_when_template_is_system_template(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => true,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => true,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 
@@ -397,12 +473,17 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_delete_template_throws_exception_when_delete_fails(): void {
+		$template    = $this->create_template_row(
+			array(
+				'id'        => 10,
+				'is_system' => false,
+			)
+		);
+		$template_id = (int) $template['id'];
+
 		$repository                    = new FakeTemplateRepository(
-			$this->create_template_row(
-				array(
-					'id'        => 10,
-					'is_system' => false,
-				)
+			array(
+				$template_id => $template,
 			)
 		);
 		$repository->deactivate_result = false;
@@ -413,31 +494,5 @@ final class TemplateServiceTest extends TestCase {
 		$this->expectExceptionMessage( 'Failed to delete template.' );
 
 		$service->delete_template( 10 );
-	}
-
-	/**
-	 * Create template row.
-	 *
-	 * @param   array<string, mixed> $override  Overrides.
-	 * @return  array<string, mixed>
-	 */
-	private function create_template_row( array $override = array() ): array {
-		return array_merge(
-			array(
-				'id'           => 1,
-				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
-				'name'         => 'default Sales Report',
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => '<h1>{{report.title}}</h1>',
-				'content_hash' => 'hash - default',
-				'version'      => '1.0.0',
-				'is_system'    => true,
-				'is_default'   => true,
-				'is_active'    => true,
-				'created_at'   => '2026 - 05 - 01 10:00:00',
-				'updated_at'   => '2026 - 05 - 01 10:00:00',
-			),
-			$override
-		);
 	}
 }
