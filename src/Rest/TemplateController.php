@@ -188,13 +188,6 @@ final class TemplateController {
 				$template_id,
 				$name
 			);
-
-			return new WP_REST_Response(
-				array(
-					'id' => $duplicated_id,
-				),
-				201
-			);
 		} catch ( \InvalidArgumentException $exception ) {
 			$message = $exception->getMessage();
 
@@ -220,5 +213,24 @@ final class TemplateController {
 				array( 'status' => 500 )
 			);
 		}
+
+		try {
+			$template = $this->template_service->get_template( $duplicated_id );
+		} catch ( \InvalidArgumentException $exception ) {
+			unset( $exception );
+
+			return new WP_Error(
+				'ossr_template_duplicate_failed',
+				'Failed to duplicate template.',
+				array( 'status' => 500 )
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'item' => $template,
+			),
+			201
+		);
 	}
 }
