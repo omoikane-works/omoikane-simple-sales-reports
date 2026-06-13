@@ -77,7 +77,6 @@ rm -rf \
 	"${PACKAGE_DIR}/vendor/mustache/mustache/spec"
 
 rm -f \
-	"${PACKAGE_DIR}/composer.json" \
 	"${PACKAGE_DIR}/composer.lock"
 
 find "${PACKAGE_DIR}/vendor" -name ".git" -type d -prune -exec rm -rf {} +
@@ -90,7 +89,7 @@ zip -r "${ZIP_FILE}" "${PLUGIN_SLUG}"
 
 echo "Built: ${ZIP_FILE}"
 
-UNWANTED_PATTERN="DS_Store|debug|phpunit|phpstan|phpcs|wpcs|phpcompatibility|react|promise|tests|node_modules|${PLUGIN_SLUG}/composer\.json|${PLUGIN_SLUG}/composer\.lock|composer\.phar|\.github|\.git|\.gitignore|\.gitattributes"
+UNWANTED_PATTERN="DS_Store|debug|phpunit|phpstan|phpcs|wpcs|phpcompatibility|react|promise|tests|node_modules|${PLUGIN_SLUG}/composer\.lock|composer\.phar|\.github|\.git|\.gitignore|\.gitattributes"
 
 if unzip -l "${ZIP_FILE}" | grep -E "${UNWANTED_PATTERN}"; then
 	echo "Error: unwanted files found in zip."
