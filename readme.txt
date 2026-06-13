@@ -4,7 +4,7 @@ Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Template editing is being considered for a future extension.
 
 == Changelog ==
 
+= 1.0.3 =
+* Updated the release package to include composer.json.
+
 = 1.0.2 =
 * Improved the release package to include production dependencies only.
 * Removed unnecessary development and Composer metadata files from the distributed ZIP.
@@ -81,6 +84,9 @@ Template editing is being considered for a future extension.
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Updated the release package to include composer.json.
 
 = 1.0.2 =
 Updated the release package to include production dependencies only.
