@@ -1,0 +1,25 @@
+// tsconfig.json
+
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "jsx": "preserve",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "lib": ["ES2022", "DOM", "DOM.iterable"],
+        "paths": {
+            "@/*": ["./assets/admin/src/*"]
+        },
+        "types": ["node"]
+    },
+    "include": [
+        "assets/admin/src/**/*.ts",
+        "assets/admin/src/**/*.vue",
+        "vite.config.ts"
+    ]
+}

@@ -1,0 +1,32 @@
+{
+    "name": "omoikane-simple-sales-reports",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Generates simple sales reports for Welcart.",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host 0.0.0.0",
+        "build": "vue-tsc --noEmit && vite build",
+        "typecheck": "vue-tsc --noEmit"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/omoikane-works/omoikane-simple-sales-reports.git"
+    },
+    "author": "Omoikane Works",
+    "license": "GPL-2.0-or-later",
+    "bugs": {
+        "url": "https://github.com/omoikane-works/omoikane-simple-sales-reports/issues"
+    },
+    "homepage": "https://github.com/omoikane-works/omoikane-simple-sales-reports#readme",
+    "dependencies": {
+        "vue": "^3.5.38"
+    },
+    "devDependencies": {
+        "@types/node": "^25.9.3",
+        "@vitejs/plugin-vue": "^6.0.7",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.16",
+        "vue-tsc": "^3.3.5"
+    }
+}
