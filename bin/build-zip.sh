@@ -21,9 +21,28 @@ if [[ ! -f "${ROOT_DIR}/composer.json" ]]; then
 	exit 1
 fi
 
-if [[ ! -f "${VITE_MANIFEST_FILE}" ]]; then
+command -v npm >/dev/null 2>&1 || {
+    echo "Error: npm is required."
+    exit 1
+}
+
+if [[ ! -f "${ROOT_DIR}/package.json" || ! -f "${ROOT_DIR}/package-lock.json" ]]; then
+    echo "Error: npm package files not found."
+    exit 1
+fi
+
+# Build Vue admin assets.
+if ! (
+    cd "${ROOT_DIR}" &&
+    npm ci &&
+    npm run build
+); then
+    echo "Error: npm build failed."
+    exit 1
+fi
+
+if [[ ! -s "${VITE_MANIFEST_FILE}" ]]; then
     echo "Error: Vite build manifest not found or empty."
-    echo "Run npm run build before packaging."
     exit 1
 fi
 
@@ -99,7 +118,10 @@ cd "${BUILD_DIR}"
 rm -f "${ZIP_FILE}"
 zip -r "${ZIP_FILE}" "${PLUGIN_SLUG}"
 
-echo "Built: ${ZIP_FILE}"
+if ! unzip -tq "${ZIP_FILE}"; then
+    echo "Error: ZIP integrity check failed."
+    exit 1
+fi
 
 UNWANTED_PATTERN="DS_Store|debug|phpunit|phpstan|phpcs|wpcs|phpcompatibility|react|promise|tests|node_modules|${PLUGIN_SLUG}/composer\.lock|composer\.phar|\.github|\.git|\.gitignore|\.gitattributes"
 
@@ -114,3 +136,7 @@ unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/omoikane-simple-sales-re
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/assets/admin/dist/.vite/manifest.json" >/dev/null
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/src/Admin/AdminAssets.php" >/dev/null
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/resources/i18n.php" >/dev/null
+unzip -Z -1 "${ZIP_FILE}" | grep -E "^${PLUGIN_SLUG}/assets/admin/dist/assets/.*\.js$" >/dev/null
+unzip -Z -1 "${ZIP_FILE}" | grep -E "^${PLUGIN_SLUG}/assets/admin/dist/assets/.*\.css$" >/dev/null
+
+echo "Built: ${ZIP_FILE}"
