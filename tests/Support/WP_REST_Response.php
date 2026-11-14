@@ -28,6 +28,32 @@ if ( ! class_exists( 'WP_REST_Response' ) ) {
 		private int $status;
 
 		/**
+		 * HTTP headers.
+		 *
+		 * @var array<string, string>
+		 */
+		private array $headers = array();
+
+		/**
+		 * Set a response header.
+		 *
+		 * @param string $key   Header name.
+		 * @param string $value Header value.
+		 */
+		public function header( string $key, string $value ): void {
+			$this->headers[ $key ] = $value;
+		}
+
+		/**
+		 * Get response headers.
+		 *
+		 * @return array<string, string>
+		 */
+		public function get_headers(): array {
+			return $this->headers;
+		}
+
+		/**
 		 * Constructor.
 		 *
 		 * @param   mixed $data   Response data.

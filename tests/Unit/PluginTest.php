@@ -78,11 +78,17 @@ final class PluginTest extends TestCase {
 		$rest_init();
 
 		$registrations = array_slice( $GLOBALS['ossr_test_calls'], count( $calls ) );
-		$this->assertSame( array( 'register_rest_route', 'register_rest_route', 'register_rest_route' ), array_column( $registrations, 0 ) );
-		$this->assertSame( array( 'ossr/v1', 'ossr/v1', 'ossr/v1' ), array_column( $registrations, 1 ) );
+		$this->assertSame( array_fill( 0, 4, 'register_rest_route' ), array_column( $registrations, 0 ) );
+		$this->assertSame( array_fill( 0, 4, 'ossr/v1' ), array_column( $registrations, 1 ) );
 		$this->assertEqualsCanonicalizing(
-			array( '/templates', '/templates/(?P<id>\d+)', '/templates/(?P<id>\d+)/duplicate' ),
+			array( '/templates', '/templates/(?P<id>\d+)', '/templates/(?P<id>\d+)/duplicate', '/config/branding/(?P<slot>logo|stamp)' ),
 			array_column( $registrations, 2 )
 		);
+
+		$branding = $registrations[3][3];
+		$this->assertSame( array( 'GET', 'PUT', 'DELETE' ), array_column( $branding, 'methods' ) );
+		foreach ( $branding as $endpoint ) {
+			$this->assertSame( 'check_permissions', $endpoint['permission_callback'][1] );
+		}
 	}
 }

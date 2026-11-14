@@ -23,7 +23,17 @@ function getRestConfig(): OssrRestConfig {
 }
 
 function buildUrl(restUrl: string, path: string): string {
-    return `${restUrl.replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
+    const url = new URL(restUrl, window.location.href);
+    const suffix = path.replace(/^\/+/, "");
+    const route = url.searchParams.get("rest_route");
+
+    if (route !== null) {
+        url.searchParams.set("rest_route", `${route.replace(/\/+$/, "")}/${suffix}`);
+    } else {
+        url.pathname = `${url.pathname.replace(/\/+$/, "")}/${suffix}`;
+    }
+
+    return url.href;
 }
 
 async function parseResponseBody(res: Response): Promise<unknown> {
@@ -82,6 +92,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const { restUrl, nonce } = getRestConfig();
 
     const headers = new Headers(init.headers);
+    headers.set("Accept", "application/json");
     headers.set("X-WP-Nonce", nonce);
 
     const res = await fetch(buildUrl(restUrl, path), {

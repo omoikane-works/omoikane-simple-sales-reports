@@ -11,10 +11,14 @@ namespace OmoikaneWorks\SimpleSalesReports;
 
 use OmoikaneWorks\SimpleSalesReports\Admin\AdminPage;
 use OmoikaneWorks\SimpleSalesReports\Admin\AdminAssets;
+use OmoikaneWorks\SimpleSalesReports\Configs\BrandingImageService;
+use OmoikaneWorks\SimpleSalesReports\Configs\ConfigRepository;
+use OmoikaneWorks\SimpleSalesReports\Configs\ConfigService;
 use OmoikaneWorks\SimpleSalesReports\Reports\OrderRepository;
 use OmoikaneWorks\SimpleSalesReports\Reports\ReportPeriodResolver;
 use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportBuilder;
 use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
+use OmoikaneWorks\SimpleSalesReports\Rest\ConfigController;
 use OmoikaneWorks\SimpleSalesReports\Rest\TemplateController;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
@@ -46,6 +50,13 @@ final class Plugin {
 	 * @var string
 	 */
 	public const OSSR_ADMIN_TEMPLATES_VIEW_SLUG = 'templates';
+
+	/**
+	 * Settings view slug.
+	 *
+	 * @var string
+	 */
+	public const OSSR_ADMIN_SETTINGS_VIEW_SLUG = 'config';
 
 	/**
 	 * Plugin instance.
@@ -135,6 +146,9 @@ final class Plugin {
 			static function () use ( $template_service ): void {
 				$controller = new TemplateController( $template_service );
 				$controller->register_routes();
+
+				$configs = new ConfigService( new ConfigRepository() );
+				( new ConfigController( new BrandingImageService( $configs ) ) )->register_routes();
 			}
 		);
 	}
@@ -146,16 +160,23 @@ final class Plugin {
 	 * @return array<string, array<string, string>>
 	 */
 	public function add_admin_menu_items( array $items ): array {
-		$items[ self::OSSR_ADMIN_TEMPLATES_VIEW_SLUG ] = array(
-			'label' => __( 'Templates', 'omoikane-simple-sales-reports' ),
-			'url'   => add_query_arg(
-				array(
-					'page'                      => self::OSSR_ADMIN_PAGE_SLUG,
-					self::OSSR_ADMIN_VIEW_PARAM => self::OSSR_ADMIN_TEMPLATES_VIEW_SLUG,
-				),
-				admin_url( 'admin.php' ),
-			),
+		$views = array(
+			self::OSSR_ADMIN_TEMPLATES_VIEW_SLUG => __( 'Templates', 'omoikane-simple-sales-reports' ),
+			self::OSSR_ADMIN_SETTINGS_VIEW_SLUG  => __( 'Settings', 'omoikane-simple-sales-reports' ),
 		);
+
+		foreach ( $views as $view => $label ) {
+			$items[ $view ] = array(
+				'label' => $label,
+				'url'   => add_query_arg(
+					array(
+						'page'                      => self::OSSR_ADMIN_PAGE_SLUG,
+						self::OSSR_ADMIN_VIEW_PARAM => $view,
+					),
+					admin_url( 'admin.php' ),
+				),
+			);
+		}
 
 		return $items;
 	}
@@ -167,11 +188,11 @@ final class Plugin {
 	 * @return void
 	 */
 	public function render_extended_admin_view( string $current_view ): void {
-		if ( self::OSSR_ADMIN_TEMPLATES_VIEW_SLUG !== $current_view ) {
-			return;
+		if ( self::OSSR_ADMIN_TEMPLATES_VIEW_SLUG === $current_view ) {
+			echo '<div id="ossr-admin"></div>';
+		} elseif ( self::OSSR_ADMIN_SETTINGS_VIEW_SLUG === $current_view ) {
+			echo '<div id="ossr-settings"></div>';
 		}
-
-		echo '<div id="ossr-admin"></div>';
 	}
 
 	/**

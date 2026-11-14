@@ -21,6 +21,56 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		private array $params = array();
 
 		/**
+		 * Matched URL parameters.
+		 *
+		 * @var array<string, string>
+		 */
+		private array $url_params = array();
+
+		/**
+		 * Decoded JSON body.
+		 *
+		 * @var mixed
+		 */
+		private mixed $json_params = null;
+
+		/**
+		 * Get the matched URL parameters.
+		 *
+		 * @return array<string, string>
+		 */
+		public function get_url_params(): array {
+			return $this->url_params;
+		}
+
+		/**
+		 * Set the matched URL parameters.
+		 *
+		 * @param array<string, string> $params URL parameters.
+		 */
+		public function set_url_params( array $params ): void {
+			$this->url_params = $params;
+		}
+
+		/**
+		 * Get the decoded JSON body.
+		 *
+		 * @return mixed
+		 */
+		public function get_json_params(): mixed {
+			return $this->json_params;
+		}
+
+		/**
+		 * Set the decoded JSON body as returned by WordPress.
+		 *
+		 * @param mixed $params Decoded JSON value.
+		 */
+		public function set_json_params( mixed $params ): void {
+			$this->json_params = $params;
+		}
+
+		/**
 		 * Get request parameter.
 		 *
 		 * @param   string $key    Parameter key.

@@ -31,6 +31,22 @@ define( 'OSSR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'OSSR_MINIMUM_PHP_VERSION', '8.2' );
 define( 'OSSR_MINIMUM_USCES_VERSION', '2.11.10' );
 
+add_action(
+	'init',
+	static function (): void {
+		$domain = 'omoikane-simple-sales-reports';
+		load_plugin_textdomain( $domain, false, dirname( OSSR_PLUGIN_BASENAME ) . '/languages' );
+
+		$locale  = determine_locale();
+		$bundled = OSSR_PLUGIN_DIR . "languages/{$domain}-{$locale}.mo";
+		if ( is_readable( $bundled ) ) {
+			// Load the installed language pack first. The bundled catalog fills in missing strings.
+			get_translations_for_domain( $domain );
+			load_textdomain( $domain, $bundled, $locale );
+		}
+	}
+);
+
 /**
  * Check whether the current PHP version is supported.
  *

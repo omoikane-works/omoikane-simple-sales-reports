@@ -43,8 +43,8 @@ final class AdminAssets {
 	 * @var array<string>
 	 */
 	private const OSSR_ADMIN_VUE_VIEWS = array(
-		'templates',
-		'config',
+		Plugin::OSSR_ADMIN_TEMPLATES_VIEW_SLUG,
+		Plugin::OSSR_ADMIN_SETTINGS_VIEW_SLUG,
 	);
 
 	/**
@@ -156,7 +156,29 @@ final class AdminAssets {
 			true
 		);
 
-		wp_script_add_data( self::SCRIPT_HANDLE, 'type', 'module' );
+		add_filter( 'script_loader_tag', array( $this, 'add_module_type' ), 10, 2 );
+	}
+
+	/**
+	 * Mark only the Vite entry as a module, preserving inline localization and other attributes.
+	 *
+	 * @param string $tag    Script markup.
+	 * @param string $handle Script handle.
+	 * @return string
+	 */
+	public function add_module_type( string $tag, string $handle ): string {
+		if ( self::SCRIPT_HANDLE !== $handle ) {
+			return $tag;
+		}
+
+		$processor = new \WP_HTML_Tag_Processor( $tag );
+		while ( $processor->next_tag( array( 'tag_name' => 'SCRIPT' ) ) ) {
+			if ( self::SCRIPT_HANDLE . '-js' === $processor->get_attribute( 'id' ) ) {
+				$processor->set_attribute( 'type', 'module' );
+				break;
+			}
+		}
+		return $processor->get_updated_html();
 	}
 
 	/**
@@ -196,7 +218,7 @@ final class AdminAssets {
 			self::SCRIPT_HANDLE,
 			'ossrRestConfig',
 			array(
-				'restUrl' => esc_url_raw( rest_url( self::REST_NAMESPACE ) ),
+				'restUrl' => esc_url_raw( add_query_arg( '_locale', 'user', rest_url( self::REST_NAMESPACE ) ) ),
 				'nonce'   => wp_create_nonce( 'wp_rest' ),
 			)
 		);

@@ -52,6 +52,25 @@ return array(
 	'template.tooltip.system_edit'         => __( 'System templates cannot be edited. Duplicate this template to edit it.', 'omoikane-simple-sales-reports' ),
 	'template.tooltip.system_delete'       => __( 'System templates cannot be deleted.', 'omoikane-simple-sales-reports' ),
 
+	// Branding settings.
+	'branding.title'                       => __( 'Branding Images', 'omoikane-simple-sales-reports' ),
+	'branding.logo'                        => __( 'Logo', 'omoikane-simple-sales-reports' ),
+	'branding.stamp'                       => __( 'Company Stamp', 'omoikane-simple-sales-reports' ),
+	'branding.limits'                      => __( 'PNG, JPEG, or WebP. Up to 1 MiB, 4,096 px per side, and 4,194,304 pixels in total. Static images only.', 'omoikane-simple-sales-reports' ),
+	'branding.empty'                       => __( 'No image registered.', 'omoikane-simple-sales-reports' ),
+	'branding.choose'                      => __( 'Image file', 'omoikane-simple-sales-reports' ),
+	'branding.preview_saved'               => __( 'Saved image', 'omoikane-simple-sales-reports' ),
+	'branding.preview_unsaved'             => __( 'Unsaved preview', 'omoikane-simple-sales-reports' ),
+	'branding.cancel_selection'            => __( 'Discard selection', 'omoikane-simple-sales-reports' ),
+	'branding.register'                    => __( 'Register', 'omoikane-simple-sales-reports' ),
+	'branding.replace'                     => __( 'Replace', 'omoikane-simple-sales-reports' ),
+	'branding.retry'                       => __( 'Retry', 'omoikane-simple-sales-reports' ),
+	'branding.confirm_delete'              => __( 'Delete this image?', 'omoikane-simple-sales-reports' ),
+	'branding.saved'                       => __( 'Image saved.', 'omoikane-simple-sales-reports' ),
+	'branding.deleted'                     => __( 'Image deleted.', 'omoikane-simple-sales-reports' ),
+	'branding.read_failed'                 => __( 'The image file could not be read.', 'omoikane-simple-sales-reports' ),
+	'branding.too_large'                   => __( 'The image file must be 1 MiB or smaller.', 'omoikane-simple-sales-reports' ),
+
 	// Errors.
 	'error.unknown'                        => __( 'An unknown error occurred.', 'omoikane-simple-sales-reports' ),
 	'error.rest_config_missing'            => __( 'OSSR REST config is missing.', 'omoikane-simple-sales-reports' ),

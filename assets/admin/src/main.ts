@@ -1,13 +1,12 @@
-// main.ts
-
 import { createApp } from "vue";
 import App from "./App.vue";
+import SettingsApp from "./SettingsApp.vue";
 
-const mountTarget = document.getElementById("ossr-admin");
+const templateTarget = document.getElementById("ossr-admin");
+const settingsTarget = document.getElementById("ossr-settings");
 
-if (mountTarget === null) {
-    console.warn("OSSR mount target was not found.");
-} else {
-    const app = createApp(App);
-    app.mount(mountTarget);
+if (templateTarget) {
+    createApp(App).mount(templateTarget);
+} else if (settingsTarget) {
+    createApp(SettingsApp).mount(settingsTarget);
 }

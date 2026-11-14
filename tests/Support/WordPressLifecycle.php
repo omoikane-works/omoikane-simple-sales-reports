@@ -138,3 +138,35 @@ function ossr_get_unsupported_welcart_version_message(): string {
 function ossr_get_unsupported_php_version_message(): string {
 	return 'Unsupported PHP version.';
 }
+
+/**
+ * Simulate the capability check for the current user.
+ *
+ * @param string $capability WordPress capability.
+ * @return bool
+ */
+function current_user_can( string $capability ): bool {
+	return 'manage_options' === $capability && ( $GLOBALS['ossr_test_manage_options'] ?? false );
+}
+
+/**
+ * Identify a WordPress error.
+ *
+ * @param mixed $value Response value.
+ * @return bool
+ */
+function is_wp_error( mixed $value ): bool {
+	return $value instanceof WP_Error;
+}
+
+/**
+ * Encode the Config fixture as JSON.
+ *
+ * @param mixed $value Value.
+ * @param int   $flags Encoding options.
+ * @return string|false
+ */
+function wp_json_encode( mixed $value, int $flags = 0 ): string|false {
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Implements the WordPress test stub.
+	return json_encode( $value, $flags );
+}

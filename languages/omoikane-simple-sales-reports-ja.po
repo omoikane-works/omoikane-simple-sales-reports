@@ -8,7 +8,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-11-12T07:27:07+00:00\n"
-"PO-Revision-Date: 2026-11-13T03:35:59+00:00\n"
+"PO-Revision-Date: 2026-11-14T19:10:28+00:00\n"
 "Language: ja\n"
 "X-Generator: Poedit 3.10\n"
 "X-Domain: omoikane-simple-sales-reports\n"
@@ -39,22 +39,22 @@ msgid "https://github.com/omoikane-works"
 msgstr "https://github.com/omoikane-works"
 
 #. translators: 1: required PHP version, 2: current PHP version.
-#: omoikane-simple-sales-reports.php:51
+#: omoikane-simple-sales-reports.php:67
 #, php-format
 msgid "Omoikane Simple Sales Reports for Welcart requires PHP version %1$s or later. Your current PHP version is %2$s."
 msgstr "かんたん売上報告書 for Welcart を利用するには PHP %1$s 以上が必要です。現在の PHP バージョンは、%2$s です。"
 
 #. translators: %s: required Welcart version.
-#: omoikane-simple-sales-reports.php:68
+#: omoikane-simple-sales-reports.php:84
 #, php-format
 msgid "Omoikane Simple Sales Reports for Welcart requires Welcart %s or later."
 msgstr "かんたん売上報告書 for Welcart を利用するには Welcart %s 以上が必要です。"
 
-#: omoikane-simple-sales-reports.php:88
+#: omoikane-simple-sales-reports.php:104
 msgid "Plugin activation failed."
 msgstr "プラグインの有効化に失敗しました。"
 
-#: omoikane-simple-sales-reports.php:127
+#: omoikane-simple-sales-reports.php:143
 msgid "Required libraries for Omoikane Simple Sales Reports for Welcart were not found. Please run composer install."
 msgstr "かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer install を実行してください。"
 
@@ -153,10 +153,79 @@ msgid "System templates cannot be deleted."
 msgstr "システムテンプレートは削除できません。"
 
 #: resources/i18n.php:56
+msgid "Branding Images"
+msgstr "ブランド画像"
+
+#: resources/i18n.php:57
+msgid "Logo"
+msgstr "ロゴ"
+
+#: resources/i18n.php:58
+msgid "Company Stamp"
+msgstr "社印"
+
+#: resources/i18n.php:59
+msgid "PNG, JPEG, or WebP. Up to 1 MiB, 4,096 px per side, and 4,194,304 pixels in total. Static images only."
+msgstr "PNG・JPEG・WebPの静止画に対応しています。ファイルは1 MiB以下、幅と高さはそれぞれ4,096 px以下、総画素数は4,194,304以下です。"
+
+#: resources/i18n.php:60
+msgid "No image registered."
+msgstr "画像は未登録です。"
+
+#: resources/i18n.php:61
+msgid "Image file"
+msgstr "画像ファイル"
+
+#: resources/i18n.php:62
+msgid "Saved image"
+msgstr "保存済みの画像"
+
+#: resources/i18n.php:63
+msgid "Unsaved preview"
+msgstr "未保存のプレビュー"
+
+#: resources/i18n.php:64
+msgid "Discard selection"
+msgstr "画像の選択を取り消す"
+
+#: resources/i18n.php:65
+msgid "Register"
+msgstr "登録"
+
+#: resources/i18n.php:66
+msgid "Replace"
+msgstr "差し替え"
+
+#: resources/i18n.php:67
+msgid "Retry"
+msgstr "再試行"
+
+#: resources/i18n.php:68
+msgid "Delete this image?"
+msgstr "この画像を削除しますか？"
+
+#: resources/i18n.php:69
+msgid "Image saved."
+msgstr "画像を保存しました。"
+
+#: resources/i18n.php:70
+msgid "Image deleted."
+msgstr "画像を削除しました。"
+
+#: resources/i18n.php:71
+msgid "The image file could not be read."
+msgstr "画像ファイルを読み込めませんでした。"
+
+#: resources/i18n.php:72
+#: src/Configs/BrandingImageService.php:298
+msgid "The image file must be 1 MiB or smaller."
+msgstr "画像ファイルは1 MiB以下にしてください。"
+
+#: resources/i18n.php:75
 msgid "An unknown error occurred."
 msgstr "不明なエラーが発生しました。"
 
-#: resources/i18n.php:57
+#: resources/i18n.php:76
 msgid "OSSR REST config is missing."
 msgstr "OSSR REST 設定が見つかりません。"
 
@@ -215,9 +284,37 @@ msgstr "印刷"
 msgid "If dates or URLs appear when saving as PDF, turn off \"Headers and footers\" in the print dialog."
 msgstr "PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。"
 
-#: src/Plugin.php:150
+#: src/Configs/BrandingImageService.php:95
+msgid "The specified MIME type does not match the image."
+msgstr "指定されたMIMEタイプが画像の形式と一致しません。"
+
+#: src/Configs/BrandingImageService.php:103
+msgid "The image must be at most 4,096 px per side and 4,194,304 pixels in total."
+msgstr "画像の幅と高さはそれぞれ4,096 px以下、総画素数は4,194,304以下にしてください。"
+
+#: src/Configs/BrandingImageService.php:120
+msgid "The server cannot decode this image format with GD."
+msgstr "サーバーのGDではこの画像形式をデコードできません。"
+
+#: src/Configs/BrandingImageService.php:285
+msgid "Upload a valid PNG, JPEG, or WebP image."
+msgstr "有効なPNG・JPEG・WebP画像をアップロードしてください。"
+
+#: src/Configs/BrandingImageService.php:311
+msgid "Animated images are not supported."
+msgstr "アニメーション画像は登録できません。"
+
+#: src/Configs/BrandingImageService.php:324
+msgid "The branding image could not be accessed or saved."
+msgstr "ブランド画像の取得、保存、または削除に失敗しました。"
+
+#: src/Plugin.php:164
 msgid "Templates"
 msgstr "テンプレート"
+
+#: src/Plugin.php:165
+msgid "Settings"
+msgstr "設定"
 
 #. translators: 1: start date, 2: end date
 #: src/Reports/ReportPeriodResolver.php:165
@@ -255,6 +352,10 @@ msgstr "発送済み"
 #: src/Reports/SalesReportRenderer.php:68
 msgid "The sales report template was not found. Please reactivate the plugin."
 msgstr "売上報告書テンプレートが見つかりません。プラグインを再有効化してください。"
+
+#: src/Rest/ConfigController.php:103
+msgid "Provide the image as base64 data and, optionally, its MIME type."
+msgstr "画像をBase64データで指定してください。MIMEタイプの指定は任意です。"
 
 #. translators: %s: template name.
 #: src/Templates/TemplateService.php:273
