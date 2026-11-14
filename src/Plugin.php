@@ -86,6 +86,9 @@ final class Plugin {
 
 		$this->booted = true;
 
+		// Run upgrade tasks if needed.
+		Activation::maybe_upgrade();
+
 		$this->register_hooks();
 
 		add_filter(

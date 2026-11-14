@@ -67,3 +67,6 @@ phpstan-cache/
 !.gitattributes
 !.gitignore
 !.editorconfig
+
+# WP-CLI dependencies.
+tools/wp-cli/vendor/

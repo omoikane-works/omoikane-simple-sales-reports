@@ -1,0 +1,12 @@
+{
+    "name": "omoikane-works/ossr-wp-cli-tools",
+    "authors": [
+        {
+            "name": "Kiminori KATO",
+            "email": "kimikato@morgenrot.in"
+        }
+    ],
+    "require-dev": {
+        "wp-cli/wp-cli-bundle": "^2.12"
+    }
+}

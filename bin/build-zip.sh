@@ -98,6 +98,8 @@ rsync -av \
     --exclude='/package-lock.json' \
     --exclude='/vite.config.ts' \
     --exclude='/tsconfig.json' \
+    --exclude='/Justfile' \
+    --exclude='/tools/' \
 	"${ROOT_DIR}/" "${PACKAGE_DIR}/"
 
 cd "${PACKAGE_DIR}"
