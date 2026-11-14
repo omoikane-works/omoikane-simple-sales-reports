@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database;
 
 use OmoikaneWorks\SimpleSalesReports\Database\ConfigTable;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -110,6 +111,28 @@ final class ConfigTableTest extends TestCase {
 	}
 
 	/**
-	 * Test
+	 * Test the config schema handed to WordPress.
+	 *
+	 * @return void
 	 */
+	#[BackupGlobals( true )]
+	public function test_create_passes_config_schema_to_db_delta(): void {
+		$GLOBALS['ossr_test_calls']  = array();
+		$this->wpdb->prefix          = 'wp_test_';
+		$this->wpdb->charset_collate = 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
+
+		ConfigTable::create();
+
+		$calls = $GLOBALS['ossr_test_calls'];
+		$this->assertSame( array( 'dbDelta' ), array_column( $calls, 0 ) );
+		$sql = $calls[0][1];
+		$this->assertStringStartsWith( 'CREATE TABLE wp_test_ossr_configs (', $sql );
+		$this->assertMatchesRegularExpression( '/^\s*id bigint\(20\) unsigned NOT NULL AUTO_INCREMENT,\s*$/m', $sql );
+		$this->assertMatchesRegularExpression( '/^\s*config_key varchar\(191\) NOT NULL,\s*$/m', $sql );
+		$this->assertMatchesRegularExpression( '/^\s*config_value longtext NOT NULL,\s*$/m', $sql );
+		// dbDelta() expects two spaces between PRIMARY KEY and its column list.
+		$this->assertStringContainsString( 'PRIMARY KEY  (id)', $sql );
+		$this->assertStringContainsString( 'UNIQUE KEY config_key (config_key)', $sql );
+		$this->assertStringEndsWith( ') DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', $sql );
+	}
 }

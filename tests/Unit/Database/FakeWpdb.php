@@ -22,6 +22,29 @@ final class FakeWpdb {
 	public string $prefix = 'wp_';
 
 	/**
+	 * Charset and collation returned for schema creation.
+	 *
+	 * @var string
+	 */
+	public string $charset_collate = '';
+
+	/**
+	 * Optional observer for database lookups and inserts.
+	 *
+	 * @var \Closure(string, string): void|null
+	 */
+	public ?\Closure $record_call = null;
+
+	/**
+	 * Get the configured charset and collation.
+	 *
+	 * @return string
+	 */
+	public function get_charset_collate(): string {
+		return $this->charset_collate;
+	}
+
+	/**
 	 * Row returned by get_row().
 	 *
 	 * @var array<string, mixed>|null
@@ -187,6 +210,7 @@ final class FakeWpdb {
 	 */
 	public function get_var( string $query ): mixed {
 		$this->last_query = $query;
+		$this->record_call?->__invoke( 'get_var', $query );
 
 		return $this->var;
 	}
@@ -205,6 +229,7 @@ final class FakeWpdb {
 		$this->last_query      = 'INSERT INTO ' . $table;
 		$this->inserted_rows[] = $data;
 		$this->insert_id       = count( $this->inserted_rows );
+		$this->record_call?->__invoke( 'insert', $table );
 
 		return 1;
 	}

@@ -219,6 +219,8 @@ if ( ! function_exists( 'absint' ) ) {
 require __DIR__ . '/Support/WP_REST_Response.php';
 require __DIR__ . '/Support/WP_Error.php';
 require __DIR__ . '/Support/WP_REST_Request.php';
+require __DIR__ . '/Support/WP_REST_Server.php';
+require __DIR__ . '/Support/WordPressLifecycle.php';
 
 require_once __DIR__ . '/Support/CreatesTemplateRows.php';
 
