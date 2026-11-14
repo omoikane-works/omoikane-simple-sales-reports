@@ -39,11 +39,13 @@
         }
     },
     "scripts": {
-        "lint": "find omoikane-simple-sales-reports.php src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
-        "phpcs": "phpcs -s omoikane-simple-sales-reports.php src tests",
-        "phpcbf": "phpcbf omoikane-simple-sales-reports.php src tests",
+        "lint": "find omoikane-simple-sales-reports.php resources src tests -name '*.php' -print0 | xargs -0 -n1 php -l",
+        "phpcs": "phpcs -s omoikane-simple-sales-reports.php resources src tests",
+        "phpcbf": "phpcbf omoikane-simple-sales-reports.php resources src tests",
         "phpstan": "phpstan analyse --memory-limit=1G",
-        "make-pot": "wp i18n make-pot . languages/omoikane-simple-sales-reports.pot --exclude=node_modules,vendor,tests,build",
+        "make-pot": "tools/wp-cli/vendor/bin/wp i18n make-pot . languages/omoikane-simple-sales-reports.pot --exclude=node_modules,vendor,tests,build,assets/admin/dist,tools",
+        "update-po": "tools/wp-cli/vendor/bin/wp i18n update-po languages/omoikane-simple-sales-reports.pot languages/",
+        "make-mo": "tools/wp-cli/vendor/bin/wp i18n make-mo languages/",
         "test": "phpunit -c phpunit.xml.dist",
         "phpunit": "phpunit -c phpunit.xml.dist",
         "coverage": "XDEBUG_MODE=coverage composer phpunit -- --coverage-text",

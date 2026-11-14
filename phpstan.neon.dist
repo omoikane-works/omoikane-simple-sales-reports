@@ -6,6 +6,7 @@ parameters:
 
     paths:
         - omoikane-simple-sales-reports.php
+        - resources
         - src
 
     bootstrapFiles:

@@ -261,4 +261,96 @@ final class FakeWpdb {
 	public function get_updated_where_clauses(): array {
 		return $this->updated_where_clauses;
 	}
+
+	/**
+	 * Query result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $query_result = 1;
+
+	/**
+	 * Set query result.
+	 *
+	 * @param int|false $result Query result.
+	 */
+	public function set_query_result( int|false $result ): void {
+		$this->query_result = $result;
+	}
+
+	/**
+	 * Execute query.
+	 *
+	 * @param  string $query SQL query.
+	 * @return int|false
+	 */
+	public function query( string $query ): int|false {
+		$this->last_query = $query;
+
+		return $this->query_result;
+	}
+
+	/**
+	 * Delete result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $delete_result = 1;
+
+	/**
+	 * Set delete result.
+	 *
+	 * @param int|false $result Delete result.
+	 * @return void
+	 */
+	public function set_delete_result( int|false $result ): void {
+		$this->delete_result = $result;
+	}
+
+	/**
+	 * Deleted where clauses.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $deleted_where_clauses = array();
+
+	/**
+	 * Get deleted where clauses.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_deleted_where_clauses(): array {
+		return $this->deleted_where_clauses;
+	}
+
+	/**
+	 * Execute delete.
+	 *
+	 * @param  string                    $table          Table name.
+	 * @param  array<string, mixed>      $where          Named array of WHERE.
+	 * @param  array<string>|string|null $where_format   Array of formats.
+	 * @return int|false
+	 */
+	public function delete(
+		string $table,
+		array $where,
+		array|string|null $where_format = null
+	): int|false {
+		unset( $where_format );
+
+		$this->last_query              = 'DELETE ' . $table;
+		$this->deleted_where_clauses[] = $where;
+
+		return $this->delete_result;
+	}
+
+	/**
+	 * Escaping for LIKE special characters.
+	 *
+	 * @param  string $text Escape text.
+	 * @return string
+	 */
+	public function esc_like( string $text ): string {
+		return addcslashes( $text, '_%\\' );
+	}
 }

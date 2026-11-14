@@ -9,33 +9,33 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-12T07:27:07+00:00\n"
+"POT-Creation-Date: 2026-11-13T03:35:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: omoikane-simple-sales-reports\n"
 
 #. Plugin Name of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:3
 msgid "Omoikane Simple Sales Reports for Welcart"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:4
 msgid "https://github.com/omoikane-works/omoikane-simple-sales-reports"
 msgstr ""
 
 #. Description of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:5
 msgid "Create simple sales reports for Welcart stores."
 msgstr ""
 
 #. Author of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:9
 msgid "Omoikane Works"
 msgstr ""
 
 #. Author URI of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:10
 msgid "https://github.com/omoikane-works"
 msgstr ""
 
@@ -161,7 +161,7 @@ msgstr ""
 msgid "OSSR REST config is missing."
 msgstr ""
 
-#: src/Activation.php:54
+#: src/Activation.php:64
 msgid "Omoikane Simple Sales Reports for Welcart requires Welcart to be activated."
 msgstr ""
 
@@ -216,7 +216,7 @@ msgstr ""
 msgid "If dates or URLs appear when saving as PDF, turn off \"Headers and footers\" in the print dialog."
 msgstr ""
 
-#: src/Plugin.php:147
+#: src/Plugin.php:150
 msgid "Templates"
 msgstr ""
 
