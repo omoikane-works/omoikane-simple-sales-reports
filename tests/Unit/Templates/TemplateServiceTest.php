@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSettings;
 use OmoikaneWorks\SimpleSalesReports\Tests\Support\CreatesTemplateRows;
 use PHPUnit\Framework\TestCase;
 
@@ -87,10 +88,16 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_duplicate_template_inserts_copied_template(): void {
+		$settings = TemplateSettings::defaults();
+
+		$settings['branding']['stamp']['enabled']  = true;
+		$settings['branding']['stamp']['width_mm'] = 24.5;
+
 		$templates = $this->create_template_rows_with_copy_names(
 			10,
 			'Default Sales Report',
-			0
+			0,
+			array( 'settings' => $settings )
 		);
 
 		$repository                = new FakeTemplateRepository( $templates );
@@ -101,6 +108,7 @@ final class TemplateServiceTest extends TestCase {
 		$result = $service->duplicate_template( 10 );
 
 		$this->assertSame( 20, $result );
+		$this->assertSame( $settings, $service->get_template( $result )['settings'] );
 
 		$this->assert_inserted_template_copy( $repository, 'Default Sales Report copy' );
 	}
@@ -204,11 +212,18 @@ final class TemplateServiceTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_update_template_updates_custom_template(): void {
+		$settings = TemplateSettings::defaults();
+
+		$settings['branding']['logo']['enabled'] = true;
+
 		$templates = $this->create_template_rows_with_copy_names(
 			10,
 			'Custom Sales Report',
 			0,
-			array( 'is_system' => false )
+			array(
+				'is_system' => false,
+				'settings'  => $settings,
+			)
 		);
 
 		$repository = new FakeTemplateRepository( $templates );
@@ -222,6 +237,8 @@ final class TemplateServiceTest extends TestCase {
 		$this->assertSame( 'Updated Template', $repository->updated_data['data']['name'] );
 		$this->assertSame( '<p>Updated</p>', $repository->updated_data['data']['content'] );
 		$this->assertSame( hash( 'sha256', '<p>Updated</p>' ), $repository->updated_data['data']['content_hash'] );
+		$this->assertArrayNotHasKey( 'settings', $repository->updated_data['data'] );
+		$this->assertSame( $settings, $service->get_template( 10 )['settings'] );
 	}
 
 	/**

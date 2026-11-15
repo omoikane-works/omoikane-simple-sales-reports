@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSettings;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
 
 /**
@@ -104,6 +105,7 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 				'name'         => 'Template ' . (string) $template_id,
 				'type'         => TemplateTypes::SALES_REPORT,
 				'content'      => '',
+				'settings'     => TemplateSettings::defaults(),
 				'content_hash' => '',
 				'version'      => '1.0.0',
 				'is_system'    => false,

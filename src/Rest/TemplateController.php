@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Rest;
 
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
+use stdClass;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -174,6 +175,31 @@ final class TemplateController {
 	}
 
 	/**
+	 * Read optional settings from the JSON body without coercing objects into arrays.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return stdClass|null The JSON object, or null when the field is absent.
+	 * @throws \InvalidArgumentException If the field is present but is not an object.
+	 */
+	private function get_settings( WP_REST_Request $request ): ?stdClass {
+		$params = $request->get_json_params();
+		if (
+			/* @phpstan-ignore function.alreadyNarrowedType (WordPress can return a scalar or null) */
+			! is_array( $params ) || ! array_key_exists( 'settings', $params )
+		) {
+			return null;
+		}
+
+		$body     = json_decode( $request->get_body() );
+		$settings = $body instanceof stdClass ? ( $body->settings ?? null ) : null;
+		if ( ! $settings instanceof stdClass ) {
+			throw new \InvalidArgumentException( 'settings must be an object.' );
+		}
+
+		return $settings;
+	}
+
+	/**
 	 * Get templates.
 	 *
 	 * @return  WP_REST_Response
@@ -232,7 +258,8 @@ final class TemplateController {
 		try {
 			$new_template_id = $this->template_service->create_template(
 				$name,
-				$content
+				$content,
+				$this->get_settings( $request )
 			);
 		} catch ( \InvalidArgumentException $exception ) {
 			$message = $exception->getMessage();
@@ -344,7 +371,8 @@ final class TemplateController {
 			$this->template_service->update_template(
 				$template_id,
 				$name,
-				$content
+				$content,
+				$this->get_settings( $request )
 			);
 		} catch ( \InvalidArgumentException $exception ) {
 			$message = $exception->getMessage();

@@ -55,8 +55,8 @@ final class ActivationTest extends TestCase {
 	 */
 	public static function current_or_newer_versions(): array {
 		return array(
-			'current' => array( '1.1.0' ),
-			'newer'   => array( '1.2.0' ),
+			'current' => array( '1.2.0' ),
+			'newer'   => array( '1.3.0' ),
 		);
 	}
 
@@ -83,8 +83,9 @@ final class ActivationTest extends TestCase {
 	 */
 	public static function legacy_versions(): array {
 		return array(
-			'older'   => array( '1.0.5' ),
-			'missing' => array( null ),
+			'previous' => array( '1.1.0' ),
+			'older'    => array( '1.0.5' ),
+			'missing'  => array( null ),
 		);
 	}
 
@@ -95,43 +96,84 @@ final class ActivationTest extends TestCase {
 	 * @return void
 	 */
 	#[DataProvider( 'legacy_versions' )]
-	public function test_advances_schema_version_after_confirming_config_table( ?string $version ): void {
+	public function test_advances_schema_version_after_confirming_tables_and_settings_column( ?string $version ): void {
 		if ( null !== $version ) {
 			$GLOBALS['ossr_test_options']['ossr_db_version'] = $version;
 		}
-		$this->wpdb->set_var( 'wp_ossr_configs' );
+		$this->mock_schema_checks();
 
 		Activation::maybe_upgrade();
 
 		$calls = $GLOBALS['ossr_test_calls'];
-		$this->assertSame( array( 'get_option', 'dbDelta', 'get_var', 'update_option' ), array_column( $calls, 0 ) );
+		$this->assertSame( array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option' ), array_column( $calls, 0 ) );
 		$this->assertSame( array( 'get_option', 'ossr_db_version', '1.0.0' ), $calls[0] );
 		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_configs (', $calls[1][1] );
-		$this->assertSame( "SHOW TABLES LIKE 'wp\\_ossr\\_configs'", $calls[2][1] );
-		$this->assertSame( array( 'update_option', 'ossr_db_version', '1.1.0', false ), $calls[3] );
-		$this->assertSame( '1.1.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[2][1] );
+		$this->assertSame( "SHOW TABLES LIKE 'wp\\_ossr\\_configs'", $calls[3][1] );
+		$this->assertSame( "SHOW COLUMNS FROM 'wp_ossr_templates' LIKE 'settings'", $calls[4][1] );
+		$this->assertSame( array( 'update_option', 'ossr_db_version', '1.2.0', false ), $calls[5] );
+		$this->assertSame( '1.2.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
 	}
 
 	/**
-	 * A missing table leaves the old version in place so the upgrade can be retried.
+	 * Schema checks that must succeed before recording the new version.
 	 *
+	 * @return array<string, array{bool, bool}>
+	 */
+	public static function failed_schema_checks(): array {
+		return array(
+			'missing config table'    => array( false, true ),
+			'missing settings column' => array( true, false ),
+		);
+	}
+
+	/**
+	 * Retry the migration if either schema check fails.
+	 *
+	 * @param bool $config_table    Whether the config table exists.
+	 * @param bool $settings_column Whether the settings column exists.
 	 * @return void
 	 */
-	public function test_retries_upgrade_when_config_table_could_not_be_confirmed(): void {
-		$GLOBALS['ossr_test_options']['ossr_db_version'] = '1.0.0';
+	#[DataProvider( 'failed_schema_checks' )]
+	public function test_retries_upgrade_when_schema_could_not_be_confirmed( bool $config_table, bool $settings_column ): void {
+		$GLOBALS['ossr_test_options']['ossr_db_version'] = '1.1.0';
+		$this->mock_schema_checks( $config_table, $settings_column );
 
 		Activation::maybe_upgrade();
 
-		$this->assertSame( array( 'get_option', 'dbDelta', 'get_var' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
-		$this->assertSame( '1.0.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$this->assertSame( '1.1.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$this->assertNotContains( 'update_option', array_column( $GLOBALS['ossr_test_calls'], 0 ) );
 
 		$GLOBALS['ossr_test_calls'] = array();
-		$this->wpdb->set_var( 'wp_ossr_configs' );
+		$this->mock_schema_checks();
 
 		Activation::maybe_upgrade();
 
-		$this->assertSame( array( 'get_option', 'dbDelta', 'get_var', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
-		$this->assertSame( '1.1.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$this->assertSame( array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertSame( '1.2.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+	}
+
+	/**
+	 * Set the results of the schema and seed lookups.
+	 *
+	 * @param bool $config_table    Whether the config table exists.
+	 * @param bool $settings_column Whether the settings column exists.
+	 * @return void
+	 */
+	private function mock_schema_checks( bool $config_table = true, bool $settings_column = true ): void {
+		$this->wpdb->record_call = function ( string $call, string $argument ) use ( $config_table, $settings_column ): void {
+			if ( 'get_var' === $call ) {
+				$this->wpdb->set_var(
+					match ( $argument ) {
+						"SHOW TABLES LIKE 'wp\\_ossr\\_configs'" => $config_table ? 'wp_ossr_configs' : null,
+						"SHOW TABLES LIKE 'wp\\_ossr\\_templates'" => 'wp_ossr_templates',
+						"SHOW COLUMNS FROM 'wp_ossr_templates' LIKE 'settings'" => $settings_column ? 'settings' : null,
+						default => '0',
+					}
+				);
+			}
+			ossr_test_record_call( $call, $argument );
+		};
 	}
 
 	/**
@@ -144,31 +186,25 @@ final class ActivationTest extends TestCase {
 	public function test_activate_upgrades_schema_creates_template_table_and_seeds(): void {
 		$this->define_activation_constants();
 		define( 'USCES_VERSION', '2.11.10' );
-		$this->wpdb->set_var( 'wp_ossr_configs' );
-		$this->wpdb->record_call = function ( string $call, string $argument ): void {
-			if ( 'get_var' === $call && str_starts_with( $argument, 'SELECT EXISTS' ) ) {
-				$this->wpdb->set_var( '0' );
-			}
-			ossr_test_record_call( $call, $argument );
-		};
+		$this->mock_schema_checks();
 
 		Activation::activate();
 
 		$calls = $GLOBALS['ossr_test_calls'];
 		$this->assertSame(
-			array( 'get_option', 'dbDelta', 'get_var', 'update_option', 'dbDelta', 'get_var', 'insert', 'update_option', 'update_option' ),
+			array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option', 'get_var', 'get_var', 'insert', 'update_option', 'update_option' ),
 			array_column( $calls, 0 )
 		);
-		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[4][1] );
-		$this->assertSame( array( 'insert', 'wp_ossr_templates' ), $calls[6] );
+		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[2][1] );
+		$this->assertSame( array( 'insert', 'wp_ossr_templates' ), $calls[8] );
 		$this->assertSame( array( TemplateKeys::DEFAULT_SALES_REPORT ), array_column( $this->wpdb->get_inserted_rows(), 'template_key' ) );
 		$catalog_hash = $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'];
 		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $catalog_hash );
-		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[7] );
-		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[8] );
+		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[9] );
+		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[10] );
 		$this->assertSame(
 			array(
-				'ossr_db_version'            => '1.1.0',
+				'ossr_db_version'            => '1.2.0',
 				'ossr_template_catalog_hash' => $catalog_hash,
 				'ossr_version'               => OSSR_VERSION,
 			),

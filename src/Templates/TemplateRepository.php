@@ -15,6 +15,11 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Handles template queries.
+ *
+ * Row lookups also support tables awaiting the settings migration.
+ *
+ * @phpstan-import-type Settings from TemplateSettings
+ * @phpstan-import-type TemplateRow from TemplateRepositoryInterface
  */
 final class TemplateRepository implements TemplateRepositoryInterface {
 
@@ -22,6 +27,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 * Find default sales report template.
 	 *
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_default_sales_report_template(): ?array {
 		return $this->find_by_key( TemplateKeys::DEFAULT_SALES_REPORT );
@@ -32,6 +38,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   string $template_key   Template key.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_by_key( string $template_key ): ?array {
 		global $wpdb;
@@ -41,19 +48,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT
-					id,
-					template_key,
-					name,
-					type,
-					content,
-					content_hash,
-					version,
-					is_system,
-					is_default,
-					is_active,
-					created_at,
-					updated_at
+				'SELECT *
 				FROM %i
 				WHERE template_key = %s
 				AND is_active = 1
@@ -77,6 +72,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   string $type   Template type.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_active_default_by_type( string $type = TemplateTypes::SALES_REPORT ): ?array {
 		global $wpdb;
@@ -86,19 +82,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT
-					id,
-					template_key,
-					name,
-					type,
-					content,
-					content_hash,
-					version,
-					is_system,
-					is_default,
-					is_active,
-					created_at,
-					updated_at
+				'SELECT *
 				FROM %i
 				WHERE type = %s
 				AND is_default = 1
@@ -123,6 +107,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   int $id     Template ID.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_by_id( int $id ): ?array {
 		global $wpdb;
@@ -132,19 +117,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT
-					id,
-					template_key,
-					name,
-					type,
-					content,
-					content_hash,
-					version,
-					is_system,
-					is_default,
-					is_active,
-					created_at,
-					updated_at
+				'SELECT *
 				FROM %i
 				WHERE id = %d
 				AND is_active = 1
@@ -167,6 +140,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   string $type   Template type.
 	 * @return  array<int, array<string, mixed>>
+	 * @phpstan-return list<TemplateRow>
 	 */
 	public function find_selectable_by_type( string $type ): array {
 		global $wpdb;
@@ -176,19 +150,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT
-					id,
-					template_key,
-					name,
-					type,
-					content,
-					content_hash,
-					version,
-					is_system,
-					is_default,
-					is_active,
-					created_at,
-					updated_at
+				'SELECT *
 				FROM %i
 				WHERE type = %s
 				AND is_active = 1
@@ -204,11 +166,9 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		}
 
 		return array_values(
-			array_filter(
-				array_map(
-					array( $this, 'normalize_row' ),
-					$rows
-				)
+			array_map(
+				array( $this, 'normalize_row' ),
+				$rows
 			)
 		);
 	}
@@ -218,6 +178,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *
 	 * @param   array<string, mixed> $row    Database row.
 	 * @return  array<string, mixed>
+	 * @phpstan-return TemplateRow
 	 */
 	private function normalize_row( array $row ): array {
 		return array(
@@ -226,6 +187,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 			'name'         => isset( $row['name'] ) ? (string) $row['name'] : '',
 			'type'         => isset( $row['type'] ) ? (string) $row['type'] : '',
 			'content'      => isset( $row['content'] ) ? (string) $row['content'] : '',
+			'settings'     => $this->decode_settings( $row['settings'] ?? null ),
 			'content_hash' => isset( $row['content_hash'] ) ? (string) $row['content_hash'] : '',
 			'version'      => isset( $row['version'] ) ? (string) $row['version'] : '',
 			'is_system'    => ! empty( $row['is_system'] ),
@@ -234,6 +196,24 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 			'created_at'   => isset( $row['created_at'] ) ? (string) $row['created_at'] : '',
 			'updated_at'   => isset( $row['updated_at'] ) ? (string) $row['updated_at'] : '',
 		);
+	}
+
+	/**
+	 * Decode stored settings, with disabled placements for absent or invalid data.
+	 *
+	 * @param mixed $stored Settings column value.
+	 * @return Settings
+	 */
+	private function decode_settings( mixed $stored ): array {
+		if ( ! is_string( $stored ) ) {
+			return TemplateSettings::defaults();
+		}
+
+		try {
+			return TemplateSettings::normalize( json_decode( $stored, false, 512, JSON_THROW_ON_ERROR ) );
+		} catch ( \JsonException | \InvalidArgumentException ) {
+			return TemplateSettings::defaults();
+		}
 	}
 
 	/**
@@ -279,7 +259,8 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 *  name: string,
 	 *  content: string,
 	 *  content_hash: string,
-	 *  version: string
+	 *  version: string,
+	 *  settings?: Settings
 	 * }    $data
 	 */
 	public function insert( array $data ): int {
@@ -288,36 +269,30 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 		$table_name = TemplateTable::get_table_name();
 		$now        = current_time( 'mysql' );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->insert(
-			$table_name,
-			array(
-				'template_key' => $data['template_key'],
-				'name'         => $data['name'],
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => $data['content'],
-				'content_hash' => $data['content_hash'],
-				'version'      => $data['version'],
-				'is_system'    => 0,
-				'is_default'   => 0,
-				'is_active'    => 1,
-				'created_at'   => $now,
-				'updated_at'   => $now,
-			),
-			array(
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%d',
-				'%d',
-				'%d',
-				'%s',
-				'%s',
-			)
+		$row     = array(
+			'template_key' => $data['template_key'],
+			'name'         => $data['name'],
+			'type'         => TemplateTypes::SALES_REPORT,
+			'content'      => $data['content'],
+			'content_hash' => $data['content_hash'],
+			'version'      => $data['version'],
+			'is_system'    => 0,
+			'is_default'   => 0,
+			'is_active'    => 1,
+			'created_at'   => $now,
+			'updated_at'   => $now,
 		);
+		$formats = array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s' );
+		if ( isset( $data['settings'] ) ) {
+			$settings = TemplateSettings::encode( $data['settings'] );
+			if ( null !== $settings ) {
+				$row['settings'] = $settings;
+				$formats[]       = '%s';
+			}
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->insert( $table_name, $row, $formats );
 
 		if ( false === $result ) {
 			return 0;
@@ -335,7 +310,8 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 * @phpstan-param   array{
 	 *  name: string,
 	 *  content: string,
-	 *  content_hash: string
+	 *  content_hash: string,
+	 *  settings?: Settings
 	 * }    $data
 	 */
 	public function update( int $id, array $data ): bool {
@@ -343,22 +319,27 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 
 		$table_name = TemplateTable::get_table_name();
 
-		$now = current_time( 'mysql' );
+		$row     = array(
+			'name'         => $data['name'],
+			'content'      => $data['content'],
+			'content_hash' => $data['content_hash'],
+			'updated_at'   => current_time( 'mysql' ),
+		);
+		$formats = array( '%s', '%s', '%s', '%s' );
+		if ( isset( $data['settings'] ) ) {
+			$row['settings'] = TemplateSettings::encode( $data['settings'] );
+			$formats[]       = '%s';
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->update(
 			$table_name,
-			array(
-				'name'         => $data['name'],
-				'content'      => $data['content'],
-				'content_hash' => $data['content_hash'],
-				'updated_at'   => $now,
-			),
+			$row,
 			array(
 				'id'        => $id,
 				'is_active' => 1,
 			),
-			array( '%s', '%s', '%s', '%s' ),
+			$formats,
 			array( '%d', '%d' )
 		);
 

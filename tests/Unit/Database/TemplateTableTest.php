@@ -94,6 +94,7 @@ final class TemplateTableTest extends TestCase {
 		$this->assertSame( array( 'dbDelta' ), array_column( $calls, 0 ) );
 		$sql = $calls[0][1];
 		$this->assertStringStartsWith( 'CREATE TABLE wp_test_ossr_templates (', $sql );
+		$this->assertStringContainsString( 'settings longtext NULL,', $sql );
 		$this->assertStringContainsString( 'PRIMARY KEY  (id)', $sql );
 		$this->assertStringContainsString( 'UNIQUE KEY template_key_version (template_key, version)', $sql );
 		$this->assertStringEndsWith( ') DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', $sql );

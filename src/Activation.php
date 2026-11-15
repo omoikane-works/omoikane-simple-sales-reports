@@ -25,7 +25,7 @@ final class Activation {
 	 *
 	 * @var string
 	 */
-	private const DB_SCHEMA_VERSION = '1.1.0';
+	private const DB_SCHEMA_VERSION = '1.2.0';
 
 	/**
 	 * Run activation tasks.
@@ -37,7 +37,9 @@ final class Activation {
 
 		self::maybe_upgrade();
 
-		TemplateTable::create();
+		if ( ! TemplateTable::exists() ) {
+			TemplateTable::create();
+		}
 		TemplateSeeder::seed();
 
 		update_option( 'ossr_version', OSSR_VERSION, false );
@@ -87,9 +89,10 @@ final class Activation {
 		}
 
 		ConfigTable::create();
+		TemplateTable::create();
 
 		// Confirm the schema update succeeded before recording the version.
-		if ( ! ConfigTable::exists() ) {
+		if ( ! ConfigTable::exists() || ! TemplateTable::has_settings_column() ) {
 			return;
 		}
 

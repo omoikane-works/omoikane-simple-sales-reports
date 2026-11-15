@@ -35,6 +35,33 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		private mixed $json_params = null;
 
 		/**
+		 * Raw JSON request body.
+		 *
+		 * @var string
+		 */
+		private string $body = '';
+
+		/**
+		 * Get the request body.
+		 *
+		 * @return string
+		 */
+		public function get_body(): string {
+			return $this->body;
+		}
+
+		/**
+		 * Set a JSON request body using the WordPress parameter decoding convention.
+		 *
+		 * @param string $body Raw JSON.
+		 * @return void
+		 */
+		public function set_body( string $body ): void {
+			$this->body        = $body;
+			$this->json_params = json_decode( $body, true );
+		}
+
+		/**
 		 * Get the matched URL parameters.
 		 *
 		 * @return array<string, string>

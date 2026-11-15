@@ -63,6 +63,7 @@ final class TemplateSeederTest extends TestCase {
 		$this->assertSame( '標準 売上報告書', $row['name'] );
 		$this->assertSame( TemplateTypes::SALES_REPORT, $row['type'] );
 		$this->assertSame( '1.0.0', $row['version'] );
+		$this->assertArrayNotHasKey( 'settings', $row );
 		$this->assertNotSame( '', $row['content'] );
 		$this->assertSame( hash( 'sha256', (string) $row['content'] ), $row['content_hash'] );
 		$this->assertSame( 1, $row['is_system'] );
@@ -104,6 +105,7 @@ final class TemplateSeederTest extends TestCase {
 			'version'      => $version,
 			'content'      => $stored_body,
 			'content_hash' => hash( 'sha256', $stored_body ),
+			'settings'     => '{"branding":{"logo":{"enabled":true}}}',
 		);
 		$this->wpdb->insert( 'wp_ossr_templates', $stored_row );
 		$this->wpdb->record_call = ossr_test_record_call( ... );
