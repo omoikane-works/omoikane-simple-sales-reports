@@ -21,6 +21,7 @@ use OmoikaneWorks\SimpleSalesReports\Reports\SalesReportRenderer;
 use OmoikaneWorks\SimpleSalesReports\Rest\ConfigController;
 use OmoikaneWorks\SimpleSalesReports\Rest\TemplateController;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSeeder;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
 
 defined( 'ABSPATH' ) || exit;
@@ -99,6 +100,7 @@ final class Plugin {
 
 		// Run upgrade tasks if needed.
 		Activation::maybe_upgrade();
+		TemplateSeeder::maybe_seed();
 
 		$this->register_hooks();
 

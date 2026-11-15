@@ -146,8 +146,8 @@ final class ActivationTest extends TestCase {
 		define( 'USCES_VERSION', '2.11.10' );
 		$this->wpdb->set_var( 'wp_ossr_configs' );
 		$this->wpdb->record_call = function ( string $call, string $argument ): void {
-			if ( 'get_var' === $call && str_starts_with( $argument, 'SELECT id FROM' ) ) {
-				$this->wpdb->set_var( null );
+			if ( 'get_var' === $call && str_starts_with( $argument, 'SELECT EXISTS' ) ) {
+				$this->wpdb->set_var( '0' );
 			}
 			ossr_test_record_call( $call, $argument );
 		};
@@ -156,17 +156,21 @@ final class ActivationTest extends TestCase {
 
 		$calls = $GLOBALS['ossr_test_calls'];
 		$this->assertSame(
-			array( 'get_option', 'dbDelta', 'get_var', 'update_option', 'dbDelta', 'get_var', 'insert', 'update_option' ),
+			array( 'get_option', 'dbDelta', 'get_var', 'update_option', 'dbDelta', 'get_var', 'insert', 'update_option', 'update_option' ),
 			array_column( $calls, 0 )
 		);
 		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[4][1] );
 		$this->assertSame( array( 'insert', 'wp_ossr_templates' ), $calls[6] );
 		$this->assertSame( array( TemplateKeys::DEFAULT_SALES_REPORT ), array_column( $this->wpdb->get_inserted_rows(), 'template_key' ) );
-		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[7] );
+		$catalog_hash = $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'];
+		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $catalog_hash );
+		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[7] );
+		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[8] );
 		$this->assertSame(
 			array(
-				'ossr_db_version' => '1.1.0',
-				'ossr_version'    => OSSR_VERSION,
+				'ossr_db_version'            => '1.1.0',
+				'ossr_template_catalog_hash' => $catalog_hash,
+				'ossr_version'               => OSSR_VERSION,
 			),
 			$GLOBALS['ossr_test_options']
 		);

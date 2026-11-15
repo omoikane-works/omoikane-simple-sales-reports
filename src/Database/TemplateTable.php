@@ -65,6 +65,27 @@ final class TemplateTable {
 	}
 
 	/**
+	 * Check whether the template table exists.
+	 *
+	 * @return bool
+	 */
+	public static function exists(): bool {
+		global $wpdb;
+
+		$table_name = self::get_table_name();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->get_var(
+			$wpdb->prepare(
+				'SHOW TABLES LIKE %s',
+				$wpdb->esc_like( $table_name )
+			)
+		);
+
+		return $table_name === $result;
+	}
+
+	/**
 	 * Prevent instantiation.
 	 */
 	private function __construct() {}
