@@ -26,8 +26,9 @@ export function t(key: string): string {
 }
 
 export function format(message: string, ...values: string[]): string {
-    return values.reduce(
-        (result, value) => result.replace("%s", value),
-        message,
-    );
+    let next = 0;
+    return message.replace(/%(?:(\d+)\$)?s/g, (placeholder, position) => {
+        const index = position === undefined ? next++ : Number(position) - 1;
+        return values[index] ?? placeholder;
+    });
 }

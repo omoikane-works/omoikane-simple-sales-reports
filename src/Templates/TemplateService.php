@@ -10,11 +10,14 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Templates;
 
 use Mustache_Engine;
+use stdClass;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Handles template operations.
+ *
+ * @phpstan-import-type TemplateRow from TemplateRepositoryInterface
  */
 final class TemplateService {
 
@@ -38,6 +41,7 @@ final class TemplateService {
 	 * List templates.
 	 *
 	 * @return array<int, array<string, mixed>>
+	 * @phpstan-return list<TemplateRow>
 	 */
 	public function list_templates(): array {
 		return $this->template_repository->find_selectable_by_type( TemplateTypes::SALES_REPORT );
@@ -48,6 +52,7 @@ final class TemplateService {
 	 *
 	 * @param   int $template_id    Template ID.
 	 * @return  array<string, mixed>
+	 * @phpstan-return TemplateRow
 	 * @throws  \InvalidArgumentException   Template not found.
 	 */
 	public function get_template( int $template_id ): array {
@@ -63,13 +68,14 @@ final class TemplateService {
 	/**
 	 * Create template.
 	 *
-	 * @param   string $name       Template name.
-	 * @param   string $content    Template content.
+	 * @param   string        $name       Template name.
+	 * @param   string        $content    Template content.
+	 * @param   stdClass|null $settings   Optional placement settings.
 	 * @return  int
 	 * @throws  \InvalidArgumentException   Template name already exists.
 	 * @throws  \RuntimeException           Failed to create template.
 	 */
-	public function create_template( string $name, string $content ): int {
+	public function create_template( string $name, string $content, ?stdClass $settings = null ): int {
 
 		// Check name.
 		$this->validate_name( $name );
@@ -86,6 +92,7 @@ final class TemplateService {
 				'name'         => $name,
 				'type'         => TemplateTypes::SALES_REPORT,
 				'content'      => $content,
+				'settings'     => null === $settings ? TemplateSettings::defaults() : TemplateSettings::normalize( $settings ),
 				'content_hash' => $this->generate_content_hash( $content ),
 				'version'      => '1.0.0',
 				'is_system'    => false,
@@ -127,6 +134,7 @@ final class TemplateService {
 				'template_key' => $this->generate_template_key(),
 				'name'         => $name,
 				'content'      => $content,
+				'settings'     => $template['settings'],
 				'content_hash' => $this->generate_content_hash( $content ),
 				'version'      => '1.0.0',
 			)
@@ -142,15 +150,16 @@ final class TemplateService {
 	/**
 	 * Update template.
 	 *
-	 * @param   int    $template_id    Template ID.
-	 * @param   string $name           Template name.
-	 * @param   string $content        Template content.
+	 * @param   int           $template_id Template ID.
+	 * @param   string        $name        Template name.
+	 * @param   string        $content     Template content.
+	 * @param   stdClass|null $settings    Optional replacement placement settings.
 	 * @return  void
 	 * @throws  \InvalidArgumentException   System templates cannot be edited.
 	 * @throws  \InvalidArgumentException   Template name already exists.
 	 * @throws  \RuntimeException           Failed to update template.
 	 */
-	public function update_template( int $template_id, string $name, string $content ): void {
+	public function update_template( int $template_id, string $name, string $content, ?stdClass $settings = null ): void {
 		$template = $this->get_template( $template_id );
 
 		if ( ! empty( $template['is_system'] ) ) {
@@ -164,16 +173,16 @@ final class TemplateService {
 			throw new \InvalidArgumentException( 'Template name already exists.' );
 		}
 
-		$updated = $this->template_repository->update(
-			$template_id,
-			array(
-				'name'         => $name,
-				'content'      => $content,
-				'content_hash' => $this->generate_content_hash( $content ),
-			)
+		$data = array(
+			'name'         => $name,
+			'content'      => $content,
+			'content_hash' => $this->generate_content_hash( $content ),
 		);
+		if ( null !== $settings ) {
+			$data['settings'] = TemplateSettings::normalize( $settings );
+		}
 
-		if ( ! $updated ) {
+		if ( ! $this->template_repository->update( $template_id, $data ) ) {
 			throw new \RuntimeException( 'Failed to update template.' );
 		}
 	}

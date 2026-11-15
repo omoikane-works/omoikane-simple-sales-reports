@@ -1,5 +1,18 @@
 // assets/admin/src/types/templates.ts
 
+export type BrandingSlot = "logo" | "stamp";
+
+export type BrandingPlacement = {
+    enabled: boolean;
+    x_mm: number;
+    y_mm: number;
+    width_mm: number;
+};
+
+export type TemplateSettings = {
+    branding: Record<BrandingSlot, BrandingPlacement>;
+};
+
 export type TemplateListItem = {
     id: number;
     template_key: string;
@@ -15,4 +28,6 @@ export type TemplateListItem = {
 
 export type TemplateData = TemplateListItem & {
     content: string;
+    settings?: TemplateSettings;
+    settings_invalid: boolean;
 };

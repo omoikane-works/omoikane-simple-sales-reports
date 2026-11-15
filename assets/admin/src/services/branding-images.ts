@@ -1,7 +1,6 @@
 import { t } from "@/lib/i18n";
 import { wpRest } from "@/lib/wp-rest";
-
-export type BrandingSlot = "logo" | "stamp";
+import type { BrandingSlot } from "@/types/templates";
 
 export type BrandingImage = {
     mime: "image/png" | "image/jpeg" | "image/webp";
@@ -34,6 +33,19 @@ function readImage(file: File): Promise<string> {
 }
 
 export const brandingImages = {
+    async isRegistered(slot: BrandingSlot): Promise<boolean> {
+        const { image } = await wpRest.get<{ image: Pick<BrandingImage, "mime"> | null }>(
+            route(slot),
+            { _fields: "image.mime" },
+        );
+        if (image === null) {
+            return false;
+        }
+        if (!image?.mime) {
+            throw new Error(t("template.placement.image_unknown"));
+        }
+        return true;
+    },
     async get(slot: BrandingSlot): Promise<BrandingImage | null> {
         return (await wpRest.get<ImageResponse>(route(slot))).image;
     },

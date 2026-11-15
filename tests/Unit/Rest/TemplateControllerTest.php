@@ -11,8 +11,10 @@ namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Rest;
 
 use OmoikaneWorks\SimpleSalesReports\Rest\TemplateController;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateService;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSettings;
 use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates\FakeTemplateRepository;
 use OmoikaneWorks\SimpleSalesReports\Tests\Support\CreatesTemplateRows;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use WP_Error;
@@ -705,6 +707,135 @@ final class TemplateControllerTest extends TestCase {
 
 		$this->assertIsArray( $data );
 		$this->assertSame( 500, $data['status'] );
+	}
+
+	/**
+	 * Return normalized settings on writes and distinguish omission from reset.
+	 *
+	 * @return void
+	 */
+	public function test_create_update_and_reset_settings(): void {
+		$repository = new FakeTemplateRepository();
+		$controller = $this->create_controller_with_repository( $repository );
+		$request    = new WP_REST_Request();
+		$request->set_param( 'name', 'Layout' );
+		$request->set_param( 'content', '<p>Report</p>' );
+		$request->set_body( '{"settings":{"branding":{"logo":{"enabled":true,"x_mm":-12.5}}}}' );
+
+		$created = $controller->create_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $created );
+		$this->assertSame( 201, $created->get_status() );
+		$settings = TemplateSettings::defaults();
+
+		$settings['branding']['logo']['enabled'] = true;
+		$settings['branding']['logo']['x_mm']    = -12.5;
+		$this->assertSame( $settings, $created->get_data()['item']['settings'] );
+
+		$request->set_param( 'id', (string) $repository->insert_result );
+		$request->set_body( '{}' );
+		$updated = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $updated );
+		$this->assertSame( $settings, $updated->get_data()['item']['settings'] );
+
+		$request->set_body( '{"settings":{"branding":{"stamp":{"enabled":true}}}}' );
+		$updated = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $updated );
+		$replacement = TemplateSettings::defaults();
+
+		$replacement['branding']['stamp']['enabled'] = true;
+		$this->assertSame( $replacement, $updated->get_data()['item']['settings'] );
+
+		$request->set_body( '{"settings":{}}' );
+		$reset = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $reset );
+		$this->assertSame( TemplateSettings::defaults(), $reset->get_data()['item']['settings'] );
+	}
+
+	/**
+	 * Invalid inputs at the REST boundary.
+	 *
+	 * @return array<string, array{string}>
+	 */
+	public static function invalid_settings_requests(): array {
+		return array(
+			'null'         => array( '{"settings":null}' ),
+			'empty array'  => array( '{"settings":[]}' ),
+			'nested array' => array( '{"settings":{"branding":{"logo":[]}}}' ),
+			'invalid mm'   => array( '{"settings":{"branding":{"logo":{"width_mm":"30"}}}}' ),
+		);
+	}
+
+	/**
+	 * Reject invalid settings before writing any template data.
+	 *
+	 * @param string $body JSON request body.
+	 * @return void
+	 */
+	#[DataProvider( 'invalid_settings_requests' )]
+	public function test_invalid_settings_leave_saved_template_untouched( string $body ): void {
+		$settings = TemplateSettings::defaults();
+
+		$settings['branding']['logo']['enabled'] = true;
+
+		$template   = $this->create_template_row(
+			array(
+				'is_system' => false,
+				'settings'  => $settings,
+			)
+		);
+		$repository = new FakeTemplateRepository( array( $template ) );
+		$controller = $this->create_controller_with_repository( $repository );
+		$request    = new WP_REST_Request();
+		$request->set_param( 'id', (string) $template['id'] );
+		$request->set_param( 'name', 'Renamed template' );
+		$request->set_param( 'content', '<p>New report body</p>' );
+		$request->set_body( $body );
+
+		$response = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_Error::class, $response );
+		$this->assertSame( 'ossr_template_invalid_request', $response->get_error_code() );
+		$this->assertSame( 400, $response->get_error_data()['status'] );
+		$this->assertNull( $repository->updated_data );
+		$this->assertSame( $template['content'], $repository->find_by_id( $template['id'] )['content'] );
+		$this->assertSame( $settings, $repository->find_by_id( $template['id'] )['settings'] );
+	}
+
+	/**
+	 * The invalid-settings flag is read-only and survives until a successful settings write.
+	 *
+	 * @return void
+	 */
+	public function test_settings_invalid_flag_requires_successful_repair(): void {
+		$template   = $this->create_template_row(
+			array(
+				'is_system'        => false,
+				'settings_invalid' => true,
+			)
+		);
+		$repository = new FakeTemplateRepository( array( $template ) );
+		$controller = $this->create_controller_with_repository( $repository );
+		$request    = new WP_REST_Request();
+		$request->set_param( 'id', (string) $template['id'] );
+		$request->set_param( 'name', 'Renamed template' );
+		$request->set_param( 'content', '<p>Updated report</p>' );
+		$request->set_body( '{"settings_invalid":false}' );
+
+		$response = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertTrue( $response->get_data()['item']['settings_invalid'] );
+		$this->assertArrayNotHasKey( 'settings_invalid', $repository->updated_data['data'] );
+		$this->assertArrayNotHasKey( 'settings', $repository->updated_data['data'] );
+
+		$request->set_body( '{"settings":{}}' );
+		$repository->update_result = false;
+		$this->assertInstanceOf( WP_Error::class, $controller->update_item( $request ) );
+		$this->assertTrue( $controller->get_item( $request )->get_data()['item']['settings_invalid'] );
+
+		$repository->update_result = true;
+		$response                  = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertFalse( $response->get_data()['item']['settings_invalid'] );
+		$this->assertSame( TemplateSettings::defaults(), $response->get_data()['item']['settings'] );
 	}
 
 	/**

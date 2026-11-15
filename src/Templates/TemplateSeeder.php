@@ -41,6 +41,17 @@ final class TemplateSeeder {
 			'file'         => 'templates/default-sales-report-1.0.0.mustache',
 			'version'      => '1.0.0',
 		),
+		array(
+			'template_key'  => TemplateKeys::DEFAULT_SALES_REPORT,
+			'name'          => '標準 売上報告書',
+			'type'          => TemplateTypes::SALES_REPORT,
+			'file'          => 'templates/default-sales-report-1.1.0.mustache',
+			'version'       => '1.1.0',
+			'settings_json' => '{"branding":{'
+				. '"logo":{"enabled":true,"x_mm":0,"y_mm":0,"width_mm":30},'
+				. '"stamp":{"enabled":true,"x_mm":38,"y_mm":0,"width_mm":18}'
+				. '}}',
+		),
 	);
 
 	/**
@@ -129,38 +140,33 @@ final class TemplateSeeder {
 			return false;
 		}
 
-		$now = current_time( 'mysql' );
+		$now     = current_time( 'mysql' );
+		$row     = array(
+			'template_key' => $template['template_key'],
+			'name'         => $template['name'],
+			'type'         => $template['type'],
+			'content'      => $content,
+			'version'      => $template['version'],
+			'content_hash' => hash( 'sha256', $content ),
+			'is_system'    => 1,
+			'is_default'   => 1,
+			'is_active'    => 1,
+			'created_at'   => $now,
+			'updated_at'   => $now,
+		);
+		$formats = array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s' );
+		if ( isset( $template['settings_json'] ) ) {
+			try {
+				$settings        = TemplateSettings::normalize( json_decode( $template['settings_json'], false, 512, JSON_THROW_ON_ERROR ) );
+				$row['settings'] = TemplateSettings::encode( $settings );
+				$formats[]       = '%s';
+			} catch ( \JsonException | \InvalidArgumentException | \RuntimeException ) {
+				return false;
+			}
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->insert(
-			$table_name,
-			array(
-				'template_key' => $template['template_key'],
-				'name'         => $template['name'],
-				'type'         => $template['type'],
-				'content'      => $content,
-				'version'      => $template['version'],
-				'content_hash' => hash( 'sha256', $content ),
-				'is_system'    => 1,
-				'is_default'   => 1,
-				'is_active'    => 1,
-				'created_at'   => $now,
-				'updated_at'   => $now,
-			),
-			array(
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%d',
-				'%d',
-				'%d',
-				'%s',
-				'%s',
-			)
-		);
+		$result = $wpdb->insert( $table_name, $row, $formats );
 
 		// The unique key also protects against concurrent inserts of the same version.
 		return 1 === $result;

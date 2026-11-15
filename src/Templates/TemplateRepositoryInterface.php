@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Handles template queries.
+ *
+ * @phpstan-import-type Settings from TemplateSettings
+ * @phpstan-type TemplateRow array{name: mixed, content: mixed, settings: Settings, settings_invalid: bool, ...<string, mixed>}
  */
 interface TemplateRepositoryInterface {
 
@@ -20,6 +23,7 @@ interface TemplateRepositoryInterface {
 	 * Find default sales report template.
 	 *
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_default_sales_report_template(): ?array;
 
@@ -28,6 +32,7 @@ interface TemplateRepositoryInterface {
 	 *
 	 * @param   string $template_key   Template key.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_by_key( string $template_key ): ?array;
 
@@ -36,6 +41,7 @@ interface TemplateRepositoryInterface {
 	 *
 	 * @param   string $type   Template type.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_active_default_by_type( string $type ): ?array;
 
@@ -44,6 +50,7 @@ interface TemplateRepositoryInterface {
 	 *
 	 * @param   int $id     Template ID.
 	 * @return  array<string, mixed>|null
+	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_by_id( int $id ): ?array;
 
@@ -52,6 +59,7 @@ interface TemplateRepositoryInterface {
 	 *
 	 * @param   string $type   Template type.
 	 * @return  array<int, array<string, mixed>>
+	 * @phpstan-return list<TemplateRow>
 	 */
 	public function find_selectable_by_type( string $type ): array;
 
@@ -74,7 +82,8 @@ interface TemplateRepositoryInterface {
 	 *  name: string,
 	 *  content: string,
 	 *  content_hash: string,
-	 *  version: string
+	 *  version: string,
+	 *  settings?: Settings
 	 * }    $data
 	 */
 	public function insert( array $data ): int;
@@ -89,7 +98,8 @@ interface TemplateRepositoryInterface {
 	 *  name?: string,
 	 *  content?: string,
 	 *  content_hash?: string,
-	 *  updated_at?: string
+	 *  updated_at?: string,
+	 *  settings?: Settings
 	 * }    $data
 	 */
 	public function update( int $id, array $data ): bool;

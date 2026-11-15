@@ -11,6 +11,7 @@ namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit\Templates;
 
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateKeys;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepository;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSettings;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateTypes;
 use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database\FakeWpdb;
 use PHPUnit\Framework\TestCase;
@@ -93,18 +94,20 @@ final class TemplateRepositoryTest extends TestCase {
 
 		$this->assertSame(
 			array(
-				'id'           => 10,
-				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
-				'name'         => 'Default Sales Report',
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => '<h1>{{report.title}}</h1>',
-				'content_hash' => 'abc123',
-				'version'      => '1.0.0',
-				'is_system'    => true,
-				'is_default'   => true,
-				'is_active'    => true,
-				'created_at'   => '2026-05-01 10:00:00',
-				'updated_at'   => '2026-05-02 11:00:00',
+				'id'               => 10,
+				'template_key'     => TemplateKeys::DEFAULT_SALES_REPORT,
+				'name'             => 'Default Sales Report',
+				'type'             => TemplateTypes::SALES_REPORT,
+				'content'          => '<h1>{{report.title}}</h1>',
+				'settings'         => TemplateSettings::defaults(),
+				'settings_invalid' => false,
+				'content_hash'     => 'abc123',
+				'version'          => '1.0.0',
+				'is_system'        => true,
+				'is_default'       => true,
+				'is_active'        => true,
+				'created_at'       => '2026-05-01 10:00:00',
+				'updated_at'       => '2026-05-02 11:00:00',
 			),
 			$result
 		);
@@ -180,25 +183,35 @@ final class TemplateRepositoryTest extends TestCase {
 	}
 
 	/**
-	 * Test find default sales report template returns normalized template.
+	 * The newest semantic version wins even with a lower database ID.
 	 *
 	 * @return  void
 	 */
 	public function test_find_default_sales_report_template_returns_normalized_template(): void {
-		$this->wpdb->set_row(
+		$new = array(
+			'id'           => '20',
+			'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
+			'name'         => 'Default Sales Report',
+			'type'         => TemplateTypes::SALES_REPORT,
+			'content'      => 'Default content',
+			'content_hash' => 'hash-default',
+			'version'      => '1.10.0',
+			'is_system'    => '1',
+			'is_default'   => '1',
+			'is_active'    => '1',
+			'created_at'   => '2026-05-03 10:00:00',
+			'updated_at'   => '2026-05-03 10:00:00',
+		);
+		$this->wpdb->set_results(
 			array(
-				'id'           => '20',
-				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
-				'name'         => 'Default Sales Report',
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => 'Default content',
-				'content_hash' => 'hash-default',
-				'version'      => '1.0.0',
-				'is_system'    => '1',
-				'is_default'   => '1',
-				'is_active'    => '1',
-				'created_at'   => '2026-05-03 10:00:00',
-				'updated_at'   => '2026-05-03 10:00:00',
+				array_replace(
+					$new,
+					array(
+						'id'      => '21',
+						'version' => '1.9.0',
+					)
+				),
+				$new,
 			)
 		);
 
@@ -208,6 +221,7 @@ final class TemplateRepositoryTest extends TestCase {
 
 		$this->assertIsArray( $result );
 		$this->assertSame( 20, $result['id'] );
+		$this->assertSame( '1.10.0', $result['version'] );
 		$this->assertSame( TemplateKeys::DEFAULT_SALES_REPORT, $result['template_key'] );
 		$this->assertSame( TemplateTypes::SALES_REPORT, $result['type'] );
 		$this->assertTrue( $result['is_system'] );
@@ -410,10 +424,74 @@ final class TemplateRepositoryTest extends TestCase {
 		$this->assertSame( 'Updated Template', $updated_rows[0]['name'] );
 		$this->assertSame( '<p>Updated</p>', $updated_rows[0]['content'] );
 		$this->assertSame( 'hash-updated', $updated_rows[0]['content_hash'] );
+		$this->assertArrayNotHasKey( 'settings', $updated_rows[0] );
 		$this->assertArrayHasKey( 'updated_at', $updated_rows[0] );
 
 		$this->assertSame( 10, $where[0]['id'] );
 		$this->assertSame( 1, $where[0]['is_active'] );
+	}
+
+	/**
+	 * Store canonical JSON and decode it when reading the row.
+	 *
+	 * @return void
+	 */
+	public function test_settings_round_trip_and_explicit_reset(): void {
+		$repository = new TemplateRepository();
+		$settings   = TemplateSettings::defaults();
+
+		$settings['branding']['logo']['enabled'] = true;
+		$settings['branding']['logo']['x_mm']    = -2.75;
+
+		$data = array(
+			'template_key' => 'custom_layout',
+			'name'         => 'Layout',
+			'content'      => '<p>Report</p>',
+			'content_hash' => 'body-hash',
+			'version'      => '1.0.0',
+			'settings'     => $settings,
+		);
+
+		$this->assertSame( 1, $repository->insert( $data ) );
+		$stored = $this->wpdb->get_inserted_rows()[0];
+		$this->assertSame(
+			'{"branding":{"logo":{"enabled":true,"x_mm":-2.75,"y_mm":0,"width_mm":30},"stamp":{"enabled":false,"x_mm":0,"y_mm":0,"width_mm":18}}}',
+			$stored['settings']
+		);
+		$this->wpdb->set_row( $stored );
+		$this->assertSame( $settings, $repository->find_by_id( 1 )['settings'] );
+		$this->assertFalse( $repository->find_by_id( 1 )['settings_invalid'] );
+
+		$data['settings'] = TemplateSettings::defaults();
+		$this->assertTrue( $repository->update( 1, $data ) );
+		$updated = $this->wpdb->get_updated_rows()[0];
+		$this->assertArrayHasKey( 'settings', $updated );
+		$this->assertNull( $updated['settings'] );
+	}
+
+	/**
+	 * Keep a readable template with both images disabled when stored settings are invalid.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_stored_settings_fall_back_without_writing(): void {
+		$this->wpdb->set_results(
+			array(
+				array( 'settings' => null ),
+				array( 'settings' => '{' ),
+				array( 'settings' => '{"branding":{"logo":{"enabled":true},"stamp":[]}}' ),
+			)
+		);
+
+		$repository = new TemplateRepository();
+		$templates  = $repository->find_selectable_by_type( TemplateTypes::SALES_REPORT );
+
+		$this->assertCount( 3, $templates );
+		$this->assertSame( array( false, true, true ), array_column( $templates, 'settings_invalid' ) );
+		foreach ( $templates as $template ) {
+			$this->assertSame( TemplateSettings::defaults(), $template['settings'] );
+		}
+		$this->assertSame( array(), $this->wpdb->get_updated_rows() );
 	}
 
 	/**

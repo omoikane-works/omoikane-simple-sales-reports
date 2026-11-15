@@ -12,7 +12,9 @@ namespace OmoikaneWorks\SimpleSalesReports\Tests\Unit;
 use OmoikaneWorks\SimpleSalesReports\Admin\AdminAssets;
 use OmoikaneWorks\SimpleSalesReports\Admin\AdminPage;
 use OmoikaneWorks\SimpleSalesReports\Plugin;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSeeder;
 use OmoikaneWorks\SimpleSalesReports\Tests\Unit\Database\FakeWpdb;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -23,13 +25,27 @@ use PHPUnit\Framework\TestCase;
 final class PluginTest extends TestCase {
 
 	/**
+	 * Catalog states for the existing installation.
+	 *
+	 * @return array<string, array{bool}>
+	 */
+	public static function catalog_states(): array {
+		return array(
+			'pending'        => array( false ),
+			'already seeded' => array( true ),
+		);
+	}
+
+	/**
 	 * Boot migrates the database and wires the admin and REST hooks once.
 	 *
+	 * @param bool $already_seeded Whether the current catalog has been seeded.
 	 * @return void
 	 */
+	#[DataProvider( 'catalog_states' )]
 	#[RunInSeparateProcess]
 	#[PreserveGlobalState( false )]
-	public function test_boot_upgrades_schema_and_registers_hooks_once(): void {
+	public function test_boot_upgrades_schema_and_registers_hooks_once( bool $already_seeded ): void {
 		$database              = new FakeWpdb();
 		$database->record_call = static function ( string $call, string $argument ) use ( $database ): void {
 			ossr_test_record_call( $call, $argument );
@@ -38,7 +54,8 @@ final class PluginTest extends TestCase {
 					match ( $argument ) {
 						"SHOW TABLES LIKE 'wp\\_ossr\\_configs'"   => 'wp_ossr_configs',
 						"SHOW TABLES LIKE 'wp\\_ossr\\_templates'" => 'wp_ossr_templates',
-						default                                  => '1',
+						"SHOW COLUMNS FROM 'wp_ossr_templates' LIKE 'settings'" => 'settings',
+						default => '1',
 					}
 				);
 			}
@@ -47,23 +64,27 @@ final class PluginTest extends TestCase {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride
 		$GLOBALS['wpdb']              = $database;
 		$GLOBALS['ossr_test_options'] = array(
-			'ossr_db_version'               => '1.0.0',
+			'ossr_db_version'               => '1.1.0',
 			'ossr_sales_report_template_id' => 32,
 		);
-		$GLOBALS['ossr_test_calls']   = array();
+		if ( $already_seeded ) {
+			TemplateSeeder::seed();
+		}
+		$GLOBALS['ossr_test_calls'] = array();
 
 		$plugin = Plugin::instance();
 		$plugin->boot();
 
 		$calls = $GLOBALS['ossr_test_calls'];
-		$this->assertSame( array( 'get_option', 'dbDelta', 'get_var', 'update_option' ), array_column( array_slice( $calls, 0, 4 ), 0 ) );
-		$this->assertSame( '1.1.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
-		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'update_option' ), array_column( array_slice( $calls, 4, 4 ), 0 ) );
+		$this->assertSame( array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option' ), array_column( array_slice( $calls, 0, 6 ), 0 ) );
+		$this->assertSame( '1.2.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$seed_calls = $already_seeded ? array( 'get_option' ) : array( 'get_option', 'get_var', 'get_var', 'get_var', 'update_option' );
+		$this->assertSame( $seed_calls, array_column( array_slice( $calls, 6, count( $seed_calls ) ), 0 ) );
 		$this->assertArrayHasKey( 'ossr_template_catalog_hash', $GLOBALS['ossr_test_options'] );
 		$this->assertSame( 32, $GLOBALS['ossr_test_options']['ossr_sales_report_template_id'] );
 		$this->assertSame( array(), $database->get_inserted_rows() );
 
-		$hooks         = array_slice( $calls, 8 );
+		$hooks         = array_slice( $calls, 6 + count( $seed_calls ) );
 		$registrations = array();
 		$rest_init     = null;
 		foreach ( $hooks as $registration ) {

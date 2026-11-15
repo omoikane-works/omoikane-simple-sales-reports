@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import {
     deleteTemplate as deleteTemplateRequest,
     duplicateTemplate,
@@ -19,9 +19,13 @@ const templates = ref<TemplateListItem[]>([]);
 const isLoading = ref(false);
 const errorMessage = ref("");
 const noticeMessage = ref("");
-const currentView = ref<"list" | "edit">("list");
 const editingTemplate = ref<TemplateData | null>(null);
-const hasError = computed(() => errorMessage.value !== "");
+const editor = ref<InstanceType<typeof TemplateEditForm> | null>(null);
+const listError = ref("");
+const savedTemplateName = ref<string | null>(null);
+const reportUrl = window.ossrAdminLinks?.report;
+const activeError = computed(() => errorMessage.value || (editingTemplate.value === null ? listError.value : ""));
+let latestListRequest = 0;
 
 const setError = (error: unknown) => {
     errorMessage.value =
@@ -40,17 +44,25 @@ const showValidationError = (message: string) => {
 const clearMessages = () => {
     noticeMessage.value = "";
     errorMessage.value = "";
+    savedTemplateName.value = null;
 };
 
 const loadTemplates = async (showLoading: boolean = true) => {
+    const request = ++latestListRequest;
     if (showLoading) {
         isLoading.value = true;
     }
 
     try {
-        templates.value = await fetchTemplates();
+        const items = await fetchTemplates();
+        if (request === latestListRequest) {
+            templates.value = items;
+            listError.value = "";
+        }
     } catch (error) {
-        setError(error);
+        if (request === latestListRequest) {
+            listError.value = error instanceof Error ? error.message : t("error.unknown");
+        }
     } finally {
         if (showLoading) {
             isLoading.value = false;
@@ -64,7 +76,6 @@ const editTemplate = async (template: TemplateListItem) => {
 
     try {
         editingTemplate.value = await fetchTemplate(template.id);
-        currentView.value = "edit";
     } catch (error) {
         setError(error);
     } finally {
@@ -74,7 +85,6 @@ const editTemplate = async (template: TemplateListItem) => {
 
 const backToList = (clearMessagesFlag: boolean = true) => {
     editingTemplate.value = null;
-    currentView.value = "list";
 
     if (clearMessagesFlag) {
         clearMessages();
@@ -88,19 +98,26 @@ const duplicateAndEditTemplate = async (template: TemplateListItem) => {
     try {
         const duplicated = await duplicateTemplate(template.id);
 
-        await loadTemplates(false);
+        // The duplicate exists even if fetching the list fails.
+        ++latestListRequest;
+        templates.value = [duplicated, ...templates.value];
         editingTemplate.value = duplicated;
         setMessage(t("template.notice.duplicated"));
-        currentView.value = "edit";
+        void loadTemplates(false);
     } catch (error) {
         setError(error);
     } finally {
         isLoading.value = false;
     }
+
+    if (editingTemplate.value && editingTemplate.value.id !== template.id) {
+        await nextTick();
+        editor.value?.focusPlacement();
+    }
 };
 
 const saveTemplate = async (payload: UpdateTemplatePayload) => {
-    if (editingTemplate.value === null) {
+    if (isLoading.value || editingTemplate.value === null || editingTemplate.value.is_system) {
         return;
     }
 
@@ -111,9 +128,12 @@ const saveTemplate = async (payload: UpdateTemplatePayload) => {
         const saved = await updateTemplate(editingTemplate.value.id, payload);
 
         editingTemplate.value = saved;
-        await loadTemplates(false);
+        ++latestListRequest;
+        templates.value = templates.value.map((template) => template.id === saved.id ? saved : template);
         backToList(false);
+        savedTemplateName.value = saved.name;
         setMessage(t("template.notice.saved"));
+        void loadTemplates(false);
     } catch (error) {
         setError(error);
     } finally {
@@ -149,28 +169,35 @@ onMounted(() => {
     <div class="ossr-pk-admin-panel">
         <h2>{{ t("template.title") }}</h2>
 
-        <ShowMessage
-            :notice-message="noticeMessage"
-            :error-message="errorMessage"
-        />
+        <div aria-live="polite">
+            <ShowMessage :notice-message="noticeMessage" :error-message="activeError" />
+        </div>
+
+        <p v-if="savedTemplateName !== null && reportUrl">
+            <a :href="reportUrl">{{ t("template.action.open_report") }}</a>
+            {{ format(t("template.notice.report_hint"), savedTemplateName) }}
+        </p>
 
         <div class="ossr-pk-admin">
             <TemplateList
-                v-if="currentView === 'list'"
+                v-if="editingTemplate === null"
                 :templates="templates"
                 :is-loading="isLoading"
-                :has-error="hasError"
+                :has-error="activeError !== ''"
                 @edit="editTemplate"
                 @remove="removeTemplate"
                 @duplicate="duplicateAndEditTemplate"
             />
 
             <TemplateEditForm
-                v-else-if="currentView === 'edit' && editingTemplate !== null"
+                v-else
+                :key="editingTemplate.id"
+                ref="editor"
                 :editing-template="editingTemplate"
                 :is-loading="isLoading"
                 @save="saveTemplate"
-                @back="backToList"
+                @back="backToList()"
+                @duplicate="duplicateAndEditTemplate(editingTemplate)"
                 @validation-error="showValidationError"
             />
         </div>

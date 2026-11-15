@@ -46,6 +46,7 @@ final class TemplateTable {
 			name varchar(191) NOT NULL,
 			type varchar(50) NOT NULL DEFAULT 'sales_report',
 			content longtext NOT NULL,
+			settings longtext NULL,
 			content_hash varchar(64) NOT NULL DEFAULT '',
 			version varchar(20) NOT NULL DEFAULT '1.0.0',
 			is_system tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -83,6 +84,22 @@ final class TemplateTable {
 		);
 
 		return $table_name === $result;
+	}
+
+	/**
+	 * Check whether the settings column has been installed.
+	 *
+	 * @return bool
+	 */
+	public static function has_settings_column(): bool {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$column = $wpdb->get_var(
+			$wpdb->prepare( 'SHOW COLUMNS FROM %i LIKE %s', self::get_table_name(), 'settings' )
+		);
+
+		return 'settings' === $column;
 	}
 
 	/**

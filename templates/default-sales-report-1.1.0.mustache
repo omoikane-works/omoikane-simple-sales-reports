@@ -1,0 +1,294 @@
+<style>
+	.ossr-report {
+		max-width: 1100px;
+		margin: 0 auto;
+		color: #1d2327;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		font-size: 13px;
+		line-height: 1.6;
+	}
+
+	.ossr-report__header {
+		display: flex;
+		align-items: flex-start;
+		gap: 6mm;
+		margin-bottom: 24px;
+		padding-bottom: 16px;
+		border-bottom: 2px solid #1d2327;
+	}
+
+	.ossr-report__header-text {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.ossr-report__branding {
+		position: relative;
+		flex: 0 0 60mm;
+		height: 32mm;
+	}
+
+	.ossr-report__branding-image {
+		position: absolute;
+		display: block;
+		height: auto;
+		max-width: none;
+	}
+
+	.ossr-report__title {
+		margin: 0 0 8px;
+		font-size: 24px;
+		font-weight: 700;
+	}
+
+	.ossr-report__meta {
+		margin: 2px 0;
+	}
+
+	.ossr-report__section {
+		margin-top: 24px;
+	}
+
+	.ossr-report__section-title {
+		margin: 0 0 8px;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.ossr-report__orders-table .customer-name {
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	.ossr-report table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.ossr-report th,
+	.ossr-report td {
+		padding: 6px 8px;
+		border: 1px solid #c3c4c7;
+		vertical-align: top;
+	}
+
+	.ossr-report th {
+		background: #f6f7f7;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.ossr-report .number {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.ossr-report__summary {
+		max-width: 720px;
+	}
+
+	.ossr-report__note {
+		margin-top: 8px;
+		color: #646970;
+		font-size: 12px;
+	}
+
+	@media print {
+		@page {
+			size: A4 landscape;
+			margin: 12mm;
+		}
+
+		#adminmenumain,
+		#wpadminbar,
+		#wpfooter,
+		.notice,
+		.update-nag,
+		.ossr-no-print {
+			display: none !important;
+		}
+
+		#wpcontent,
+		#wpbody-content {
+			margin-left: 0 !important;
+			padding-left: 0 !important;
+		}
+
+		.notice,
+		.update-nag,
+		.error,
+		.updated,
+		.notice-error,
+		.notice-warning,
+		.usces_admin_message,
+		.usces_admin_error {
+			display: none !important;
+		}
+
+		.ossr-report {
+			max-width: none;
+			font-size: 11px;
+		}
+
+		.ossr-report__header {
+			break-inside: avoid;
+		}
+
+		.ossr-report thead {
+			display: table-header-group;
+		}
+
+		.ossr-report tr {
+			break-inside: avoid;
+			page-break-inside: avoid;
+		}
+
+		.ossr-report__section--orders {
+			break-before: page;
+		}
+	}
+</style>
+
+<div class="ossr-report">
+	<header class="ossr-report__header">
+		<div class="ossr-report__header-text">
+			<h1 class="ossr-report__title">{{ report.title }}</h1>
+			<p class="ossr-report__meta">対象期間：{{ report.period_label }}</p>
+			<p class="ossr-report__meta">店舗名：{{ store.name }}</p>
+			<p class="ossr-report__meta">出力日時：{{ report.generated_at }}</p>
+		</div>
+		{{#branding}}
+		<div class="ossr-report__branding">
+			{{#logo}}
+			<img class="ossr-report__branding-image" src="{{src}}" alt="ロゴ"
+				style="left: {{x_mm}}mm; top: {{y_mm}}mm; width: {{width_mm}}mm;">
+			{{/logo}}
+			{{#stamp}}
+			<img class="ossr-report__branding-image" src="{{src}}" alt="社印"
+				style="left: {{x_mm}}mm; top: {{y_mm}}mm; width: {{width_mm}}mm;">
+			{{/stamp}}
+		</div>
+		{{/branding}}
+	</header>
+
+	<section class="ossr-report__section">
+		<h2 class="ossr-report__section-title">集計</h2>
+		<table class="ossr-report__summary">
+			<tbody>
+				<tr>
+					<th>受注数</th>
+					<td class="number">{{ totals.order_count }} 件</td>
+				</tr>
+				<tr>
+					<th>売上対象数</th>
+					<td class="number">{{ totals.sales_order_count }} 件</td>
+				</tr>
+				<tr>
+					<th>商品合計</th>
+					<td class="number">{{ totals.amounts.item_total.label }} 円</td>
+				</tr>
+				<tr>
+					<th>値引き</th>
+					<td class="number">{{ totals.amounts.discount.label }} 円</td>
+				</tr>
+				<tr>
+					<th>消費税</th>
+					<td class="number">{{ totals.amounts.tax.label }} 円</td>
+				</tr>
+				<tr>
+					<th>送料</th>
+					<td class="number">{{ totals.amounts.shipping_fee.label }} 円</td>
+				</tr>
+				<tr>
+					<th>代引手数料</th>
+					<td class="number">{{ totals.amounts.cod_fee.label }} 円</td>
+				</tr>
+				<tr>
+					<th>使用ポイント</th>
+					<td class="number">{{ totals.amounts.used_points.label }} 円</td>
+				</tr>
+				<tr>
+					<th>支払い合計金額</th>
+					<td class="number"><strong>{{ totals.amounts.payment_total.label }} 円</strong></td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section class="ossr-report__section">
+		<h2 class="ossr-report__section-title">税率別内訳</h2>
+		<table class="ossr-report__summary">
+			<thead>
+				<tr>
+					<th>区分</th>
+					<th>小計</th>
+					<th>値引き</th>
+					<th>消費税</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>標準税率対象</th>
+					<td class="number">{{ totals.amounts.item_total.standard.label }} 円</td>
+					<td class="number">{{ totals.amounts.discount.standard.label }} 円</td>
+					<td class="number">{{ totals.amounts.tax.standard.label }} 円</td>
+				</tr>
+				<tr>
+					<th>軽減税率対象</th>
+					<td class="number">{{ totals.amounts.item_total.reduced.label }} 円</td>
+					<td class="number">{{ totals.amounts.discount.reduced.label }} 円</td>
+					<td class="number">{{ totals.amounts.tax.reduced.label }} 円</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section class="ossr-report__section ossr-report__section--orders">
+		<h2 class="ossr-report__section-title">注文明細</h2>
+		<table class="ossr-report__orders-table">
+			<thead>
+				<tr>
+					<th>注文日</th>
+					<th>注文番号</th>
+					<th>顧客名</th>
+					<th>支払い方法</th>
+					<th>状態</th>
+					<th>商品合計</th>
+					<th>値引き</th>
+					<th>消費税</th>
+					<th>送料</th>
+					<th>代引</th>
+					<th>使用pt</th>
+					<th>支払い合計</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#orders}}
+				<tr>
+					<td class="order-date">{{ order_date }}</td>
+					<td class="order-number">{{ order_number }}</td>
+					<td class="customer-name">{{ customer.name }}</td>
+					<td class="payment-method">{{ payment.method }}</td>
+					<td class="status-label">{{ status.label }}</td>
+					<td class="number">{{ amounts.item_total.label }}</td>
+					<td class="number">{{ amounts.discount.label }}</td>
+					<td class="number">{{ amounts.tax.label }}</td>
+					<td class="number">{{ amounts.shipping_fee.label }}</td>
+					<td class="number">{{ amounts.cod_fee.label }}</td>
+					<td class="number">{{ amounts.used_points.label }}</td>
+					<td class="number">{{ amounts.payment_total.label }}</td>
+				</tr>
+				{{/orders}}
+				{{^orders}}
+				<tr>
+					<td colspan="12">対象期間の注文はありません。</td>
+				</tr>
+				{{/orders}}
+			</tbody>
+		</table>
+
+		<p class="ossr-report__note">
+			キャンセル注文は明細に表示されますが、売上対象の集計には含まれません。
+		</p>
+	</section>
+</div>

@@ -22,7 +22,7 @@ function getRestConfig(): OssrRestConfig {
     return { restUrl: cfg.restUrl, nonce: cfg.nonce };
 }
 
-function buildUrl(restUrl: string, path: string): string {
+function buildUrl(restUrl: string, path: string, query: Record<string, string>): string {
     const url = new URL(restUrl, window.location.href);
     const suffix = path.replace(/^\/+/, "");
     const route = url.searchParams.get("rest_route");
@@ -31,6 +31,10 @@ function buildUrl(restUrl: string, path: string): string {
         url.searchParams.set("rest_route", `${route.replace(/\/+$/, "")}/${suffix}`);
     } else {
         url.pathname = `${url.pathname.replace(/\/+$/, "")}/${suffix}`;
+    }
+
+    for (const [name, value] of Object.entries(query)) {
+        url.searchParams.set(name, value);
     }
 
     return url.href;
@@ -88,14 +92,18 @@ function getErrorMessage(data: unknown, res: Response): string {
     return `REST ${res.status} ${res.statusText}`;
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function request<T>(
+    path: string,
+    init: RequestInit,
+    query: Record<string, string> = {},
+): Promise<T> {
     const { restUrl, nonce } = getRestConfig();
 
     const headers = new Headers(init.headers);
     headers.set("Accept", "application/json");
     headers.set("X-WP-Nonce", nonce);
 
-    const res = await fetch(buildUrl(restUrl, path), {
+    const res = await fetch(buildUrl(restUrl, path, query), {
         ...init,
         headers,
     });
@@ -120,8 +128,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const wpRest = {
-    get<T>(path: string): Promise<T> {
-        return request<T>(path, { method: "GET" });
+    get<T>(path: string, query?: Record<string, string>): Promise<T> {
+        return request<T>(path, { method: "GET" }, query);
     },
     post<T>(path: string, body?: unknown): Promise<T> {
         return request<T>(path, {

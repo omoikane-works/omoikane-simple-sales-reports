@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-14T19:10:27+00:00\n"
+"POT-Creation-Date: 2026-11-15T07:52:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: omoikane-simple-sales-reports\n"
@@ -218,102 +218,184 @@ msgid "The image file could not be read."
 msgstr ""
 
 #: resources/i18n.php:72
-#: src/Configs/BrandingImageService.php:298
+#: src/Configs/BrandingImageService.php:328
 msgid "The image file must be 1 MiB or smaller."
 msgstr ""
 
 #: resources/i18n.php:75
-msgid "An unknown error occurred."
+msgid "View"
 msgstr ""
 
 #: resources/i18n.php:76
+msgid "Check in report generation"
+msgstr ""
+
+#. Translators: %s: Saved template name.
+#: resources/i18n.php:78
+#, php-format
+msgid "Select “%s”, then choose Show and Print."
+msgstr ""
+
+#: resources/i18n.php:79
+msgid "Logo and company stamp placement"
+msgstr ""
+
+#: resources/i18n.php:80
+msgid "Positive X moves right and positive Y moves down from the template anchor. Height is calculated from the image proportions."
+msgstr ""
+
+#: resources/i18n.php:81
+msgid "Show on report"
+msgstr ""
+
+#: resources/i18n.php:82
+msgid "X (mm)"
+msgstr ""
+
+#: resources/i18n.php:83
+msgid "Y (mm)"
+msgstr ""
+
+#: resources/i18n.php:84
+msgid "Width (mm)"
+msgstr ""
+
+#: resources/i18n.php:85
+msgid "Image registered"
+msgstr ""
+
+#: resources/i18n.php:86
+msgid "Image registration could not be checked."
+msgstr ""
+
+#: resources/i18n.php:87
+msgid "Manage images in Settings (opens in a new tab)"
+msgstr ""
+
+#: resources/i18n.php:88
+msgid "No standard image tags were found in this template. To display the images, add image tags to the body or duplicate the latest standard template."
+msgstr ""
+
+#: resources/i18n.php:89
+msgid "The placement settings could not be loaded. You can still save the name and content."
+msgstr ""
+
+#: resources/i18n.php:90
+msgid "The saved placement settings are damaged. Both images are currently hidden. Save changed placements or restore the defaults to repair the settings."
+msgstr ""
+
+#: resources/i18n.php:91
+msgid "Repair with defaults"
+msgstr ""
+
+#: resources/i18n.php:92
+msgid "Save to repair the settings using the values shown below."
+msgstr ""
+
+#: resources/i18n.php:93
+msgid "Enter a number from −1000 to 1000 mm."
+msgstr ""
+
+#: resources/i18n.php:94
+msgid "Enter a number from 0.1 to 1000 mm."
+msgstr ""
+
+#: resources/i18n.php:95
+msgid "Check the highlighted placement fields."
+msgstr ""
+
+#: resources/i18n.php:98
+msgid "An unknown error occurred."
+msgstr ""
+
+#: resources/i18n.php:99
 msgid "OSSR REST config is missing."
 msgstr ""
 
-#: src/Activation.php:64
+#: src/Activation.php:66
 msgid "Omoikane Simple Sales Reports for Welcart requires Welcart to be activated."
 msgstr ""
 
-#: src/Admin/AdminPage.php:168
-#: src/Admin/AdminPage.php:169
+#: src/Admin/AdminPage.php:175
+#: src/Admin/AdminPage.php:176
 msgid "Simple Reports"
 msgstr ""
 
-#: src/Admin/AdminPage.php:181
-#: src/Admin/AdminPage.php:182
-#: src/Admin/AdminPage.php:240
+#: src/Admin/AdminPage.php:188
+#: src/Admin/AdminPage.php:189
+#: src/Admin/AdminPage.php:247
 msgid "Sales Reports"
 msgstr ""
 
-#: src/Admin/AdminPage.php:233
+#: src/Admin/AdminPage.php:240
 msgid "You do not have permission to access this page."
 msgstr ""
 
-#: src/Admin/AdminPage.php:322
+#: src/Admin/AdminPage.php:329
 msgid "Period"
 msgstr ""
 
-#: src/Admin/AdminPage.php:325
+#: src/Admin/AdminPage.php:332
 msgid "This month"
 msgstr ""
 
-#: src/Admin/AdminPage.php:330
+#: src/Admin/AdminPage.php:337
 msgid "Previous month"
 msgstr ""
 
-#: src/Admin/AdminPage.php:335
+#: src/Admin/AdminPage.php:342
 msgid "Custom Period"
 msgstr ""
 
-#: src/Admin/AdminPage.php:346
+#: src/Admin/AdminPage.php:353
 msgid "Show"
 msgstr ""
 
-#: src/Admin/AdminPage.php:383
+#: src/Admin/AdminPage.php:390
 msgid "Template"
 msgstr ""
 
-#: src/Admin/AdminPage.php:445
+#: src/Admin/AdminPage.php:452
 msgid "Generate report"
 msgstr ""
 
-#: src/Admin/AdminPage.php:507
+#: src/Admin/AdminPage.php:521
 msgid "Print"
 msgstr ""
 
-#: src/Admin/AdminPage.php:512
+#: src/Admin/AdminPage.php:526
 msgid "If dates or URLs appear when saving as PDF, turn off \"Headers and footers\" in the print dialog."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:95
+#: src/Configs/BrandingImageService.php:131
 msgid "The specified MIME type does not match the image."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:103
+#: src/Configs/BrandingImageService.php:139
 msgid "The image must be at most 4,096 px per side and 4,194,304 pixels in total."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:120
+#: src/Configs/BrandingImageService.php:156
 msgid "The server cannot decode this image format with GD."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:285
+#: src/Configs/BrandingImageService.php:315
 msgid "Upload a valid PNG, JPEG, or WebP image."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:311
+#: src/Configs/BrandingImageService.php:341
 msgid "Animated images are not supported."
 msgstr ""
 
-#: src/Configs/BrandingImageService.php:324
+#: src/Configs/BrandingImageService.php:354
 msgid "The branding image could not be accessed or saved."
 msgstr ""
 
-#: src/Plugin.php:164
+#: src/Plugin.php:166
 msgid "Templates"
 msgstr ""
 
-#: src/Plugin.php:165
+#: src/Plugin.php:167
 msgid "Settings"
 msgstr ""
 
@@ -350,7 +432,7 @@ msgstr ""
 msgid "Shipped"
 msgstr ""
 
-#: src/Reports/SalesReportRenderer.php:68
+#: src/Reports/SalesReportRenderer.php:55
 msgid "The sales report template was not found. Please reactivate the plugin."
 msgstr ""
 
@@ -358,14 +440,42 @@ msgstr ""
 msgid "Provide the image as base64 data and, optionally, its MIME type."
 msgstr ""
 
+#: src/Rest/TemplateController.php:197
+msgid "settings must be an object."
+msgstr ""
+
 #. translators: %s: template name.
-#: src/Templates/TemplateService.php:273
+#: src/Templates/TemplateService.php:282
 #, php-format
 msgid "%s copy"
 msgstr ""
 
 #. translators: 1: template name, 2: copy number.
-#: src/Templates/TemplateService.php:284
+#: src/Templates/TemplateService.php:293
 #, php-format
 msgid "%1$s copy(%2$d)"
+msgstr ""
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:114
+#, php-format
+msgid "%s must be an object."
+msgstr ""
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:125
+#, php-format
+msgid "%s contains an unknown field."
+msgstr ""
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:154
+#, php-format
+msgid "%s.enabled must be a boolean."
+msgstr ""
+
+#. translators: 1: Settings field path, 2: Minimum value in mm.
+#: src/Templates/TemplateSettings.php:182
+#, php-format
+msgid "%1$s must be a number from %2$s to 1000 mm."
 msgstr ""

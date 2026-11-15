@@ -58,6 +58,21 @@ final class BrandingImageService {
 	}
 
 	/**
+	 * Read and validate the stored image for rendering.
+	 *
+	 * @param string $slot Branding slot.
+	 * @return Image|WP_Error|null
+	 */
+	public function get_validated( string $slot ): array|WP_Error|null {
+		$image = $this->get( $slot );
+		if ( ! is_array( $image ) ) {
+			return $image;
+		}
+
+		return $this->validate( $image['data'], $image['mime'] );
+	}
+
+	/**
 	 * Validate and save an image.
 	 *
 	 * @param string      $slot Branding slot.
@@ -66,11 +81,32 @@ final class BrandingImageService {
 	 * @return Image|WP_Error
 	 */
 	public function save( string $slot, string $data, ?string $mime ): array|WP_Error {
+		$value = $this->validate( $data, $mime );
+		if ( is_wp_error( $value ) ) {
+			return $value;
+		}
+
+		$json = wp_json_encode( $value, JSON_UNESCAPED_SLASHES );
+		if ( false === $json || ! $this->configs->set( 'branding.' . $slot, $json ) ) {
+			return $this->storage_error();
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Validate the image payload without accessing storage.
+	 *
+	 * @param string      $data Base64-encoded image.
+	 * @param string|null $mime Optional declared MIME type.
+	 * @return Image|WP_Error
+	 */
+	private function validate( string $data, ?string $mime ): array|WP_Error {
 		if ( strlen( $data ) > self::MAX_BASE64 ) {
 			return $this->size_error();
 		}
 
-		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Decode and verify the REST image payload.
+		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Decode and verify the image payload.
 		$bytes = base64_decode( $data, true );
 		if ( false === $bytes || '' === $bytes || base64_encode( $bytes ) !== $data ) {
 			return $this->invalid_image();
@@ -142,16 +178,10 @@ final class BrandingImageService {
 			return $this->invalid_image();
 		}
 
-		$value = array(
+		return array(
 			'mime' => $detected,
 			'data' => $data,
 		);
-		$json  = wp_json_encode( $value, JSON_UNESCAPED_SLASHES );
-		if ( false === $json || ! $this->configs->set( 'branding.' . $slot, $json ) ) {
-			return $this->storage_error();
-		}
-
-		return $value;
 	}
 
 	/**

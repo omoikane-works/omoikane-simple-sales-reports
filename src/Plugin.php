@@ -131,7 +131,8 @@ final class Plugin {
 		$period_resolver       = new ReportPeriodResolver();
 		$template_repository   = new TemplateRepository();
 		$template_service      = new TemplateService( $template_repository );
-		$sales_report_renderer = new SalesReportRenderer( $template_repository );
+		$branding_images       = new BrandingImageService( new ConfigService( new ConfigRepository() ) );
+		$sales_report_renderer = new SalesReportRenderer( $template_repository, $branding_images );
 		$order_repository      = new OrderRepository();
 		$sales_report_builder  = new SalesReportBuilder( $order_repository );
 
@@ -145,12 +146,11 @@ final class Plugin {
 
 		add_action(
 			'rest_api_init',
-			static function () use ( $template_service ): void {
+			static function () use ( $template_service, $branding_images ): void {
 				$controller = new TemplateController( $template_service );
 				$controller->register_routes();
 
-				$configs = new ConfigService( new ConfigRepository() );
-				( new ConfigController( new BrandingImageService( $configs ) ) )->register_routes();
+				( new ConfigController( $branding_images ) )->register_routes();
 			}
 		);
 	}
