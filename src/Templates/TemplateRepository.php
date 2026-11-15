@@ -30,7 +30,30 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 * @phpstan-return TemplateRow|null
 	 */
 	public function find_default_sales_report_template(): ?array {
-		return $this->find_by_key( TemplateKeys::DEFAULT_SALES_REPORT );
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT *
+				FROM %i
+				WHERE template_key = %s
+				AND is_active = 1
+				ORDER BY id DESC',
+				TemplateTable::get_table_name(),
+				TemplateKeys::DEFAULT_SALES_REPORT
+			),
+			ARRAY_A
+		);
+
+		$latest = null;
+		foreach ( $rows ?? array() as $row ) {
+			if ( null === $latest || version_compare( (string) $row['version'], (string) $latest['version'], '>' ) ) {
+				$latest = $row;
+			}
+		}
+
+		return null === $latest ? null : $this->normalize_row( $latest );
 	}
 
 	/**

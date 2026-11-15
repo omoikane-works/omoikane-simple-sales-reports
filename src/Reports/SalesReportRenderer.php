@@ -10,30 +10,29 @@ declare(strict_types=1);
 namespace OmoikaneWorks\SimpleSalesReports\Reports;
 
 use Mustache_Engine;
+use OmoikaneWorks\SimpleSalesReports\Configs\BrandingImageService;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateRepositoryInterface;
+use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSettings;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Renders sales report templates.
+ *
+ * @phpstan-import-type Settings from TemplateSettings
  */
 final class SalesReportRenderer {
 
 	/**
-	 * Template repository.
-	 *
-	 * @var TemplateRepositoryInterface
-	 */
-	private TemplateRepositoryInterface $template_repository;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param   TemplateRepositoryInterface $template_repository    Template repository.
+	 * @param TemplateRepositoryInterface $template_repository Template repository.
+	 * @param BrandingImageService        $branding_images     Branding image service.
 	 */
-	public function __construct( TemplateRepositoryInterface $template_repository ) {
-		$this->template_repository = $template_repository;
-	}
+	public function __construct(
+		private readonly TemplateRepositoryInterface $template_repository,
+		private readonly BrandingImageService $branding_images,
+	) {}
 
 	/**
 	 * Render default sales report.
@@ -42,19 +41,7 @@ final class SalesReportRenderer {
 	 * @return  string
 	 */
 	public function render_default_sales_report( array $view_data ): string {
-		$template = $this->template_repository->find_default_sales_report_template();
-
-		if ( null === $template ) {
-			return $this->render_template_not_found_message();
-		}
-
-		$content = isset( $template['content'] ) ? (string) $template['content'] : '';
-
-		if ( '' === $content ) {
-			return $this->render_template_not_found_message();
-		}
-
-		return $this->render_content( $content, $view_data );
+		return $this->render_report( $view_data, null );
 	}
 
 	/**
@@ -80,31 +67,33 @@ final class SalesReportRenderer {
 	 * @return  string
 	 */
 	public function render_sales_report( array $view_data, int $template_id ): string {
-		$template = $this->template_repository->find_by_id( $template_id );
-
-		if ( null === $template ) {
-			return $this->render_default_sales_report( $view_data );
-		}
-
-		$content = isset( $template['content'] )
-			? (string) $template['content']
-			: '';
-
-		if ( '' === $content ) {
-			return $this->render_default_sales_report( $view_data );
-		}
-
-		return $this->render_content( $content, $view_data );
+		return $this->render_report( $view_data, $template_id );
 	}
 
 	/**
-	 * Render template content.
+	 * Resolve the template, then render its body with its placement settings.
 	 *
-	 * @param   string               $content    Template content.
-	 * @param   array<string, mixed> $view_data  View data.
-	 * @return  string
+	 * @param array<string, mixed> $view_data   View data.
+	 * @param int|null             $template_id Requested template ID.
+	 * @return string
 	 */
-	private function render_content( string $content, array $view_data ): string {
+	private function render_report( array $view_data, ?int $template_id ): string {
+		$template = null === $template_id ? null : $this->template_repository->find_by_id( $template_id );
+		if ( '' === (string) ( $template['content'] ?? '' ) ) {
+			$template = $this->template_repository->find_default_sales_report_template();
+		}
+
+		$content = (string) ( $template['content'] ?? '' );
+		if ( '' === $content ) {
+			return $this->render_template_not_found_message();
+		}
+
+		$branding = $this->build_branding_view_data( $template['settings'] ?? TemplateSettings::defaults() );
+		unset( $view_data['branding'] );
+		if ( array() !== $branding ) {
+			$view_data['branding'] = $branding;
+		}
+
 		$mustache = new Mustache_Engine(
 			array(
 				'entity_flags' => ENT_QUOTES,
@@ -113,5 +102,35 @@ final class SalesReportRenderer {
 		);
 
 		return $mustache->render( $content, $view_data );
+	}
+
+	/**
+	 * Build Mustache variables for enabled slots with valid images.
+	 *
+	 * @param array<string, mixed> $settings Normalized template settings.
+	 * @phpstan-param Settings $settings
+	 * @return array<string, array{src: string, x_mm: int|float, y_mm: int|float, width_mm: int|float}>
+	 */
+	private function build_branding_view_data( array $settings ): array {
+		$branding = array();
+		foreach ( $settings['branding'] as $slot => $placement ) {
+			if ( ! $placement['enabled'] ) {
+				continue;
+			}
+
+			$image = $this->branding_images->get_validated( $slot );
+			if ( ! is_array( $image ) ) {
+				continue;
+			}
+
+			$branding[ $slot ] = array(
+				'src'      => 'data:' . $image['mime'] . ';base64,' . $image['data'],
+				'x_mm'     => $placement['x_mm'],
+				'y_mm'     => $placement['y_mm'],
+				'width_mm' => $placement['width_mm'],
+			);
+		}
+
+		return $branding;
 	}
 }

@@ -182,25 +182,35 @@ final class TemplateRepositoryTest extends TestCase {
 	}
 
 	/**
-	 * Test find default sales report template returns normalized template.
+	 * The newest semantic version wins even with a lower database ID.
 	 *
 	 * @return  void
 	 */
 	public function test_find_default_sales_report_template_returns_normalized_template(): void {
-		$this->wpdb->set_row(
+		$new = array(
+			'id'           => '20',
+			'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
+			'name'         => 'Default Sales Report',
+			'type'         => TemplateTypes::SALES_REPORT,
+			'content'      => 'Default content',
+			'content_hash' => 'hash-default',
+			'version'      => '1.10.0',
+			'is_system'    => '1',
+			'is_default'   => '1',
+			'is_active'    => '1',
+			'created_at'   => '2026-05-03 10:00:00',
+			'updated_at'   => '2026-05-03 10:00:00',
+		);
+		$this->wpdb->set_results(
 			array(
-				'id'           => '20',
-				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
-				'name'         => 'Default Sales Report',
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => 'Default content',
-				'content_hash' => 'hash-default',
-				'version'      => '1.0.0',
-				'is_system'    => '1',
-				'is_default'   => '1',
-				'is_active'    => '1',
-				'created_at'   => '2026-05-03 10:00:00',
-				'updated_at'   => '2026-05-03 10:00:00',
+				array_replace(
+					$new,
+					array(
+						'id'      => '21',
+						'version' => '1.9.0',
+					)
+				),
+				$new,
 			)
 		);
 
@@ -210,6 +220,7 @@ final class TemplateRepositoryTest extends TestCase {
 
 		$this->assertIsArray( $result );
 		$this->assertSame( 20, $result['id'] );
+		$this->assertSame( '1.10.0', $result['version'] );
 		$this->assertSame( TemplateKeys::DEFAULT_SALES_REPORT, $result['template_key'] );
 		$this->assertSame( TemplateTypes::SALES_REPORT, $result['type'] );
 		$this->assertTrue( $result['is_system'] );

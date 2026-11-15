@@ -56,7 +56,7 @@ final class TemplateSeederTest extends TestCase {
 
 		TemplateSeeder::seed();
 		$inserted_rows = $this->wpdb->get_inserted_rows();
-		$this->assertCount( 1, $inserted_rows );
+		$this->assertCount( 2, $inserted_rows );
 		$row = $inserted_rows[0];
 
 		$this->assertSame( TemplateKeys::DEFAULT_SALES_REPORT, $row['template_key'] );
@@ -71,6 +71,16 @@ final class TemplateSeederTest extends TestCase {
 		$this->assertSame( 1, $row['is_active'] );
 		$this->assertSame( '2026-05-24 12:34:56', $row['created_at'] );
 		$this->assertSame( '2026-05-24 12:34:56', $row['updated_at'] );
+
+		$new = $inserted_rows[1];
+		$this->assertSame( TemplateKeys::DEFAULT_SALES_REPORT, $new['template_key'] );
+		$this->assertSame( '1.1.0', $new['version'] );
+		$this->assertStringContainsString( '{{#branding}}', $new['content'] );
+		$this->assertSame( hash( 'sha256', $new['content'] ), $new['content_hash'] );
+		$this->assertSame(
+			'{"branding":{"logo":{"enabled":true,"x_mm":0,"y_mm":0,"width_mm":30},"stamp":{"enabled":true,"x_mm":38,"y_mm":0,"width_mm":18}}}',
+			$new['settings']
+		);
 	}
 
 	/**
@@ -108,8 +118,12 @@ final class TemplateSeederTest extends TestCase {
 			'settings'     => '{"branding":{"logo":{"enabled":true}}}',
 		);
 		$this->wpdb->insert( 'wp_ossr_templates', $stored_row );
-		$this->wpdb->record_call = ossr_test_record_call( ... );
-		$this->wpdb->set_var( $already_seeded ? '1' : '0' );
+		$this->wpdb->record_call = function ( string $call, string $argument ) use ( $already_seeded ): void {
+			ossr_test_record_call( $call, $argument );
+			if ( 'get_var' === $call ) {
+				$this->wpdb->set_var( $already_seeded && str_contains( $argument, "version = '1.0.0'" ) ? '1' : '0' );
+			}
+		};
 
 		TemplateSeeder::seed();
 
@@ -118,7 +132,8 @@ final class TemplateSeederTest extends TestCase {
 			$GLOBALS['ossr_test_calls'][0]
 		);
 		$rows = $this->wpdb->get_inserted_rows();
-		$this->assertCount( $already_seeded ? 1 : 2, $rows );
+		$this->assertCount( $already_seeded ? 2 : 3, $rows );
+		$this->assertSame( '1.1.0', $rows[ count( $rows ) - 1 ]['version'] );
 		$this->assertSame( $stored_row, $rows[0] );
 		$this->assertSame( array(), $this->wpdb->get_updated_rows() );
 		$this->assertArrayHasKey( 'ossr_template_catalog_hash', $GLOBALS['ossr_test_options'] );
@@ -152,7 +167,13 @@ final class TemplateSeederTest extends TestCase {
 		$this->wpdb->record_call                                    = function ( string $call, string $argument ): void {
 			ossr_test_record_call( $call, $argument );
 			if ( 'get_var' === $call ) {
-				$this->wpdb->set_var( str_starts_with( $argument, 'SHOW TABLES' ) ? 'wp_ossr_templates' : '0' );
+				$this->wpdb->set_var(
+					match ( true ) {
+						str_starts_with( $argument, 'SHOW TABLES' )    => 'wp_ossr_templates',
+						str_contains( $argument, "version = '1.0.0'" ) => '1',
+						default                                       => '0',
+					}
+				);
 			}
 		};
 		$this->wpdb->set_insert_result( false );
@@ -160,7 +181,7 @@ final class TemplateSeederTest extends TestCase {
 		TemplateSeeder::maybe_seed();
 
 		$this->assertSame( 'previous-catalog', $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] );
-		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'insert' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'get_var', 'insert' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
 		$this->assertSame( array(), $this->wpdb->get_inserted_rows() );
 
 		$this->wpdb->set_insert_result( 1 );
@@ -190,7 +211,7 @@ final class TemplateSeederTest extends TestCase {
 
 		TemplateSeeder::maybe_seed();
 
-		$this->assertSame( array( 'get_option', 'get_var', 'dbDelta', 'get_var', 'insert', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
-		$this->assertCount( 1, $this->wpdb->get_inserted_rows() );
+		$this->assertSame( array( 'get_option', 'get_var', 'dbDelta', 'get_var', 'insert', 'get_var', 'insert', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertCount( 2, $this->wpdb->get_inserted_rows() );
 	}
 }

@@ -192,16 +192,16 @@ final class ActivationTest extends TestCase {
 
 		$calls = $GLOBALS['ossr_test_calls'];
 		$this->assertSame(
-			array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option', 'get_var', 'get_var', 'insert', 'update_option', 'update_option' ),
+			array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option', 'get_var', 'get_var', 'insert', 'get_var', 'insert', 'update_option', 'update_option' ),
 			array_column( $calls, 0 )
 		);
 		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[2][1] );
 		$this->assertSame( array( 'insert', 'wp_ossr_templates' ), $calls[8] );
-		$this->assertSame( array( TemplateKeys::DEFAULT_SALES_REPORT ), array_column( $this->wpdb->get_inserted_rows(), 'template_key' ) );
+		$this->assertSame( array( TemplateKeys::DEFAULT_SALES_REPORT, TemplateKeys::DEFAULT_SALES_REPORT ), array_column( $this->wpdb->get_inserted_rows(), 'template_key' ) );
 		$catalog_hash = $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'];
 		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $catalog_hash );
-		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[9] );
-		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[10] );
+		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[11] );
+		$this->assertSame( array( 'update_option', 'ossr_version', OSSR_VERSION, false ), $calls[12] );
 		$this->assertSame(
 			array(
 				'ossr_db_version'            => '1.2.0',
