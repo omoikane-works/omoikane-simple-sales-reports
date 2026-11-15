@@ -53,15 +53,10 @@ const emit = defineEmits<{
                             <button
                                 type="button"
                                 class="button"
-                                :disabled="isLoading || template.is_system"
-                                :title="
-                                    template.is_system
-                                        ? t('template.tooltip.system_edit')
-                                        : ''
-                                "
+                                :disabled="isLoading"
                                 @click="emit('edit', template)"
                             >
-                                {{ t("common.edit") }}
+                                {{ t(template.is_system ? "template.action.view" : "common.edit") }}
                             </button>
 
                             <button

@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  * Handles template queries.
  *
  * @phpstan-import-type Settings from TemplateSettings
- * @phpstan-type TemplateRow array{name: mixed, content: mixed, settings: Settings, ...<string, mixed>}
+ * @phpstan-type TemplateRow array{name: mixed, content: mixed, settings: Settings, settings_invalid: bool, ...<string, mixed>}
  */
 interface TemplateRepositoryInterface {
 

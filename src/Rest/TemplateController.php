@@ -193,7 +193,8 @@ final class TemplateController {
 		$body     = json_decode( $request->get_body() );
 		$settings = $body instanceof stdClass ? ( $body->settings ?? null ) : null;
 		if ( ! $settings instanceof stdClass ) {
-			throw new \InvalidArgumentException( 'settings must be an object.' );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Returned as a REST error message.
+			throw new \InvalidArgumentException( __( 'settings must be an object.', 'omoikane-simple-sales-reports' ) );
 		}
 
 		return $settings;

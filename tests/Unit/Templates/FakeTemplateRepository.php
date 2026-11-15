@@ -100,19 +100,20 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 
 		$this->templates[ $template_id ] = array_merge(
 			array(
-				'id'           => $template_id,
-				'template_key' => 'custom_' . (string) $template_id,
-				'name'         => 'Template ' . (string) $template_id,
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => '',
-				'settings'     => TemplateSettings::defaults(),
-				'content_hash' => '',
-				'version'      => '1.0.0',
-				'is_system'    => false,
-				'is_default'   => false,
-				'is_active'    => true,
-				'created_at'   => '2026-05-01 10:00:00',
-				'updated_at'   => '2026-05-01 10:00:00',
+				'id'               => $template_id,
+				'template_key'     => 'custom_' . (string) $template_id,
+				'name'             => 'Template ' . (string) $template_id,
+				'type'             => TemplateTypes::SALES_REPORT,
+				'content'          => '',
+				'settings'         => TemplateSettings::defaults(),
+				'settings_invalid' => false,
+				'content_hash'     => '',
+				'version'          => '1.0.0',
+				'is_system'        => false,
+				'is_default'       => false,
+				'is_active'        => true,
+				'created_at'       => '2026-05-01 10:00:00',
+				'updated_at'       => '2026-05-01 10:00:00',
 			),
 			$template,
 			array( 'id' => $template_id )
@@ -280,6 +281,9 @@ final class FakeTemplateRepository implements TemplateRepositoryInterface {
 				'updated_at' => '2026-05-01 10:00:00',
 			)
 		);
+		if ( isset( $data['settings'] ) ) {
+			$this->templates[ $template_id ]['settings_invalid'] = false;
+		}
 
 		return true;
 	}

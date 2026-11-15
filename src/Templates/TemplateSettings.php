@@ -109,14 +109,24 @@ final class TemplateSettings {
 	 */
 	private static function object_properties( mixed $value, string $path, array $allowed_keys ): array {
 		if ( ! $value instanceof stdClass ) {
+			$message = sprintf(
+				/* translators: %s: Settings field path. */
+				__( '%s must be an object.', 'omoikane-simple-sales-reports' ),
+				$path
+			);
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- The path contains only fixed field names.
-			throw new InvalidArgumentException( sprintf( '%s must be an object.', $path ) );
+			throw new InvalidArgumentException( $message );
 		}
 
 		$properties = get_object_vars( $value );
 		if ( array_diff_key( $properties, array_flip( $allowed_keys ) ) ) {
+			$message = sprintf(
+				/* translators: %s: Settings field path. */
+				__( '%s contains an unknown field.', 'omoikane-simple-sales-reports' ),
+				$path
+			);
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- The path contains only fixed field names.
-			throw new InvalidArgumentException( sprintf( '%s contains an unknown field.', $path ) );
+			throw new InvalidArgumentException( $message );
 		}
 
 		return $properties;
@@ -139,8 +149,13 @@ final class TemplateSettings {
 		$path   = 'settings.branding.' . $slot;
 		$values = self::object_properties( $branding[ $slot ], $path, array_keys( $defaults ) ) + $defaults;
 		if ( ! is_bool( $values['enabled'] ) ) {
+			$message = sprintf(
+				/* translators: %s: Settings field path. */
+				__( '%s.enabled must be a boolean.', 'omoikane-simple-sales-reports' ),
+				$path
+			);
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- The path contains only fixed field names.
-			throw new InvalidArgumentException( sprintf( '%s.enabled must be a boolean.', $path ) );
+			throw new InvalidArgumentException( $message );
 		}
 
 		return array(
@@ -162,8 +177,14 @@ final class TemplateSettings {
 	 */
 	private static function normalize_mm( mixed $value, string $path, int|float $min ): int|float {
 		if ( ( ! is_int( $value ) && ! is_float( $value ) ) || ! is_finite( $value ) || $min > $value || 1000 < $value ) {
+			$message = sprintf(
+				/* translators: 1: Settings field path, 2: Minimum value in mm. */
+				__( '%1$s must be a number from %2$s to 1000 mm.', 'omoikane-simple-sales-reports' ),
+				$path,
+				$min
+			);
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- The path and limit come from the settings definition.
-			throw new InvalidArgumentException( sprintf( '%s must be a number from %s to 1000 mm.', $path, $min ) );
+			throw new InvalidArgumentException( $message );
 		}
 
 		return is_float( $value ) && floor( $value ) === $value ? (int) $value : $value;

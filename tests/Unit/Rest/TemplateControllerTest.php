@@ -801,6 +801,44 @@ final class TemplateControllerTest extends TestCase {
 	}
 
 	/**
+	 * The invalid-settings flag is read-only and survives until a successful settings write.
+	 *
+	 * @return void
+	 */
+	public function test_settings_invalid_flag_requires_successful_repair(): void {
+		$template   = $this->create_template_row(
+			array(
+				'is_system'        => false,
+				'settings_invalid' => true,
+			)
+		);
+		$repository = new FakeTemplateRepository( array( $template ) );
+		$controller = $this->create_controller_with_repository( $repository );
+		$request    = new WP_REST_Request();
+		$request->set_param( 'id', (string) $template['id'] );
+		$request->set_param( 'name', 'Renamed template' );
+		$request->set_param( 'content', '<p>Updated report</p>' );
+		$request->set_body( '{"settings_invalid":false}' );
+
+		$response = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertTrue( $response->get_data()['item']['settings_invalid'] );
+		$this->assertArrayNotHasKey( 'settings_invalid', $repository->updated_data['data'] );
+		$this->assertArrayNotHasKey( 'settings', $repository->updated_data['data'] );
+
+		$request->set_body( '{"settings":{}}' );
+		$repository->update_result = false;
+		$this->assertInstanceOf( WP_Error::class, $controller->update_item( $request ) );
+		$this->assertTrue( $controller->get_item( $request )->get_data()['item']['settings_invalid'] );
+
+		$repository->update_result = true;
+		$response                  = $controller->update_item( $request );
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertFalse( $response->get_data()['item']['settings_invalid'] );
+		$this->assertSame( TemplateSettings::defaults(), $response->get_data()['item']['settings'] );
+	}
+
+	/**
 	 * Create controller.
 	 *
 	 * @param array<int, array<string, mixed>> $templates Templates.

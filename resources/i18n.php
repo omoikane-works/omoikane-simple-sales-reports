@@ -71,6 +71,29 @@ return array(
 	'branding.read_failed'                 => __( 'The image file could not be read.', 'omoikane-simple-sales-reports' ),
 	'branding.too_large'                   => __( 'The image file must be 1 MiB or smaller.', 'omoikane-simple-sales-reports' ),
 
+	// Template placement.
+	'template.action.view'                 => __( 'View', 'omoikane-simple-sales-reports' ),
+	'template.action.open_report'          => __( 'Check in report generation', 'omoikane-simple-sales-reports' ),
+	// Translators: %s: Saved template name.
+	'template.notice.report_hint'          => __( 'Select “%s”, then choose Show and Print.', 'omoikane-simple-sales-reports' ),
+	'template.placement.title'             => __( 'Logo and company stamp placement', 'omoikane-simple-sales-reports' ),
+	'template.placement.help'              => __( 'Positive X moves right and positive Y moves down from the template anchor. Height is calculated from the image proportions.', 'omoikane-simple-sales-reports' ),
+	'template.placement.enabled'           => __( 'Show on report', 'omoikane-simple-sales-reports' ),
+	'template.placement.x'                 => __( 'X (mm)', 'omoikane-simple-sales-reports' ),
+	'template.placement.y'                 => __( 'Y (mm)', 'omoikane-simple-sales-reports' ),
+	'template.placement.width'             => __( 'Width (mm)', 'omoikane-simple-sales-reports' ),
+	'template.placement.image_registered'  => __( 'Image registered', 'omoikane-simple-sales-reports' ),
+	'template.placement.image_unknown'     => __( 'Image registration could not be checked.', 'omoikane-simple-sales-reports' ),
+	'template.placement.open_settings'     => __( 'Manage images in Settings (opens in a new tab)', 'omoikane-simple-sales-reports' ),
+	'template.placement.tags_missing'      => __( 'No standard image tags were found in this template. To display the images, add image tags to the body or duplicate the latest standard template.', 'omoikane-simple-sales-reports' ),
+	'template.placement.unavailable'       => __( 'The placement settings could not be loaded. You can still save the name and content.', 'omoikane-simple-sales-reports' ),
+	'template.placement.damaged'           => __( 'The saved placement settings are damaged. Both images are currently hidden. Save changed placements or restore the defaults to repair the settings.', 'omoikane-simple-sales-reports' ),
+	'template.placement.repair'            => __( 'Repair with defaults', 'omoikane-simple-sales-reports' ),
+	'template.placement.repair_pending'    => __( 'Save to repair the settings using the values shown below.', 'omoikane-simple-sales-reports' ),
+	'template.placement.coordinate_error'  => __( 'Enter a number from −1000 to 1000 mm.', 'omoikane-simple-sales-reports' ),
+	'template.placement.width_error'       => __( 'Enter a number from 0.1 to 1000 mm.', 'omoikane-simple-sales-reports' ),
+	'template.placement.validation_failed' => __( 'Check the highlighted placement fields.', 'omoikane-simple-sales-reports' ),
+
 	// Errors.
 	'error.unknown'                        => __( 'An unknown error occurred.', 'omoikane-simple-sales-reports' ),
 	'error.rest_config_missing'            => __( 'OSSR REST config is missing.', 'omoikane-simple-sales-reports' ),

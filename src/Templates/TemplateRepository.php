@@ -210,7 +210,7 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 			'name'         => isset( $row['name'] ) ? (string) $row['name'] : '',
 			'type'         => isset( $row['type'] ) ? (string) $row['type'] : '',
 			'content'      => isset( $row['content'] ) ? (string) $row['content'] : '',
-			'settings'     => $this->decode_settings( $row['settings'] ?? null ),
+			...$this->decode_settings( $row['settings'] ?? null ),
 			'content_hash' => isset( $row['content_hash'] ) ? (string) $row['content_hash'] : '',
 			'version'      => isset( $row['version'] ) ? (string) $row['version'] : '',
 			'is_system'    => ! empty( $row['is_system'] ),
@@ -225,17 +225,26 @@ final class TemplateRepository implements TemplateRepositoryInterface {
 	 * Decode stored settings, with disabled placements for absent or invalid data.
 	 *
 	 * @param mixed $stored Settings column value.
-	 * @return Settings
+	 * @return array{settings: Settings, settings_invalid: bool}
 	 */
 	private function decode_settings( mixed $stored ): array {
 		if ( ! is_string( $stored ) ) {
-			return TemplateSettings::defaults();
+			return array(
+				'settings'         => TemplateSettings::defaults(),
+				'settings_invalid' => null !== $stored,
+			);
 		}
 
 		try {
-			return TemplateSettings::normalize( json_decode( $stored, false, 512, JSON_THROW_ON_ERROR ) );
+			return array(
+				'settings'         => TemplateSettings::normalize( json_decode( $stored, false, 512, JSON_THROW_ON_ERROR ) ),
+				'settings_invalid' => false,
+			);
 		} catch ( \JsonException | \InvalidArgumentException ) {
-			return TemplateSettings::defaults();
+			return array(
+				'settings'         => TemplateSettings::defaults(),
+				'settings_invalid' => true,
+			);
 		}
 	}
 

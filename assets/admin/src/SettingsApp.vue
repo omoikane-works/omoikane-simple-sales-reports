@@ -5,8 +5,8 @@ import { t } from "@/lib/i18n";
 import {
     brandingImages,
     type BrandingImage,
-    type BrandingSlot,
 } from "@/services/branding-images";
+import type { BrandingSlot } from "@/types/templates";
 
 type ImageSettings = {
     slot: BrandingSlot;

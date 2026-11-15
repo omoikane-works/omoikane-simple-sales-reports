@@ -94,19 +94,20 @@ final class TemplateRepositoryTest extends TestCase {
 
 		$this->assertSame(
 			array(
-				'id'           => 10,
-				'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
-				'name'         => 'Default Sales Report',
-				'type'         => TemplateTypes::SALES_REPORT,
-				'content'      => '<h1>{{report.title}}</h1>',
-				'settings'     => TemplateSettings::defaults(),
-				'content_hash' => 'abc123',
-				'version'      => '1.0.0',
-				'is_system'    => true,
-				'is_default'   => true,
-				'is_active'    => true,
-				'created_at'   => '2026-05-01 10:00:00',
-				'updated_at'   => '2026-05-02 11:00:00',
+				'id'               => 10,
+				'template_key'     => TemplateKeys::DEFAULT_SALES_REPORT,
+				'name'             => 'Default Sales Report',
+				'type'             => TemplateTypes::SALES_REPORT,
+				'content'          => '<h1>{{report.title}}</h1>',
+				'settings'         => TemplateSettings::defaults(),
+				'settings_invalid' => false,
+				'content_hash'     => 'abc123',
+				'version'          => '1.0.0',
+				'is_system'        => true,
+				'is_default'       => true,
+				'is_active'        => true,
+				'created_at'       => '2026-05-01 10:00:00',
+				'updated_at'       => '2026-05-02 11:00:00',
 			),
 			$result
 		);
@@ -459,6 +460,7 @@ final class TemplateRepositoryTest extends TestCase {
 		);
 		$this->wpdb->set_row( $stored );
 		$this->assertSame( $settings, $repository->find_by_id( 1 )['settings'] );
+		$this->assertFalse( $repository->find_by_id( 1 )['settings_invalid'] );
 
 		$data['settings'] = TemplateSettings::defaults();
 		$this->assertTrue( $repository->update( 1, $data ) );
@@ -485,6 +487,7 @@ final class TemplateRepositoryTest extends TestCase {
 		$templates  = $repository->find_selectable_by_type( TemplateTypes::SALES_REPORT );
 
 		$this->assertCount( 3, $templates );
+		$this->assertSame( array( false, true, true ), array_column( $templates, 'settings_invalid' ) );
 		foreach ( $templates as $template ) {
 			$this->assertSame( TemplateSettings::defaults(), $template['settings'] );
 		}

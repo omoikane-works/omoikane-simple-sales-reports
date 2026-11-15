@@ -228,6 +228,23 @@ final class AdminAssets {
 			'ossrI18n',
 			$this->get_i18n_messages()
 		);
+
+		wp_localize_script(
+			self::SCRIPT_HANDLE,
+			'ossrAdminLinks',
+			array(
+				'report'   => esc_url_raw( AdminPage::get_report_review_url() ),
+				'settings' => esc_url_raw(
+					add_query_arg(
+						array(
+							'page'                        => Plugin::OSSR_ADMIN_PAGE_SLUG,
+							Plugin::OSSR_ADMIN_VIEW_PARAM => Plugin::OSSR_ADMIN_SETTINGS_VIEW_SLUG,
+						),
+						admin_url( 'admin.php' )
+					)
+				),
+			)
+		);
 	}
 
 	/**

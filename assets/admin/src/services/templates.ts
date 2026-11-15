@@ -1,7 +1,7 @@
 // assets/admin/src/services/templates.ts
 
 import { wpRest } from "../lib/wp-rest";
-import type { TemplateListItem, TemplateData } from "../types/templates";
+import type { TemplateListItem, TemplateData, TemplateSettings } from "../types/templates";
 
 type TemplateListResponse = {
     items: TemplateListItem[];
@@ -18,6 +18,7 @@ type DeleteTemplateResponse = {
 export type UpdateTemplatePayload = {
     name: string;
     content: string;
+    settings?: TemplateSettings;
 };
 
 export async function fetchTemplates(): Promise<TemplateListItem[]> {
