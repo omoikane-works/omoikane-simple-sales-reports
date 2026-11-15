@@ -80,6 +80,23 @@ final class FakeWpdb {
 	private array $inserted_rows = array();
 
 	/**
+	 * Insert result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $insert_result = 1;
+
+	/**
+	 * Set insert result.
+	 *
+	 * @param int|false $result Insert result.
+	 * @return void
+	 */
+	public function set_insert_result( int|false $result ): void {
+		$this->insert_result = $result;
+	}
+
+	/**
 	 * Insert ID.
 	 *
 	 * @var int
@@ -226,12 +243,16 @@ final class FakeWpdb {
 	public function insert( string $table, array $data, array $format = array() ): int|bool {
 		unset( $format );
 
-		$this->last_query      = 'INSERT INTO ' . $table;
-		$this->inserted_rows[] = $data;
-		$this->insert_id       = count( $this->inserted_rows );
+		$this->last_query = 'INSERT INTO ' . $table;
+
+		if ( 1 === $this->insert_result ) {
+			$this->inserted_rows[] = $data;
+			$this->insert_id       = count( $this->inserted_rows );
+		}
+
 		$this->record_call?->__invoke( 'insert', $table );
 
-		return 1;
+		return $this->insert_result;
 	}
 
 	/**

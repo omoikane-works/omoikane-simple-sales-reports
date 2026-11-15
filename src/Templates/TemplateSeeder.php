@@ -19,10 +19,17 @@ defined( 'ABSPATH' ) || exit;
 final class TemplateSeeder {
 
 	/**
-	 * Default template file.
+	 * Option for the last successfully seeded template catalog hash.
 	 *
-	 * When changing default template content, update the template version.
-	 * Default templates with the same content hash are not inserted again.
+	 * @var string
+	 */
+	private const CATALOG_HASH_OPTION = 'ossr_template_catalog_hash';
+
+	/**
+	 * Bundled template definitions.
+	 *
+	 * The catalog hash covers this metadata, including file paths and versions.
+	 * Bump the version when revising a template's body or settings.
 	 *
 	 * @var array<int, array<string, string>>
 	 */
@@ -37,49 +44,95 @@ final class TemplateSeeder {
 	);
 
 	/**
+	 * Seed templates when the bundled catalog changes.
+	 *
+	 * @return void
+	 */
+	public static function maybe_seed(): void {
+		if ( self::catalog_hash() === get_option( self::CATALOG_HASH_OPTION ) ) {
+			return;
+		}
+
+		if ( ! TemplateTable::exists() ) {
+			TemplateTable::create();
+		}
+
+		self::seed();
+	}
+
+	/**
 	 * Seed default templates.
 	 *
 	 * @return  void
 	 */
 	public static function seed(): void {
+		$complete = true;
 		foreach ( self::DEFAULT_TEMPLATES as $template ) {
-			self::seed_template( $template );
+			if ( ! self::seed_template( $template ) ) {
+				$complete = false;
+			}
 		}
+
+		if ( $complete ) {
+			update_option( self::CATALOG_HASH_OPTION, self::catalog_hash(), true );
+		}
+	}
+
+	/**
+	 * Fingerprint the catalog metadata so boot need not read template files.
+	 *
+	 * @return string
+	 */
+	private static function catalog_hash(): string {
+		return hash( 'sha256', (string) wp_json_encode( self::DEFAULT_TEMPLATES ) );
 	}
 
 	/**
 	 * Seed template.
 	 *
 	 * @param   array<string, string> $template   Template definition.
-	 * @return  void
+	 * @return  bool True if the template already exists or was inserted.
 	 */
-	private static function seed_template( array $template ): void {
+	private static function seed_template( array $template ): bool {
 		global $wpdb;
 
-		$table_name    = TemplateTable::get_table_name();
-		$template_path = OSSR_PLUGIN_DIR . $template['file'];
+		$table_name = TemplateTable::get_table_name();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$existing = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT EXISTS(SELECT 1 FROM %i WHERE template_key = %s AND version = %s)',
+				$table_name,
+				$template['template_key'],
+				$template['version']
+			)
+		);
+
+		if ( '1' === (string) $existing ) {
+			// Preserve the stored revision even if the bundled body has changed.
+			return true;
+		}
+
+		if ( '0' !== (string) $existing ) {
+			return false;
+		}
+
+		$template_path = OSSR_PLUGIN_DIR . $template['file'];
 		if ( ! file_exists( $template_path ) ) {
-			return;
+			return false;
 		}
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$content = file_get_contents( $template_path );
 
 		if ( false === $content || '' === $content ) {
-			return;
-		}
-
-		$content_hash = hash( 'sha256', $content );
-
-		if ( self::template_hash_exists( $template['template_key'], $content_hash ) ) {
-			return;
+			return false;
 		}
 
 		$now = current_time( 'mysql' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->insert(
+		$result = $wpdb->insert(
 			$table_name,
 			array(
 				'template_key' => $template['template_key'],
@@ -87,7 +140,7 @@ final class TemplateSeeder {
 				'type'         => $template['type'],
 				'content'      => $content,
 				'version'      => $template['version'],
-				'content_hash' => $content_hash,
+				'content_hash' => hash( 'sha256', $content ),
 				'is_system'    => 1,
 				'is_default'   => 1,
 				'is_active'    => 1,
@@ -108,34 +161,9 @@ final class TemplateSeeder {
 				'%s',
 			)
 		);
-	}
 
-	/**
-	 * Check whether template content hash already exists.
-	 *
-	 * @param   string $template_key   Template key.
-	 * @param   string $content_hash   Content hash.
-	 * @return  bool
-	 */
-	private static function template_hash_exists(
-		string $template_key,
-		string $content_hash
-	): bool {
-		global $wpdb;
-
-		$table_name = TemplateTable::get_table_name();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$existing_id = $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT id FROM %i WHERE template_key = %s AND content_hash = %s LIMIT 1',
-				$table_name,
-				$template_key,
-				$content_hash
-			)
-		);
-
-		return null !== $existing_id;
+		// The unique key also protects against concurrent inserts of the same version.
+		return 1 === $result;
 	}
 
 	/**

@@ -31,12 +31,25 @@ final class PluginTest extends TestCase {
 	#[PreserveGlobalState( false )]
 	public function test_boot_upgrades_schema_and_registers_hooks_once(): void {
 		$database              = new FakeWpdb();
-		$database->record_call = ossr_test_record_call( ... );
-		$database->set_var( 'wp_ossr_configs' );
+		$database->record_call = static function ( string $call, string $argument ) use ( $database ): void {
+			ossr_test_record_call( $call, $argument );
+			if ( 'get_var' === $call ) {
+				$database->set_var(
+					match ( $argument ) {
+						"SHOW TABLES LIKE 'wp\\_ossr\\_configs'"   => 'wp_ossr_configs',
+						"SHOW TABLES LIKE 'wp\\_ossr\\_templates'" => 'wp_ossr_templates',
+						default                                  => '1',
+					}
+				);
+			}
+		};
 
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride
 		$GLOBALS['wpdb']              = $database;
-		$GLOBALS['ossr_test_options'] = array( 'ossr_db_version' => '1.0.0' );
+		$GLOBALS['ossr_test_options'] = array(
+			'ossr_db_version'               => '1.0.0',
+			'ossr_sales_report_template_id' => 32,
+		);
 		$GLOBALS['ossr_test_calls']   = array();
 
 		$plugin = Plugin::instance();
@@ -45,8 +58,12 @@ final class PluginTest extends TestCase {
 		$calls = $GLOBALS['ossr_test_calls'];
 		$this->assertSame( array( 'get_option', 'dbDelta', 'get_var', 'update_option' ), array_column( array_slice( $calls, 0, 4 ), 0 ) );
 		$this->assertSame( '1.1.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
+		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'update_option' ), array_column( array_slice( $calls, 4, 4 ), 0 ) );
+		$this->assertArrayHasKey( 'ossr_template_catalog_hash', $GLOBALS['ossr_test_options'] );
+		$this->assertSame( 32, $GLOBALS['ossr_test_options']['ossr_sales_report_template_id'] );
+		$this->assertSame( array(), $database->get_inserted_rows() );
 
-		$hooks         = array_slice( $calls, 4 );
+		$hooks         = array_slice( $calls, 8 );
 		$registrations = array();
 		$rest_init     = null;
 		foreach ( $hooks as $registration ) {
