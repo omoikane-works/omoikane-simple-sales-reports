@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OmoikaneWorks\SimpleSalesReports;
 
+use OmoikaneWorks\SimpleSalesReports\Database\ConfigTable;
 use OmoikaneWorks\SimpleSalesReports\Database\TemplateTable;
 use OmoikaneWorks\SimpleSalesReports\Templates\TemplateSeeder;
 
@@ -20,6 +21,13 @@ defined( 'ABSPATH' ) || exit;
 final class Activation {
 
 	/**
+	 * Current database schema version.
+	 *
+	 * @var string
+	 */
+	private const DB_SCHEMA_VERSION = '1.2.0';
+
+	/**
 	 * Run activation tasks.
 	 *
 	 * @return  void
@@ -27,7 +35,11 @@ final class Activation {
 	public static function activate(): void {
 		self::check_requirements();
 
-		TemplateTable::create();
+		self::maybe_upgrade();
+
+		if ( ! TemplateTable::exists() ) {
+			TemplateTable::create();
+		}
 		TemplateSeeder::seed();
 
 		update_option( 'ossr_version', OSSR_VERSION, false );
@@ -40,15 +52,11 @@ final class Activation {
 	 */
 	private static function check_requirements(): void {
 		// @phpstan-ignore-next-line Runtime requirement check for plugin activation.
-		if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+		if ( version_compare( PHP_VERSION, OSSR_MINIMUM_PHP_VERSION, '<' ) ) {
 			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
-			wp_die(
-				esc_html__(
-					'Omoikane Simple Sales Reports for Welcart requires PHP 8.2 or later.',
-					'omoikane-simple-sales-reports'
-				)
-			);
+			$message = ossr_get_unsupported_php_version_message();
+			wp_die( esc_html( $message ) );
 		}
 
 		if ( ! defined( 'USCES_VERSION' ) ) {
@@ -60,16 +68,35 @@ final class Activation {
 					'omoikane-simple-sales-reports'
 				)
 			);
-		} elseif ( version_compare( \USCES_VERSION, '2.11.10', '<' ) ) {
+		} elseif ( version_compare( \USCES_VERSION, OSSR_MINIMUM_USCES_VERSION, '<' ) ) {
 			deactivate_plugins( OSSR_PLUGIN_BASENAME );
 
-			wp_die(
-				esc_html__(
-					'Omoikane Simple Sales Reports for Welcart requires Welcart 2.11.10 or later.',
-					'omoikane-simple-sales-reports'
-				)
-			);
+			$message = ossr_get_unsupported_welcart_version_message();
+			wp_die( esc_html( $message ) );
 		}
+	}
+
+	/**
+	 * Upgrade database schema if needed.
+	 *
+	 * @return void
+	 */
+	public static function maybe_upgrade(): void {
+		$installed_version = (string) get_option( 'ossr_db_version', '1.0.0' );
+
+		if ( version_compare( $installed_version, self::DB_SCHEMA_VERSION, '>=' ) ) {
+			return;
+		}
+
+		ConfigTable::create();
+		TemplateTable::create();
+
+		// Confirm the schema update succeeded before recording the version.
+		if ( ! ConfigTable::exists() || ! TemplateTable::has_settings_column() ) {
+			return;
+		}
+
+		update_option( 'ossr_db_version', self::DB_SCHEMA_VERSION, false );
 	}
 
 	/**

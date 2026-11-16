@@ -1,131 +1,406 @@
-# Copyright (C) 2026 Omoikane Works
-# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Omoikane Simple Sales Reports for Welcart 1.0.1\n"
+"Project-Id-Version: Omoikane Simple Sales Reports for Welcart 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/omoikane-simple-sales-reports\n"
-"POT-Creation-Date: 2026-06-01T11:52:08+00:00\n"
-"PO-Revision-Date: 2026-06-01 21:28+0900\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.9\n"
+"POT-Creation-Date: 2026-11-12T07:27:07+00:00\n"
+"PO-Revision-Date: 2026-11-15T17:18:39+00:00\n"
+"Language: ja\n"
+"X-Generator: Poedit 3.10\n"
 "X-Domain: omoikane-simple-sales-reports\n"
 
 #. Plugin Name of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:3
 msgid "Omoikane Simple Sales Reports for Welcart"
 msgstr "かんたん売上報告書 for Welcart"
 
 #. Plugin URI of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:4
 msgid "https://github.com/omoikane-works/omoikane-simple-sales-reports"
 msgstr "https://github.com/omoikane-works/omoikane-simple-sales-reports"
 
 #. Description of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:5
 msgid "Create simple sales reports for Welcart stores."
 msgstr "Welcart の売上報告書をかんたんに作成できるプラグインです。"
 
 #. Author of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:9
 msgid "Omoikane Works"
 msgstr "オモイカネ ワークス"
 
 #. Author URI of the plugin
-#: omoikane-simple-sales-reports.php
+#: omoikane-simple-sales-reports.php:10
 msgid "https://github.com/omoikane-works"
 msgstr "https://github.com/omoikane-works"
 
 #. translators: 1: required PHP version, 2: current PHP version.
-#: omoikane-simple-sales-reports.php:50
+#: omoikane-simple-sales-reports.php:67
 #, php-format
-msgid ""
-"Omoikane Simple Sales Reports for Welcart requires PHP version %1$s or later. Your "
-"current PHP version is %2$s."
-msgstr ""
-"かんたん売上報告書 for Welcart を利用するには PHP %1$s 以上が必要です。現在の PHP バー"
-"ジョンは、%2$s です。"
+msgid "Omoikane Simple Sales Reports for Welcart requires PHP version %1$s or later. Your current PHP version is %2$s."
+msgstr "かんたん売上報告書 for Welcart を利用するには PHP %1$s 以上が必要です。現在の PHP バージョンは、%2$s です。"
 
-#: omoikane-simple-sales-reports.php:71
+#. translators: %s: required Welcart version.
+#: omoikane-simple-sales-reports.php:84
+#, php-format
+msgid "Omoikane Simple Sales Reports for Welcart requires Welcart %s or later."
+msgstr "かんたん売上報告書 for Welcart を利用するには Welcart %s 以上が必要です。"
+
+#: omoikane-simple-sales-reports.php:104
 msgid "Plugin activation failed."
 msgstr "プラグインの有効化に失敗しました。"
 
-#: omoikane-simple-sales-reports.php:110
-msgid ""
-"Required libraries for Omoikane Simple Sales Reports for Welcart were not found. Please "
-"run composer install."
-msgstr ""
-"かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer install を実行"
-"してください。"
+#: omoikane-simple-sales-reports.php:143
+msgid "Required libraries for Omoikane Simple Sales Reports for Welcart were not found. Please run composer install."
+msgstr "かんたん売上報告書 for Welcart の依存ライブラリが見つかりません。composer install を実行してください。"
 
-#: src/Activation.php:47
-msgid "Omoikane Simple Sales Reports for Welcart requires PHP 8.2 or later."
-msgstr "かんたん売上報告書 for Welcart を利用するには PHP 8.2 以上が必要です。"
+#: resources/i18n.php:12
+msgid "Save"
+msgstr "保存"
 
-#: src/Activation.php:58
+#: resources/i18n.php:13
+msgid "Back"
+msgstr "戻る"
+
+#: resources/i18n.php:14
+msgid "Edit"
+msgstr "編集"
+
+#: resources/i18n.php:15
+msgid "Delete"
+msgstr "削除"
+
+#: resources/i18n.php:18
+msgid "Template Management"
+msgstr "テンプレート管理"
+
+#: resources/i18n.php:19
+msgid "No templates found."
+msgstr "テンプレートがありません。"
+
+#: resources/i18n.php:20
+msgid "Loading..."
+msgstr "読み込み中…"
+
+#: resources/i18n.php:23
+msgid "Name"
+msgstr "名前"
+
+#: resources/i18n.php:24
+msgid "Version"
+msgstr "バージョン"
+
+#: resources/i18n.php:25
+msgid "Type"
+msgstr "タイプ"
+
+#: resources/i18n.php:28
+msgid "System template"
+msgstr "システムテンプレート"
+
+#: resources/i18n.php:29
+msgid "User template"
+msgstr "ユーザーテンプレート"
+
+#: resources/i18n.php:32
+msgid "Duplicate and edit"
+msgstr "複製して編集"
+
+#: resources/i18n.php:35
+msgid "Template name"
+msgstr "テンプレート名"
+
+#: resources/i18n.php:36
+msgid "Template content"
+msgstr "テンプレート内容"
+
+#: resources/i18n.php:37
+msgid "Template tag reference"
+msgstr "テンプレートタグリファレンス"
+
+#: resources/i18n.php:40
+msgid "Template saved."
+msgstr "テンプレートを保存しました。"
+
+#: resources/i18n.php:41
+msgid "Template deleted."
+msgstr "テンプレートを削除しました。"
+
+#: resources/i18n.php:42
+msgid "Template duplicated."
+msgstr "テンプレートを複製しました。"
+
+#: resources/i18n.php:45
+msgid "Template name is required."
+msgstr "テンプレート名は必須です。"
+
+#: resources/i18n.php:46
+msgid "Template content is required."
+msgstr "テンプレート内容は必須です。"
+
+#. Translators: 1: Template name.
+#: resources/i18n.php:50
+#, php-format
+msgid "Delete \"%1$s\"?"
+msgstr "「%1$s」を削除しますか？"
+
+#: resources/i18n.php:53
+msgid "System templates cannot be edited. Duplicate this template to edit it."
+msgstr "システムテンプレートは編集できません。複製して編集してください。"
+
+#: resources/i18n.php:54
+msgid "System templates cannot be deleted."
+msgstr "システムテンプレートは削除できません。"
+
+#: resources/i18n.php:57
+msgid "Branding Images"
+msgstr "ブランド画像"
+
+#: resources/i18n.php:58
+msgid "Logo"
+msgstr "ロゴ"
+
+#: resources/i18n.php:59
+msgid "Company Stamp"
+msgstr "社印"
+
+#: resources/i18n.php:60
+msgid "PNG, JPEG, or WebP. Up to 1 MiB, 4,096 px per side, and 4,194,304 pixels in total. Static images only."
+msgstr "PNG・JPEG・WebPの静止画に対応しています。ファイルは1 MiB以下、幅と高さはそれぞれ4,096 px以下、総画素数は4,194,304以下です。"
+
+#: resources/i18n.php:61
+msgid "No image registered."
+msgstr "画像は未登録です。"
+
+#: resources/i18n.php:62
+msgid "Image file"
+msgstr "画像ファイル"
+
+#: resources/i18n.php:63
+msgid "Saved image"
+msgstr "保存済みの画像"
+
+#: resources/i18n.php:64
+msgid "Unsaved preview"
+msgstr "未保存のプレビュー"
+
+#: resources/i18n.php:65
+msgid "Discard selection"
+msgstr "画像の選択を取り消す"
+
+#: resources/i18n.php:66
+msgid "Register"
+msgstr "登録"
+
+#: resources/i18n.php:67
+msgid "Replace"
+msgstr "差し替え"
+
+#: resources/i18n.php:68
+msgid "Retry"
+msgstr "再試行"
+
+#: resources/i18n.php:69
+msgid "Delete this image?"
+msgstr "この画像を削除しますか？"
+
+#: resources/i18n.php:70
+msgid "Image saved."
+msgstr "画像を保存しました。"
+
+#: resources/i18n.php:71
+msgid "Image deleted."
+msgstr "画像を削除しました。"
+
+#: resources/i18n.php:72
+msgid "The image file could not be read."
+msgstr "画像ファイルを読み込めませんでした。"
+
+#: resources/i18n.php:73
+#: src/Configs/BrandingImageService.php:328
+msgid "The image file must be 1 MiB or smaller."
+msgstr "画像ファイルは1 MiB以下にしてください。"
+
+#: resources/i18n.php:76
+msgid "View"
+msgstr "表示"
+
+#: resources/i18n.php:77
+msgid "Check in report generation"
+msgstr "帳票作成で確認"
+
+#. Translators: %s: Saved template name.
+#: resources/i18n.php:79
+#, php-format
+msgid "Select “%s”, then choose Show and Print."
+msgstr "「%s」を選び、［表示］→［印刷］で確認できます。"
+
+#: resources/i18n.php:80
+msgid "Logo and company stamp placement"
+msgstr "ロゴ・社印の配置"
+
+#: resources/i18n.php:81
+msgid "Positive X moves right and positive Y moves down from the template anchor. Height is calculated from the image proportions."
+msgstr "テンプレートの基準点から右がXの正方向、下がYの正方向です。高さは画像の縦横比に合わせて自動で決まります。"
+
+#: resources/i18n.php:82
+msgid "Show on report"
+msgstr "帳票に表示する"
+
+#: resources/i18n.php:83
+msgid "X (mm)"
+msgstr "X座標（mm）"
+
+#: resources/i18n.php:84
+msgid "Y (mm)"
+msgstr "Y座標（mm）"
+
+#: resources/i18n.php:85
+msgid "Width (mm)"
+msgstr "幅（mm）"
+
+#: resources/i18n.php:86
+msgid "Image registered"
+msgstr "画像登録済み"
+
+#: resources/i18n.php:87
+msgid "Image registration could not be checked."
+msgstr "画像の登録状況を確認できませんでした。"
+
+#: resources/i18n.php:88
+msgid "Manage images in Settings (opens in a new tab)"
+msgstr "設定で画像を登録・削除（新しいタブ）"
+
+#: resources/i18n.php:89
+msgid "No standard image tags were found in this template. To display the images, add image tags to the body or duplicate the latest standard template."
+msgstr "標準の画像描画タグが見つかりません。画像を表示するには本文に描画タグを追加するか、最新の標準テンプレートを複製してください。"
+
+#: resources/i18n.php:90
+msgid "The placement settings could not be loaded. You can still save the name and content."
+msgstr "配置設定を読み込めませんでした。名前と本文は保存できます。"
+
+#: resources/i18n.php:91
+msgid "The saved placement settings are damaged. Both images are currently hidden. Save changed placements or restore the defaults to repair the settings."
+msgstr "保存済みの配置設定が破損しているため、両画像を非表示として扱っています。配置を変更して保存するか、既定値で修復してください。"
+
+#: resources/i18n.php:92
+msgid "Repair with defaults"
+msgstr "既定値で修復"
+
+#: resources/i18n.php:93
+msgid "Save to repair the settings using the values shown below."
+msgstr "［保存］すると、下に表示している値で配置設定を修復します。"
+
+#: resources/i18n.php:94
+msgid "Enter a number from −1000 to 1000 mm."
+msgstr "−1000〜1000 mmの数値を入力してください。"
+
+#: resources/i18n.php:95
+msgid "Enter a number from 0.1 to 1000 mm."
+msgstr "0.1〜1000 mmの数値を入力してください。"
+
+#: resources/i18n.php:96
+msgid "Check the highlighted placement fields."
+msgstr "エラーが表示されている配置項目を確認してください。"
+
+#: resources/i18n.php:99
+msgid "An unknown error occurred."
+msgstr "不明なエラーが発生しました。"
+
+#: resources/i18n.php:100
+msgid "OSSR REST config is missing."
+msgstr "OSSR REST 設定が見つかりません。"
+
+#: src/Activation.php:66
 msgid "Omoikane Simple Sales Reports for Welcart requires Welcart to be activated."
-msgstr ""
-"かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要があります。"
+msgstr "かんたん売上報告書 for Welcart を利用するには Welcart が有効化されている必要があります。"
 
-#: src/Activation.php:67
-msgid "Omoikane Simple Sales Reports for Welcart requires Welcart 2.11.10 or later."
-msgstr "かんたん売上報告書 for Welcart を利用するには Welcart v2.11.10 以上が必要です。"
-
-#: src/Admin/AdminPage.php:168 src/Admin/AdminPage.php:169
+#: src/Admin/AdminPage.php:175
+#: src/Admin/AdminPage.php:176
 msgid "Simple Reports"
 msgstr "かんたん報告書"
 
-#: src/Admin/AdminPage.php:181 src/Admin/AdminPage.php:182 src/Admin/AdminPage.php:240
+#: src/Admin/AdminPage.php:188
+#: src/Admin/AdminPage.php:189
+#: src/Admin/AdminPage.php:247
 msgid "Sales Reports"
 msgstr "売上報告書"
 
-#: src/Admin/AdminPage.php:233
+#: src/Admin/AdminPage.php:240
 msgid "You do not have permission to access this page."
 msgstr "このページにアクセスする権限がありません。"
 
-#: src/Admin/AdminPage.php:322
+#: src/Admin/AdminPage.php:329
 msgid "Period"
 msgstr "期間"
 
-#: src/Admin/AdminPage.php:325
+#: src/Admin/AdminPage.php:332
 msgid "This month"
 msgstr "今月"
 
-#: src/Admin/AdminPage.php:330
+#: src/Admin/AdminPage.php:337
 msgid "Previous month"
 msgstr "前月"
 
-#: src/Admin/AdminPage.php:335
+#: src/Admin/AdminPage.php:342
 msgid "Custom Period"
 msgstr "期間指定"
 
-#: src/Admin/AdminPage.php:346
+#: src/Admin/AdminPage.php:353
 msgid "Show"
 msgstr "表示"
 
-#: src/Admin/AdminPage.php:383
+#: src/Admin/AdminPage.php:390
 msgid "Template"
 msgstr "テンプレート"
 
-#: src/Admin/AdminPage.php:445
+#: src/Admin/AdminPage.php:452
 msgid "Generate report"
 msgstr "報告書生成"
 
-#: src/Admin/AdminPage.php:507
+#: src/Admin/AdminPage.php:521
 msgid "Print"
 msgstr "印刷"
 
-#: src/Admin/AdminPage.php:512
-msgid ""
-"If dates or URLs appear when saving as PDF, turn off \"Headers and footers\" in the "
-"print dialog."
-msgstr ""
-"PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにし"
-"てください。"
+#: src/Admin/AdminPage.php:526
+msgid "If dates or URLs appear when saving as PDF, turn off \"Headers and footers\" in the print dialog."
+msgstr "PDF保存時に日付やURLが表示される場合は、印刷ダイアログの「ヘッダーとフッター」をオフにしてください。"
+
+#: src/Configs/BrandingImageService.php:131
+msgid "The specified MIME type does not match the image."
+msgstr "指定されたMIMEタイプが画像の形式と一致しません。"
+
+#: src/Configs/BrandingImageService.php:139
+msgid "The image must be at most 4,096 px per side and 4,194,304 pixels in total."
+msgstr "画像の幅と高さはそれぞれ4,096 px以下、総画素数は4,194,304以下にしてください。"
+
+#: src/Configs/BrandingImageService.php:156
+msgid "The server cannot decode this image format with GD."
+msgstr "サーバーのGDではこの画像形式をデコードできません。"
+
+#: src/Configs/BrandingImageService.php:315
+msgid "Upload a valid PNG, JPEG, or WebP image."
+msgstr "有効なPNG・JPEG・WebP画像をアップロードしてください。"
+
+#: src/Configs/BrandingImageService.php:341
+msgid "Animated images are not supported."
+msgstr "アニメーション画像は登録できません。"
+
+#: src/Configs/BrandingImageService.php:354
+msgid "The branding image could not be accessed or saved."
+msgstr "ブランド画像の取得、保存、または削除に失敗しました。"
+
+#: src/Plugin.php:166
+msgid "Templates"
+msgstr "テンプレート"
+
+#: src/Plugin.php:167
+msgid "Settings"
+msgstr "設定"
 
 #. translators: 1: start date, 2: end date
 #: src/Reports/ReportPeriodResolver.php:165
@@ -133,37 +408,77 @@ msgstr ""
 msgid "%1$s - %2$s"
 msgstr "%1$s ～ %2$s"
 
-#: src/Reports/ReportPeriodResolver.php:166 src/Reports/ReportPeriodResolver.php:167
+#: src/Reports/ReportPeriodResolver.php:166
+#: src/Reports/ReportPeriodResolver.php:167
 msgid "F j, Y"
 msgstr "Y年n月j日"
 
 #. translators: %s: Sales support rate.
-#: src/Reports/SalesReportBuilder.php:378
+#: src/Reports/SalesReportBuilder.php:474
 #, php-format
-msgid ""
-"The sales support fee is calculated by multiplying %s by the amount after applying "
-"discounts to the product total, adding tax, and subtracting used points. Fractions are "
-"rounded up."
-msgstr ""
-"販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し引いた金額」"
-"に対して %s を乗じ、小数点以下を切り上げて算出しています。"
+msgid "The sales support fee is calculated by multiplying %s by the amount after applying discounts to the product total, adding tax, and subtracting used points. Fractions are rounded up."
+msgstr "販売支援料は「商品合計から値引きを反映し、消費税を加算後、使用ポイントを差し引いた金額」に対して %s を乗じ、小数点以下を切り上げて算出しています。"
 
-#: src/Reports/SalesReportBuilder.php:479
+#: src/Reports/SalesReportBuilder.php:575
 msgid "Canceled"
 msgstr "キャンセル"
 
-#: src/Reports/SalesReportBuilder.php:483
+#: src/Reports/SalesReportBuilder.php:579
 msgid "New Order"
 msgstr "新規受付"
 
-#: src/Reports/SalesReportBuilder.php:487
+#: src/Reports/SalesReportBuilder.php:583
 msgid "On Backorder"
 msgstr "取り寄せ中"
 
-#: src/Reports/SalesReportBuilder.php:491
+#: src/Reports/SalesReportBuilder.php:587
 msgid "Shipped"
 msgstr "発送済み"
 
-#: src/Reports/SalesReportRenderer.php:68
+#: src/Reports/SalesReportRenderer.php:55
 msgid "The sales report template was not found. Please reactivate the plugin."
 msgstr "売上報告書テンプレートが見つかりません。プラグインを再有効化してください。"
+
+#: src/Rest/ConfigController.php:103
+msgid "Provide the image as base64 data and, optionally, its MIME type."
+msgstr "画像をBase64データで指定してください。MIMEタイプの指定は任意です。"
+
+#: src/Rest/TemplateController.php:197
+msgid "settings must be an object."
+msgstr "settings はオブジェクトで指定してください。"
+
+#. translators: %s: template name.
+#: src/Templates/TemplateService.php:282
+#, php-format
+msgid "%s copy"
+msgstr "%sのコピー"
+
+#. translators: 1: template name, 2: copy number.
+#: src/Templates/TemplateService.php:293
+#, php-format
+msgid "%1$s copy(%2$d)"
+msgstr "%1$sのコピー(%2$d)"
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:114
+#, php-format
+msgid "%s must be an object."
+msgstr "%s はオブジェクトで指定してください。"
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:125
+#, php-format
+msgid "%s contains an unknown field."
+msgstr "%s に未対応の項目が含まれています。"
+
+#. translators: %s: Settings field path.
+#: src/Templates/TemplateSettings.php:154
+#, php-format
+msgid "%s.enabled must be a boolean."
+msgstr "%s.enabled は真偽値で指定してください。"
+
+#. translators: 1: Settings field path, 2: Minimum value in mm.
+#: src/Templates/TemplateSettings.php:182
+#, php-format
+msgid "%1$s must be a number from %2$s to 1000 mm."
+msgstr "%1$s は %2$s〜1000 mmの数値で指定してください。"

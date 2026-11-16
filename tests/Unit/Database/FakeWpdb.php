@@ -22,6 +22,29 @@ final class FakeWpdb {
 	public string $prefix = 'wp_';
 
 	/**
+	 * Charset and collation returned for schema creation.
+	 *
+	 * @var string
+	 */
+	public string $charset_collate = '';
+
+	/**
+	 * Optional observer for database lookups and inserts.
+	 *
+	 * @var \Closure(string, string): void|null
+	 */
+	public ?\Closure $record_call = null;
+
+	/**
+	 * Get the configured charset and collation.
+	 *
+	 * @return string
+	 */
+	public function get_charset_collate(): string {
+		return $this->charset_collate;
+	}
+
+	/**
 	 * Row returned by get_row().
 	 *
 	 * @var array<string, mixed>|null
@@ -50,11 +73,69 @@ final class FakeWpdb {
 	private mixed $var = null;
 
 	/**
+	 * Whether database errors are suppressed.
+	 *
+	 * @var bool
+	 */
+	private bool $errors_suppressed = false;
+
+	/**
+	 * Set error suppression and return the previous state.
+	 *
+	 * @param bool $suppress Whether to suppress database errors.
+	 * @return bool
+	 */
+	public function suppress_errors( bool $suppress = true ): bool {
+		$previous                = $this->errors_suppressed;
+		$this->errors_suppressed = $suppress;
+
+		return $previous;
+	}
+
+	/**
 	 * Inserted rows.
 	 *
 	 * @var array<int, array<string, mixed>>
 	 */
 	private array $inserted_rows = array();
+
+	/**
+	 * Insert result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $insert_result = 1;
+
+	/**
+	 * Set insert result.
+	 *
+	 * @param int|false $result Insert result.
+	 * @return void
+	 */
+	public function set_insert_result( int|false $result ): void {
+		$this->insert_result = $result;
+	}
+
+	/**
+	 * Insert ID.
+	 *
+	 * @var int
+	 */
+	public int $insert_id = 0;
+
+	/**
+	 * Updated rows.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $updated_rows = array();
+
+	/**
+	 * Updated where clauses.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $updated_where_clauses = array();
 
 	/**
 	 * Set row.
@@ -166,6 +247,7 @@ final class FakeWpdb {
 	 */
 	public function get_var( string $query ): mixed {
 		$this->last_query = $query;
+		$this->record_call?->__invoke( 'get_var', $query );
 
 		return $this->var;
 	}
@@ -181,10 +263,16 @@ final class FakeWpdb {
 	public function insert( string $table, array $data, array $format = array() ): int|bool {
 		unset( $format );
 
-		$this->last_query      = 'INSERT INTO ' . $table;
-		$this->inserted_rows[] = $data;
+		$this->last_query = 'INSERT INTO ' . $table;
 
-		return 1;
+		if ( 1 === $this->insert_result ) {
+			$this->inserted_rows[] = $data;
+			$this->insert_id       = count( $this->inserted_rows );
+		}
+
+		$this->record_call?->__invoke( 'insert', $table );
+
+		return $this->insert_result;
 	}
 
 	/**
@@ -194,5 +282,141 @@ final class FakeWpdb {
 	 */
 	public function get_inserted_rows(): array {
 		return $this->inserted_rows;
+	}
+
+	/**
+	 * Update row.
+	 *
+	 * @param   string               $table          Table name.
+	 * @param   array<string, mixed> $data           Data.
+	 * @param   array<string, mixed> $where          Where.
+	 * @param   array<int, string>   $format         Format.
+	 * @param   array<int, string>   $where_format   Where format.
+	 * @return  int|false
+	 */
+	public function update(
+		string $table,
+		array $data,
+		array $where,
+		array $format = array(),
+		array $where_format = array()
+	): int|bool {
+		unset( $format, $where_format );
+
+		$this->last_query              = 'UPDATE ' . $table;
+		$this->updated_rows[]          = $data;
+		$this->updated_where_clauses[] = $where;
+
+		return 1;
+	}
+
+	/**
+	 * Get updated rows.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_updated_rows(): array {
+		return $this->updated_rows;
+	}
+
+	/**
+	 * Get updated where clauses.
+	 *
+	 * @return array>int, array<string, mixed>>
+	 */
+	public function get_updated_where_clauses(): array {
+		return $this->updated_where_clauses;
+	}
+
+	/**
+	 * Query result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $query_result = 1;
+
+	/**
+	 * Set query result.
+	 *
+	 * @param int|false $result Query result.
+	 */
+	public function set_query_result( int|false $result ): void {
+		$this->query_result = $result;
+	}
+
+	/**
+	 * Execute query.
+	 *
+	 * @param  string $query SQL query.
+	 * @return int|false
+	 */
+	public function query( string $query ): int|false {
+		$this->last_query = $query;
+
+		return $this->query_result;
+	}
+
+	/**
+	 * Delete result.
+	 *
+	 * @var int|false
+	 */
+	private int|false $delete_result = 1;
+
+	/**
+	 * Set delete result.
+	 *
+	 * @param int|false $result Delete result.
+	 * @return void
+	 */
+	public function set_delete_result( int|false $result ): void {
+		$this->delete_result = $result;
+	}
+
+	/**
+	 * Deleted where clauses.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $deleted_where_clauses = array();
+
+	/**
+	 * Get deleted where clauses.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_deleted_where_clauses(): array {
+		return $this->deleted_where_clauses;
+	}
+
+	/**
+	 * Execute delete.
+	 *
+	 * @param  string                    $table          Table name.
+	 * @param  array<string, mixed>      $where          Named array of WHERE.
+	 * @param  array<string>|string|null $where_format   Array of formats.
+	 * @return int|false
+	 */
+	public function delete(
+		string $table,
+		array $where,
+		array|string|null $where_format = null
+	): int|false {
+		unset( $where_format );
+
+		$this->last_query              = 'DELETE ' . $table;
+		$this->deleted_where_clauses[] = $where;
+
+		return $this->delete_result;
+	}
+
+	/**
+	 * Escaping for LIKE special characters.
+	 *
+	 * @param  string $text Escape text.
+	 * @return string
+	 */
+	public function esc_like( string $text ): string {
+		return addcslashes( $text, '_%\\' );
 	}
 }

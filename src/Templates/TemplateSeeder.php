@@ -19,10 +19,17 @@ defined( 'ABSPATH' ) || exit;
 final class TemplateSeeder {
 
 	/**
-	 * Default template file.
+	 * Option for the last successfully seeded template catalog hash.
 	 *
-	 * When changing default template content, update the template version.
-	 * Default templates with the same content hash are not inserted again.
+	 * @var string
+	 */
+	private const CATALOG_HASH_OPTION = 'ossr_template_catalog_hash';
+
+	/**
+	 * Bundled template definitions.
+	 *
+	 * The catalog hash covers this metadata, including file paths and versions.
+	 * Bump the version when revising a template's body or settings.
 	 *
 	 * @var array<int, array<string, string>>
 	 */
@@ -34,7 +41,69 @@ final class TemplateSeeder {
 			'file'         => 'templates/default-sales-report-1.0.0.mustache',
 			'version'      => '1.0.0',
 		),
+		array(
+			'template_key'  => TemplateKeys::DEFAULT_SALES_REPORT,
+			'name'          => '標準 売上報告書',
+			'type'          => TemplateTypes::SALES_REPORT,
+			'file'          => 'templates/default-sales-report-1.1.0.mustache',
+			'version'       => '1.1.0',
+			'settings_json' => '{"branding":{'
+				. '"logo":{"enabled":true,"x_mm":0,"y_mm":0,"width_mm":30},'
+				. '"stamp":{"enabled":true,"x_mm":38,"y_mm":0,"width_mm":18}'
+				. '}}',
+		),
 	);
+
+	/**
+	 * Seed templates when the bundled catalog changes or a revision is missing.
+	 *
+	 * @return void
+	 */
+	public static function maybe_seed(): void {
+		if ( self::catalog_hash() === get_option( self::CATALOG_HASH_OPTION ) && self::has_all_catalog_templates() ) {
+			return;
+		}
+
+		if ( ! TemplateTable::exists() ) {
+			TemplateTable::create();
+		}
+
+		self::seed();
+	}
+
+	/**
+	 * Check all bundled keys and versions in one query.
+	 *
+	 * @return bool
+	 */
+	private static function has_all_catalog_templates(): bool {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+		$arguments  = array( $table_name );
+		foreach ( self::DEFAULT_TEMPLATES as $template ) {
+			$arguments[] = $template['template_key'];
+			$arguments[] = $template['version'];
+		}
+		$pairs = implode( ', ', array_fill( 0, count( self::DEFAULT_TEMPLATES ), '(%s, %s)' ) );
+
+		// A missing table is handled by the creation path in maybe_seed().
+		$suppressed = $wpdb->suppress_errors( true );
+		try {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Check the current rows before skipping repair.
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Only SQL placeholders are interpolated.
+					"SELECT COUNT(DISTINCT template_key, version) FROM %i WHERE (template_key, version) IN ({$pairs})",
+					...$arguments
+				)
+			);
+		} finally {
+			$wpdb->suppress_errors( $suppressed );
+		}
+
+		return (string) count( self::DEFAULT_TEMPLATES ) === (string) $count;
+	}
 
 	/**
 	 * Seed default templates.
@@ -42,100 +111,99 @@ final class TemplateSeeder {
 	 * @return  void
 	 */
 	public static function seed(): void {
+		$complete = true;
 		foreach ( self::DEFAULT_TEMPLATES as $template ) {
-			self::seed_template( $template );
+			if ( ! self::seed_template( $template ) ) {
+				$complete = false;
+			}
 		}
+
+		if ( $complete ) {
+			update_option( self::CATALOG_HASH_OPTION, self::catalog_hash(), true );
+		}
+	}
+
+	/**
+	 * Fingerprint the catalog metadata so boot need not read template files.
+	 *
+	 * @return string
+	 */
+	private static function catalog_hash(): string {
+		return hash( 'sha256', (string) wp_json_encode( self::DEFAULT_TEMPLATES ) );
 	}
 
 	/**
 	 * Seed template.
 	 *
 	 * @param   array<string, string> $template   Template definition.
-	 * @return  void
+	 * @return  bool True if the template already exists or was inserted.
 	 */
-	private static function seed_template( array $template ): void {
+	private static function seed_template( array $template ): bool {
 		global $wpdb;
 
-		$table_name    = TemplateTable::get_table_name();
-		$template_path = OSSR_PLUGIN_DIR . $template['file'];
+		$table_name = TemplateTable::get_table_name();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$existing = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT EXISTS(SELECT 1 FROM %i WHERE template_key = %s AND version = %s)',
+				$table_name,
+				$template['template_key'],
+				$template['version']
+			)
+		);
+
+		if ( '1' === (string) $existing ) {
+			// Preserve the stored revision even if the bundled body has changed.
+			return true;
+		}
+
+		if ( '0' !== (string) $existing ) {
+			return false;
+		}
+
+		$template_path = OSSR_PLUGIN_DIR . $template['file'];
 		if ( ! file_exists( $template_path ) ) {
-			return;
+			return false;
 		}
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$content = file_get_contents( $template_path );
 
 		if ( false === $content || '' === $content ) {
-			return;
+			return false;
 		}
 
-		$content_hash = hash( 'sha256', $content );
-
-		if ( self::template_hash_exists( $template['template_key'], $content_hash ) ) {
-			return;
+		$now     = current_time( 'mysql' );
+		$row     = array(
+			'template_key' => $template['template_key'],
+			'name'         => $template['name'],
+			'type'         => $template['type'],
+			'content'      => $content,
+			'version'      => $template['version'],
+			'content_hash' => hash( 'sha256', $content ),
+			'is_system'    => 1,
+			'is_default'   => 1,
+			'is_active'    => 1,
+			'created_at'   => $now,
+			'updated_at'   => $now,
+		);
+		$formats = array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s' );
+		if ( isset( $template['settings_json'] ) ) {
+			try {
+				$settings        = TemplateSettings::normalize( json_decode( $template['settings_json'], false, 512, JSON_THROW_ON_ERROR ) );
+				$row['settings'] = TemplateSettings::encode( $settings );
+				$formats[]       = '%s';
+			} catch ( \JsonException | \InvalidArgumentException | \RuntimeException ) {
+				return false;
+			}
 		}
 
-		$now = current_time( 'mysql' );
-
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->insert(
-			$table_name,
-			array(
-				'template_key' => $template['template_key'],
-				'name'         => $template['name'],
-				'type'         => $template['type'],
-				'content'      => $content,
-				'version'      => $template['version'],
-				'content_hash' => $content_hash,
-				'is_system'    => 1,
-				'is_default'   => 1,
-				'is_active'    => 1,
-				'created_at'   => $now,
-				'updated_at'   => $now,
-			),
-			array(
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				'%d',
-				'%d',
-				'%d',
-				'%s',
-				'%s',
-			)
-		);
-	}
+		$result = $wpdb->insert( $table_name, $row, $formats );
 
-	/**
-	 * Check whether template content hash already exists.
-	 *
-	 * @param   string $template_key   Template key.
-	 * @param   string $content_hash   Content hash.
-	 * @return  bool
-	 */
-	private static function template_hash_exists(
-		string $template_key,
-		string $content_hash
-	): bool {
-		global $wpdb;
-
-		$table_name = TemplateTable::get_table_name();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$existing_id = $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT id FROM %i WHERE template_key = %s AND content_hash = %s LIMIT 1',
-				$table_name,
-				$template_key,
-				$content_hash
-			)
-		);
-
-		return null !== $existing_id;
+		// The unique key also protects against concurrent inserts of the same version.
+		return 1 === $result;
 	}
 
 	/**

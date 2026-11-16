@@ -3,7 +3,7 @@
  * Plugin Name:       Omoikane Simple Sales Reports for Welcart
  * Plugin URI:        https://github.com/omoikane-works/omoikane-simple-sales-reports
  * Description:       Create simple sales reports for Welcart stores.
- * Version:           1.0.3
+ * Version:           1.1.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Author:            Omoikane Works
@@ -23,12 +23,29 @@ use OmoikaneWorks\SimpleSalesReports\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OSSR_VERSION', '1.0.3' );
+define( 'OSSR_VERSION', '1.1.0' );
 define( 'OSSR_PLUGIN_FILE', __FILE__ );
 define( 'OSSR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OSSR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'OSSR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'OSSR_MINIMUM_PHP_VERSION', '8.2' );
+define( 'OSSR_MINIMUM_USCES_VERSION', '2.11.10' );
+
+add_action(
+	'init',
+	static function (): void {
+		$domain = 'omoikane-simple-sales-reports';
+		load_plugin_textdomain( $domain, false, dirname( OSSR_PLUGIN_BASENAME ) . '/languages' );
+
+		$locale  = determine_locale();
+		$bundled = OSSR_PLUGIN_DIR . "languages/{$domain}-{$locale}.mo";
+		if ( is_readable( $bundled ) ) {
+			// Load the installed language pack first. The bundled catalog fills in missing strings.
+			get_translations_for_domain( $domain );
+			load_textdomain( $domain, $bundled, $locale );
+		}
+	}
+);
 
 /**
  * Check whether the current PHP version is supported.
@@ -53,6 +70,22 @@ function ossr_get_unsupported_php_version_message(): string {
 		),
 		OSSR_MINIMUM_PHP_VERSION,
 		PHP_VERSION
+	);
+}
+
+/**
+ * Get unsupported Welcart version message.
+ *
+ * @return  string
+ */
+function ossr_get_unsupported_welcart_version_message(): string {
+	return sprintf(
+		// translators: %s: required Welcart version.
+		__(
+			'Omoikane Simple Sales Reports for Welcart requires Welcart %s or later.',
+			'omoikane-simple-sales-reports'
+		),
+		OSSR_MINIMUM_USCES_VERSION
 	);
 }
 

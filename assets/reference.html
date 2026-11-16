@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>テンプレートタグリファレンス | OSSR v1.1.0</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #182c34;
+            --muted: #405961;
+            --accent: #075e65;
+            --line: #cedde0;
+            --surface: #edf6f5;
+            font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+            line-height: 1.7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        .page-header {
+            color: #f7ffff;
+            background: #14383e;
+            border-bottom: 4px solid #54aba7;
+            padding-block: clamp(2rem, 6vw, 4rem);
+        }
+
+        .shell {
+            width: min(72rem, 100% - 2.5rem);
+            margin-inline: auto;
+        }
+
+        .version {
+            color: #b1dad7;
+            font-size: .9rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+        }
+
+        h1, h2, h3 { line-height: 1.35; }
+
+        h1 {
+            margin: .45rem 0 .65rem;
+            font-size: clamp(1.65rem, 5vw, 2.8rem);
+            word-break: keep-all;
+        }
+
+        .page-header p { margin: 0; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 14rem minmax(0, 1fr);
+            gap: clamp(1.5rem, 4vw, 3.5rem);
+            align-items: start;
+            padding-block: 2rem 4rem;
+        }
+
+        nav {
+            position: sticky;
+            top: 1rem;
+            padding: 1.15rem;
+            border: 1px solid var(--line);
+            border-radius: .65rem;
+            background: var(--surface);
+        }
+
+        nav h2 { margin: 0 0 .5rem; font-size: 1rem; }
+        nav ul { margin: 0; padding: 0; list-style: none; }
+        nav a { display: block; padding-block: .21rem; font-size: .93rem; }
+
+        a { color: var(--accent); text-underline-offset: .19em; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        section { scroll-margin-top: 1.25rem; }
+        section + section { margin-top: 2.7rem; }
+
+        main h2 {
+            margin: 0 0 .9rem;
+            padding-bottom: .45rem;
+            border-bottom: 1px solid var(--line);
+            font-size: clamp(1.35rem, 3.2vw, 1.75rem);
+        }
+
+        h3 { margin: 1.55rem 0 .65rem; font-size: 1.12rem; }
+        p, ul { margin: .65rem 0; }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: .92em;
+        }
+
+        :not(pre) > code {
+            border-radius: .25rem;
+            padding: .08em .28em;
+            color: #164953;
+            background: var(--surface);
+            overflow-wrap: anywhere;
+        }
+
+        pre {
+            margin: .8rem 0;
+            padding: 1rem;
+            border: 1px solid var(--line);
+            border-radius: .5rem;
+            background: #f5f8f9;
+            overflow-x: auto;
+            tab-size: 2;
+        }
+
+        pre code { font-size: .875rem; }
+
+        .table-scroll {
+            margin: .85rem 0 1rem;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: .5rem;
+        }
+
+        table {
+            width: 100%;
+            min-width: 33rem;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: .94rem;
+        }
+
+        th, td {
+            padding: .54rem .7rem;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+        }
+
+        thead th { color: #193f46; background: var(--surface); }
+        tbody tr:nth-child(even) { background: #f7fafb; }
+        tbody tr:last-child > * { border-bottom: 0; }
+        tbody th { font-weight: 600; }
+        #amount-tags td code { display: inline-block; }
+        .example-output { color: var(--muted); }
+
+        @media (max-width: 46rem) {
+            .layout { grid-template-columns: minmax(0, 1fr); padding-top: 1.25rem; }
+            nav { position: static; }
+            nav ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); }
+            table { min-width: 0; }
+            th, td { padding: .45rem; }
+        }
+
+        /* テーブル */
+        .reference-table,
+        .syntax-table,
+        .amounts-table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        /* リファレンス */
+        .reference-table tbody th {
+            white-space: nowrap;
+        }
+
+        .reference-table th:nth-child(1),
+            .reference-table td:nth-child(1) {
+            width: 30%;
+        }
+
+        .reference-table th:nth-child(2),
+        .reference-table td:nth-child(2) {
+            width: 12%;
+            white-space: nowrap;
+        }
+
+        .reference-table th:nth-child(3),
+        .reference-table td:nth-child(3) {
+            width: 58%;
+        }
+
+        /* Mustache構文 */
+        .syntax-table th:nth-child(1),
+        .syntax-table td:nth-child(1) {
+            width: 18%;
+            white-space: nowrap;
+        }
+
+        .syntax-table th:nth-child(2),
+        .syntax-table td:nth-child(2) { width: 35%; }
+
+        .syntax-table th:nth-child(3),
+        .syntax-table td:nth-child(3) { width: 47%; }
+
+        .syntax-table td:nth-child(2) code {
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        /* 金額とポイント */
+        .amounts-table th:nth-child(1),
+        .amounts-table td:nth-child(1) { width: 30%; }
+
+        .amounts-table th:nth-child(2),
+        .amounts-table td:nth-child(2) { width: 70%; }
+
+        .amounts-table td:nth-child(2) code {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="shell">
+            <p class="version">OSSR v1.1.0</p>
+            <h1>テンプレートタグ<wbr>リファレンス</h1>
+            <p>売上報告書をカスタマイズするためのMustacheタグと記述例</p>
+        </div>
+    </header>
+
+    <div class="shell layout">
+        <nav aria-labelledby="contents-title">
+            <h2 id="contents-title">目次</h2>
+            <ul>
+                <li><a href="#basics">テンプレートの基本</a></li>
+                <li><a href="#mustache">Mustache構文</a></li>
+                <li><a href="#report">帳票情報</a></li>
+                <li><a href="#store">店舗情報</a></li>
+                <li><a href="#totals">集計・金額情報</a></li>
+                <li><a href="#orders">注文明細</a></li>
+                <li><a href="#branding">ロゴ・社印</a></li>
+                <li><a href="#examples">記述例と印刷確認</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="basics">
+                <h2>テンプレートの基本</h2>
+                <p>テンプレート本文に帳票のHTMLとCSSを書き、表示したい箇所に <code>{{report.title}}</code> などのMustacheタグを置きます。帳票作成時に、タグは対象期間のデータに置き換わります。標準テンプレートをもとに作る場合は、編集画面の［複製して編集］から始められます。</p>
+                <p><code>report</code>、<code>store</code>、<code>totals</code> は帳票全体のデータです。<code>orders</code> は注文明細の配列で、ループの中では注文ごとのタグを使います。<code>branding</code> には描画できるロゴ・社印がある場合に画像情報が入ります。</p>
+            </section>
+
+            <section id="mustache">
+                <h2>Mustache構文</h2>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Mustache構文の一覧">
+                    <table id="syntax-table" class="syntax-table">
+                        <thead><tr><th scope="col">構文</th><th scope="col">使用例</th><th scope="col">動作</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row">変数</th><td><code>{{store.name}}</code></td><td>値をHTMLエスケープして出力します。ドットで入れ子のフィールドを参照でき、タグが見つからない場合は空文字になります。</td></tr>
+                            <tr><th scope="row">セクション</th><td><code>{{#store}}{{name}}{{/store}}</code></td><td>データがある場合に囲んだ部分を出力します。オブジェクトの中では、そのフィールドを相対名で参照できます。</td></tr>
+                            <tr><th scope="row">真偽値の条件</th><td><code>{{#is_sales_counted}}対象{{/is_sales_counted}}</code></td><td>注文明細内で対象の注文にだけ表示します。</td></tr>
+                            <tr><th scope="row">ループ</th><td><code>{{#orders}}{{order_number}}{{/orders}}</code></td><td>配列の各要素に対して囲んだ部分を出力します。<code>order_number</code> はその行の注文番号です。</td></tr>
+                            <tr><th scope="row">逆セクション</th><td><code>{{^orders}}注文なし{{/orders}}</code></td><td>値が偽、空の配列、または未定義の場合などに囲んだ部分を出力します。</td></tr>
+                            <tr><th scope="row">エスケープなし</th><td><code>{{{store.name}}}</code> / <code>{{&amp; store.name}}</code></td><td>値をそのまま出力する構文です。帳票の値やHTML属性には通常の <code>{{...}}</code> を使います。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>HTML属性に値を入れるときは <code>href="{{store.url}}"</code> のように引用符で囲みます。帳票の集計には下記の集計タグを使います。Mustacheのタグ内で計算式を書くことはできません。</p>
+            </section>
+
+            <section id="report">
+                <h2>帳票情報</h2>
+                <p>帳票全体で使えます。最上位では <code>{{report.title}}</code>、<code>{{#report}}</code> の中では <code>{{title}}</code> と書けます。</p>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="帳票情報のタグ一覧">
+                    <table id="report-tags" class="reference-table">
+                        <thead><tr><th scope="col">タグ</th><th scope="col">型</th><th scope="col">意味・出力例</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>report.title</code></th><td>文字列</td><td>帳票タイトル。現在の値は「売上報告書」です。</td></tr>
+                            <tr><th scope="row"><code>report.period</code></th><td>文字列</td><td>期間種別。<code>current_month</code>（今月）、<code>previous_month</code>（先月）、<code>custom</code>（期間指定）。</td></tr>
+                            <tr><th scope="row"><code>report.start_date</code></th><td>文字列</td><td>対象期間の初日。<code>YYYY-MM-DD</code> 形式（例 <code>2026-10-01</code>）。</td></tr>
+                            <tr><th scope="row"><code>report.end_date</code></th><td>文字列</td><td>対象期間の末日。この日を集計に含みます。<code>YYYY-MM-DD</code> 形式（例 <code>2026-10-31</code>）。</td></tr>
+                            <tr><th scope="row"><code>report.period_label</code></th><td>文字列</td><td>画面表示用の期間。言語に応じた書式を使います（例 <code>2026年10月1日 ～ 2026年10月31日</code>）。</td></tr>
+                            <tr><th scope="row"><code>report.generated_at</code></th><td>文字列</td><td>帳票の出力日時。サイトのタイムゾーンで <code>YYYY/MM/DD HH:mm:ss</code> 形式（例 <code>2026/11/01 10:30:00</code>）。</td></tr>
+                            <tr><th scope="row"><code>report.note</code></th><td>文字列</td><td>備考用の予約フィールド。現行版の値は空文字です。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="store">
+                <h2>店舗情報</h2>
+                <p>帳票全体で使えます。<code>{{#store}}</code> の中では <code>{{name}}</code>、<code>{{url}}</code> と書けます。</p>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="店舗情報のタグ一覧">
+                    <table id="store-tags" class="reference-table">
+                        <thead><tr><th scope="col">タグ</th><th scope="col">型</th><th scope="col">意味・出力例</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>store.name</code></th><td>文字列</td><td>WordPressのサイトタイトル（例 <code>青空雑貨店</code>）。</td></tr>
+                            <tr><th scope="row"><code>store.url</code></th><td>文字列</td><td>WordPressのサイトアドレス（例 <code>https://shop.example.test</code>）。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="totals">
+                <h2>集計・金額情報</h2>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="注文集計のタグ一覧">
+                    <table id="totals-tags" class="reference-table">
+                        <thead><tr><th scope="col">タグ</th><th scope="col">型</th><th scope="col">意味・出力例</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>totals.order_count</code></th><td>整数</td><td>対象期間の注文件数。キャンセルを含みます（例 <code>12</code>）。</td></tr>
+                            <tr><th scope="row"><code>totals.sales_order_count</code></th><td>整数</td><td>売上集計に含めた注文件数（例 <code>11</code>）。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>金額とポイント</h3>
+                <p>次の表のタグ名に、帳票全体の集計では <code>totals.amounts.</code> を、<code>{{#orders}}</code> 内の注文ごとの金額では <code>amounts.</code> を付けます。たとえば、全体のお支払合計は <code>{{totals.amounts.payment_total.label}}</code>、その注文のお支払合計は <code>{{amounts.payment_total.label}}</code> です。<code>totals.amounts</code> の集計には売上集計対象の注文が入ります。</p>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="金額とポイントのタグ一覧">
+                    <table id="amount-tags" class="amounts-table">
+                        <thead><tr><th scope="col">項目</th><th scope="col">数値タグ（整数）／表示タグ（文字列）</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row">商品合計</th><td><code>item_total.<wbr>amount</code><br><code>item_total.<wbr>label</code></td></tr>
+                            <tr><th scope="row">商品合計・標準税率分</th><td><code>item_total.<wbr>standard.<wbr>amount</code><br><code>item_total.<wbr>standard.<wbr>label</code></td></tr>
+                            <tr><th scope="row">商品合計・軽減税率分</th><td><code>item_total.<wbr>reduced.<wbr>amount</code><br><code>item_total.<wbr>reduced.<wbr>label</code></td></tr>
+                            <tr><th scope="row">消費税</th><td><code>tax.<wbr>amount</code><br><code>tax.<wbr>label</code></td></tr>
+                            <tr><th scope="row">消費税・標準税率分</th><td><code>tax.<wbr>standard.<wbr>amount</code><br><code>tax.<wbr>standard.<wbr>label</code></td></tr>
+                            <tr><th scope="row">消費税・軽減税率分</th><td><code>tax.<wbr>reduced.<wbr>amount</code><br><code>tax.<wbr>reduced.<wbr>label</code></td></tr>
+                            <tr><th scope="row">送料</th><td><code>shipping_fee.<wbr>amount</code><br><code>shipping_fee.<wbr>label</code></td></tr>
+                            <tr><th scope="row">代引手数料</th><td><code>cod_fee.<wbr>amount</code><br><code>cod_fee.<wbr>label</code></td></tr>
+                            <tr><th scope="row">値引き</th><td><code>discount.<wbr>amount</code><br><code>discount.<wbr>label</code></td></tr>
+                            <tr><th scope="row">値引き・標準税率分</th><td><code>discount.<wbr>standard.<wbr>amount</code><br><code>discount.<wbr>standard.<wbr>label</code></td></tr>
+                            <tr><th scope="row">値引き・軽減税率分</th><td><code>discount.<wbr>reduced.<wbr>amount</code><br><code>discount.<wbr>reduced.<wbr>label</code></td></tr>
+                            <tr><th scope="row">利用ポイント</th><td><code>used_points.<wbr>amount</code><br><code>used_points.<wbr>label</code></td></tr>
+                            <tr><th scope="row">獲得ポイント</th><td><code>earned_points.<wbr>amount</code><br><code>earned_points.<wbr>label</code></td></tr>
+                            <tr><th scope="row">お支払合計</th><td><code>payment_total.<wbr>amount</code><br><code>payment_total.<wbr>label</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul>
+                    <li><code>amount</code> は桁区切りのない整数（例 <code>12500</code>）。帳票上の表示には、桁区切り付きの <code>label</code>（例 <code>12,500</code>）が便利です。円やポイントの単位は本文で付けます。</li>
+                    <li>値引きの <code>amount</code> は絶対値です。値引きと利用ポイントの <code>label</code> は控除を示す <code>▲</code> 付き（例 <code>▲500</code>）で、ゼロは <code>0</code> になります。</li>
+                    <li>お支払合計は、商品合計 ＋ 消費税 ＋ 送料 ＋ 代引手数料 − 値引き − 利用ポイントです。獲得ポイントは控除に含まれません。</li>
+                    <li>税率別の内訳はWelcartの注文に保存された内訳に基づき、該当するデータがない場合は <code>0</code> になります。</li>
+                </ul>
+            </section>
+
+            <section id="orders">
+                <h2>注文明細</h2>
+                <p><code>{{#orders}}</code> から <code>{{/orders}}</code> までの間で、次のタグと <a href="#totals">注文ごとの金額タグ</a> を使えます。注文は日時の昇順で、同じ日時の場合は注文IDの昇順です。明細にはキャンセルされた注文も含まれます。</p>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="注文明細のタグ一覧">
+                    <table id="order-tags" class="reference-table">
+                        <thead><tr><th scope="col"><code>orders</code> 内のタグ</th><th scope="col">型</th><th scope="col">意味・出力例</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>id</code></th><td>整数</td><td>Welcartの注文ID（例 <code>1042</code>）。</td></tr>
+                            <tr><th scope="row"><code>order_number</code></th><td>文字列</td><td>帳票表示用の注文番号。注文IDを文字列にしたものです（例 <code>1042</code>）。</td></tr>
+                            <tr><th scope="row"><code>order_date</code></th><td>文字列</td><td>注文日。<code>YYYY/MM/DD</code> 形式（例 <code>2026/10/15</code>）。日付を解釈できない場合は空文字です。</td></tr>
+                            <tr><th scope="row"><code>order_datetime</code></th><td>文字列</td><td>注文日時。<code>YYYY/MM/DD HH:mm:ss</code> 形式（例 <code>2026/10/15 14:25:00</code>）。日時を解釈できない場合は空文字です。</td></tr>
+                            <tr><th scope="row"><code>customer.name</code></th><td>文字列</td><td>顧客氏名（例 <code>空野 はな</code>）。登録されている氏名の各部分を半角スペースでつなぎます。</td></tr>
+                            <tr><th scope="row"><code>customer.name_kana</code></th><td>文字列</td><td>顧客氏名のかな（例 <code>ソラノ ハナ</code>）。登録されているかなの各部分を半角スペースでつなぎます。</td></tr>
+                            <tr><th scope="row"><code>payment.method</code></th><td>文字列</td><td>注文に保存された支払方法名（例 <code>銀行振込</code>）。</td></tr>
+                            <tr><th scope="row"><code>status.raw</code></th><td>文字列</td><td>Welcartに保存されたステータス文字列。複数の値を含むことがあります。</td></tr>
+                            <tr><th scope="row"><code>status.label</code></th><td>文字列</td><td>表示用ステータス。キャンセル、新規受付、取り寄せ中、発送済みの順で該当する表示を選びます。対応する表示がない場合は、保存されている値をカンマ区切りで表示します。</td></tr>
+                            <tr><th scope="row"><code>is_sales_counted</code></th><td>真偽値</td><td>売上集計の対象かどうか。ステータスに <code>cancel</code> が含まれる注文は <code>false</code> です。セクションで使用できます。</td></tr>
+                            <tr><th scope="row"><code>status.is_sales_counted</code></th><td>真偽値</td><td><code>is_sales_counted</code> と同じ値です。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="branding">
+                <h2>ロゴ・社印</h2>
+                <p>画像はOSSRの［設定］画面で登録し、表示の有効・無効と配置はテンプレートごとに指定します。配置設定がない場合の既定値は、ロゴ・社印ともに非表示です。表示が無効、画像が未登録、または画像を検証できない場合、その画像のタグは渡りません。片方だけ描画できる場合は、利用できる画像だけが渡ります。</p>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="ロゴ・社印のセクション一覧">
+                    <table class="reference-table">
+                        <thead><tr><th scope="col">タグ</th><th scope="col">型</th><th scope="col">使用場所・条件</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>branding</code></th><td>オブジェクト</td><td>最上位。描画できるロゴか社印が一つでもある場合に <code>{{#branding}}</code> が有効になります。</td></tr>
+                            <tr><th scope="row"><code>branding.logo</code></th><td>オブジェクト</td><td>描画できるロゴがある場合に使用できます。<code>{{#branding}}</code> 内では <code>{{#logo}}</code> と書けます。</td></tr>
+                            <tr><th scope="row"><code>branding.stamp</code></th><td>オブジェクト</td><td>描画できる社印がある場合に使用できます。<code>{{#branding}}</code> 内では <code>{{#stamp}}</code> と書けます。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="ロゴ・社印の画像と配置のタグ一覧">
+                    <table id="branding-tags" class="reference-table">
+                        <thead><tr><th scope="col">画像セクション内のタグ</th><th scope="col">型</th><th scope="col">意味・出力例</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row"><code>src</code></th><td>文字列</td><td>検証済み画像のData URI（例 <code>data:image/png;base64,…</code>）。<code>src="{{src}}"</code> と書きます。</td></tr>
+                            <tr><th scope="row"><code>x_mm</code></th><td>数値</td><td>基準枠からの水平位置。右が正で、負数・小数も使えます（例 <code>-2.5</code>）。</td></tr>
+                            <tr><th scope="row"><code>y_mm</code></th><td>数値</td><td>基準枠からの垂直位置。下が正で、負数・小数も使えます（例 <code>0.5</code>）。</td></tr>
+                            <tr><th scope="row"><code>width_mm</code></th><td>数値</td><td>画像の表示幅（例 <code>30</code>）。高さはCSSの <code>height: auto</code> で縦横比を維持します。</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>画像フィールドは <code>{{#logo}}</code> または <code>{{#stamp}}</code> の内側で使えます。最上位から直接参照する場合は、<code>branding.logo.src</code> や <code>branding.stamp.width_mm</code> のように画像までのパスを書きます。座標が <code>0</code> の場合も有効です。表示条件には画像セクションを使ってください。</p>
+                <h3>配置の基準枠</h3>
+                <p><code>position: relative</code> を指定した要素を基準枠とし、その中に <code>position: absolute</code> の画像を置きます。下の例では、X・Y座標の原点は基準枠の左上です。用紙の左上からの距離は、基準枠自体の位置で変わります。数値タグの直後にCSSの単位 <code>mm</code> を付けます。</p>
+                <pre data-example="branding" tabindex="0"><code>&lt;style&gt;
+  .report-branding {
+    position: relative;
+    width: 60mm;
+    height: 32mm;
+  }
+  .report-branding img {
+    position: absolute;
+    height: auto;
+  }
+&lt;/style&gt;
+{{#branding}}
+&lt;div class="report-branding"&gt;
+  {{#logo}}
+  &lt;img src="{{src}}" alt="店舗ロゴ"
+       style="left: {{x_mm}}mm; top: {{y_mm}}mm; width: {{width_mm}}mm;"&gt;
+  {{/logo}}
+  {{#stamp}}
+  &lt;img src="{{src}}" alt="社印"
+       style="left: {{x_mm}}mm; top: {{y_mm}}mm; width: {{width_mm}}mm;"&gt;
+  {{/stamp}}
+&lt;/div&gt;
+{{/branding}}</code></pre>
+                <p>標準テンプレートv1.1.0は、60 × 32mmの基準枠を集計ページのヘッダーに置き、ロゴをX=0・Y=0・幅30mm、社印をX=38・Y=0・幅18mmに設定しています。注文明細には画像のタグを置いていません。v1.0.0など画像タグを持たないテンプレートで表示するには、本文に画像の記述を追加します。</p>
+                <p>絶対配置の画像は必要な高さを自動で確保しません。位置や幅によっては表や見出しと重なったり、印刷時に用紙の外へはみ出したりします。印刷プレビューで確認し、実際に使う用紙・向き・倍率でPDFを出力して、切れや重なりがないか最終確認してください。</p>
+            </section>
+
+            <section id="examples">
+                <h2>記述例と印刷確認</h2>
+                <h3>店舗名と明細を出力する</h3>
+                <pre data-example="orders" tabindex="0"><code>&lt;h1&gt;{{report.title}}&lt;/h1&gt;
+&lt;p&gt;{{report.period_label}} / &lt;a href="{{store.url}}"&gt;{{store.name}}&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;売上集計 {{totals.sales_order_count}} 件 / {{totals.amounts.payment_total.label}} 円&lt;/p&gt;
+&lt;ul&gt;
+  {{#orders}}
+  &lt;li&gt;
+    {{order_number}} {{customer.name}} — {{amounts.payment_total.label}} 円
+    {{^is_sales_counted}}（売上集計対象外）{{/is_sales_counted}}
+  &lt;/li&gt;
+  {{/orders}}
+  {{^orders}}
+  &lt;li&gt;対象期間の注文はありません。&lt;/li&gt;
+  {{/orders}}
+&lt;/ul&gt;</code></pre>
+                <p class="example-output">出力例は「青空雑貨店」「1042 空野 はな — 12,500 円」です。</p>
+                <p>編集したテンプレートを保存したら、［帳票作成］でそのテンプレートと対象期間を選んで確認します。注文がない期間と明細が複数ページになる期間の両方を確認すると、空欄表示や改ページを確認できます。画像を集計ページだけに出す場合は、画像セクションを注文明細のループやページヘッダーへ入れず、集計部分に一度だけ置きます。</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -3,6 +3,7 @@
 	<description>PHPCS rules for Omoikane Simple Sales Reports for Welcart.</description>
 
 	<file>omoikane-simple-sales-reports.php</file>
+	<file>resources</file>
 	<file>src</file>
 	<file>tests</file>
 

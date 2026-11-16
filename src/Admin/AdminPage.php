@@ -49,7 +49,7 @@ final class AdminPage {
 	 *
 	 * @var string
 	 */
-	private const NONCE_ACTION = 'rssr_view_sales_report';
+	private const NONCE_ACTION = 'ossr_view_sales_report';
 
 	/**
 	 * Nonce name.
@@ -57,6 +57,13 @@ final class AdminPage {
 	 * @var string
 	 */
 	private const NONCE_NAME = 'ossr_nonce';
+
+	/**
+	 * Request flag for opening the report without persisting a template selection.
+	 *
+	 * @var string
+	 */
+	private const REPORT_REVIEW_PARAM = 'ossr_report_review';
 
 	/**
 	 * Default admin view.
@@ -491,8 +498,15 @@ final class AdminPage {
 	 * @return void
 	 */
 	private function render_report_generation_view(): void {
+		// This flag can only suppress writes. Template selection still uses the verified request.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$review = isset( $_GET[ self::REPORT_REVIEW_PARAM ] )
+			&& is_string( $_GET[ self::REPORT_REVIEW_PARAM ] )
+			&& '1' === sanitize_key( wp_unslash( $_GET[ self::REPORT_REVIEW_PARAM ] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 		$request              = $this->get_verified_request();
-		$selected_template_id = $this->resolve_selected_template_id( $request );
+		$selected_template_id = $this->resolve_selected_template_id( $request, ! $review );
 		$period               = $this->period_resolver->resolve( $request );
 		$view_data            = $this->sales_report_builder->build( $period );
 		$report_html          = $this->sales_report_renderer->render_sales_report(
@@ -518,18 +532,37 @@ final class AdminPage {
 	}
 
 	/**
+	 * Open the report form without persisting a template selection.
+	 *
+	 * @return string
+	 */
+	public static function get_report_review_url(): string {
+		return add_query_arg(
+			array(
+				'page'                    => self::MENU_SALES_SLUG,
+				self::VIEW_PARAM          => self::DEFAULT_VIEW,
+				self::REPORT_REVIEW_PARAM => '1',
+			),
+			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
 	 * Resolve selected template ID.
 	 *
-	 * @param   array<string, string> $request    Request parameters.
+	 * @param   array<string, string> $request Request parameters.
+	 * @param   bool                  $persist Whether to save the selected ID.
 	 * @return  int
 	 */
-	private function resolve_selected_template_id( array $request ): int {
+	private function resolve_selected_template_id( array $request, bool $persist ): int {
 		$request_template_id = isset( $request[ self::TEMPLATE_ID_PARAM ] )
 			? absint( $request[ self::TEMPLATE_ID_PARAM ] )
 			: 0;
 
 		if ( $request_template_id > 0 && $this->is_valid_sales_report_template_id( $request_template_id ) ) {
-			update_option( self::SELECTED_TEMPLATE_ID_OPTION, $request_template_id );
+			if ( $persist ) {
+				update_option( self::SELECTED_TEMPLATE_ID_OPTION, $request_template_id );
+			}
 
 			return $request_template_id;
 		}
@@ -548,7 +581,7 @@ final class AdminPage {
 
 		$default_template_id = absint( $default_template['id'] );
 
-		if ( $default_template_id > 0 ) {
+		if ( $persist && $default_template_id > 0 ) {
 			update_option( self::SELECTED_TEMPLATE_ID_OPTION, $default_template_id );
 		}
 
