@@ -94,6 +94,17 @@ final class SalesReportRenderer {
 			$view_data['branding'] = $branding;
 		}
 
+		if ( is_array( $view_data['totals'] ?? null ) ) {
+			$view_data['totals'] = $this->with_renderable_points( $view_data['totals'] );
+		}
+		if ( is_array( $view_data['orders'] ?? null ) ) {
+			foreach ( $view_data['orders'] as $index => $order ) {
+				if ( is_array( $order ) ) {
+					$view_data['orders'][ $index ] = $this->with_renderable_points( $order );
+				}
+			}
+		}
+
 		$mustache = new Mustache_Engine(
 			array(
 				'entity_flags' => ENT_QUOTES,
@@ -102,6 +113,27 @@ final class SalesReportRenderer {
 		);
 
 		return $mustache->render( $content, $view_data );
+	}
+
+	/**
+	 * Allow the old scalar point tags to be interpolated at the paths shared with the current point sections.
+	 *
+	 * @param array<string, mixed> $row Totals or order row.
+	 * @return array<string, mixed>
+	 */
+	private function with_renderable_points( array $row ): array {
+		if ( ! is_array( $row['amounts'] ?? null ) ) {
+			return $row;
+		}
+
+		foreach ( array( 'used_points', 'earned_points' ) as $key ) {
+			$points = $row['amounts'][ $key ] ?? null;
+			if ( is_array( $points ) && 2 === count( $points ) && is_int( $points['amount'] ?? null ) && is_string( $points['label'] ?? null ) ) {
+				$row['amounts'][ $key ] = new ReportPointValue( $points['amount'], $points['label'] );
+			}
+		}
+
+		return $row;
 	}
 
 	/**

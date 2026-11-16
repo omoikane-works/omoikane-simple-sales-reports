@@ -55,7 +55,7 @@ final class PluginTest extends TestCase {
 						"SHOW TABLES LIKE 'wp\\_ossr\\_configs'"   => 'wp_ossr_configs',
 						"SHOW TABLES LIKE 'wp\\_ossr\\_templates'" => 'wp_ossr_templates',
 						"SHOW COLUMNS FROM 'wp_ossr_templates' LIKE 'settings'" => 'settings',
-						default => '1',
+						default => str_starts_with( $argument, 'SELECT COUNT(' ) ? '2' : '1',
 					}
 				);
 			}
@@ -78,7 +78,7 @@ final class PluginTest extends TestCase {
 		$calls = $GLOBALS['ossr_test_calls'];
 		$this->assertSame( array( 'get_option', 'dbDelta', 'dbDelta', 'get_var', 'get_var', 'update_option' ), array_column( array_slice( $calls, 0, 6 ), 0 ) );
 		$this->assertSame( '1.2.0', $GLOBALS['ossr_test_options']['ossr_db_version'] );
-		$seed_calls = $already_seeded ? array( 'get_option' ) : array( 'get_option', 'get_var', 'get_var', 'get_var', 'update_option' );
+		$seed_calls = $already_seeded ? array( 'get_option', 'get_var' ) : array( 'get_option', 'get_var', 'get_var', 'get_var', 'update_option' );
 		$this->assertSame( $seed_calls, array_column( array_slice( $calls, 6, count( $seed_calls ) ), 0 ) );
 		$this->assertArrayHasKey( 'ossr_template_catalog_hash', $GLOBALS['ossr_test_options'] );
 		$this->assertSame( 32, $GLOBALS['ossr_test_options']['ossr_sales_report_template_id'] );

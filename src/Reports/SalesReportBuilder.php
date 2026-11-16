@@ -106,6 +106,9 @@ final class SalesReportBuilder {
 			'discount_amount'            => 0,
 			'standard_discount_amount'   => 0,
 			'reduced_discount_amount'    => 0,
+			'signed_discount'            => 0,
+			'signed_standard_discount'   => 0,
+			'signed_reduced_discount'    => 0,
 			'used_points'                => 0,
 			'earned_points'              => 0,
 			'sales_support_amount'       => 0,
@@ -140,6 +143,9 @@ final class SalesReportBuilder {
 		$totals['discount_amount']            += $this->get_amount_item_amount( $amounts, 'discount' );
 		$totals['standard_discount_amount']   += $this->get_amount_item_breakdown_amount( $amounts, 'discount', 'standard' );
 		$totals['reduced_discount_amount']    += $this->get_amount_item_breakdown_amount( $amounts, 'discount', 'reduced' );
+		$totals['signed_discount']            += $this->get_int_value( $amounts, 'discount_amount' );
+		$totals['signed_standard_discount']   += $this->get_int_value( $amounts, 'standard_discount_amount' );
+		$totals['signed_reduced_discount']    += $this->get_int_value( $amounts, 'reduced_discount_amount' );
 		$totals['used_points']                += $this->get_amount_item_amount( $amounts, 'used_points' );
 		$totals['earned_points']              += $this->get_amount_item_amount( $amounts, 'earned_points' );
 		$totals['sales_support_amount']       += $this->get_amount_item_amount( $amounts, 'sales_support' );
@@ -229,10 +235,78 @@ final class SalesReportBuilder {
 			),
 		);
 
+		// v1.0.3 rounded the sales support fee once for the whole report.
+		$sales_support  = $this->build_sales_support_data(
+			$totals['item_total_amount'],
+			$totals['tax_amount'],
+			-$totals['signed_discount'],
+			$totals['used_points']
+		);
+		$legacy_amounts = $this->build_legacy_amounts(
+			$amounts,
+			$totals['signed_discount'],
+			$totals['signed_standard_discount'],
+			$totals['signed_reduced_discount']
+		);
+
 		return array(
 			'order_count'       => $order_count,
 			'sales_order_count' => $sales_order_count,
-			'amounts'           => $amounts,
+			'amounts'           => $amounts + $legacy_amounts,
+			'sales_support'     => array(
+				'rate'             => $sales_support['rate']['amount'],
+				'rate_label'       => $sales_support['rate']['label'],
+				'base_amount'      => $sales_support['base']['amount'],
+				'base_label'       => $sales_support['base']['label'],
+				'amount'           => $sales_support['amount'],
+				'amount_label'     => $sales_support['label'],
+				'calculation_note' => $sales_support['calculation_note'],
+			),
+		) + $legacy_amounts;
+	}
+
+	/**
+	 * Format the flat amount fields exposed by v1.0.3.
+	 *
+	 * @param array<string, mixed> $amounts           Calculated amounts and labels in the current format.
+	 * @param int                  $discount          Signed Welcart discount.
+	 * @param int                  $standard_discount Signed standard-rate discount.
+	 * @param int                  $reduced_discount  Signed reduced-rate discount.
+	 * @return array<string, int|string>
+	 */
+	private function build_legacy_amounts( array $amounts, int $discount, int $standard_discount, int $reduced_discount ): array {
+		// The current total subtracts the discount magnitude. Restore the original signed adjustment.
+		$payment_total = $amounts['payment_total']['amount'] + ( $amounts['discount']['amount'] + $discount );
+
+		return array(
+			'item_total_amount'        => $amounts['item_total']['amount'],
+			'item_total_label'         => $amounts['item_total']['label'],
+			'standard_subtotal_amount' => $amounts['item_total']['standard']['amount'],
+			'standard_subtotal_label'  => $amounts['item_total']['standard']['label'],
+			'reduced_subtotal_amount'  => $amounts['item_total']['reduced']['amount'],
+			'reduced_subtotal_label'   => $amounts['item_total']['reduced']['label'],
+			'tax_amount'               => $amounts['tax']['amount'],
+			'tax_label'                => $amounts['tax']['label'],
+			'standard_tax_amount'      => $amounts['tax']['standard']['amount'],
+			'standard_tax_label'       => $amounts['tax']['standard']['label'],
+			'reduced_tax_amount'       => $amounts['tax']['reduced']['amount'],
+			'reduced_tax_label'        => $amounts['tax']['reduced']['label'],
+			'shipping_fee_amount'      => $amounts['shipping_fee']['amount'],
+			'shipping_fee_label'       => $amounts['shipping_fee']['label'],
+			'cod_fee_amount'           => $amounts['cod_fee']['amount'],
+			'cod_fee_label'            => $amounts['cod_fee']['label'],
+			'discount_amount'          => $discount,
+			'discount_label'           => $this->format_amount( $discount ),
+			'standard_discount_amount' => $standard_discount,
+			'standard_discount_label'  => $this->format_amount( $standard_discount ),
+			'reduced_discount_amount'  => $reduced_discount,
+			'reduced_discount_label'   => $this->format_amount( $reduced_discount ),
+			'used_points'              => $amounts['used_points']['amount'],
+			'used_points_label'        => $this->format_number( $amounts['used_points']['amount'] ),
+			'earned_points'            => $amounts['earned_points']['amount'],
+			'earned_points_label'      => $amounts['earned_points']['label'],
+			'payment_total_amount'     => $payment_total,
+			'payment_total_label'      => $this->format_amount( $payment_total ),
 		);
 	}
 
@@ -256,24 +330,28 @@ final class SalesReportBuilder {
 		$amounts            = $this->build_order_amounts( $raw_order );
 
 		return array(
-			'id'               => $id,
-			'order_number'     => (string) $id,
-			'order_date'       => $order_date,
-			'order_datetime'   => $order_datetime,
-			'customer'         => array(
+			'id'                   => $id,
+			'order_number'         => (string) $id,
+			'order_date'           => $order_date,
+			'order_datetime'       => $order_datetime,
+			'customer_name'        => $customer_name,
+			'customer_name_kana'   => $customer_name_kana,
+			'customer'             => array(
 				'name'      => $customer_name,
 				'name_kana' => $customer_name_kana,
 			),
-			'payment'          => array(
+			'payment'              => array(
 				'method' => $payment_method,
 			),
-			'is_sales_counted' => $is_sales_counted,
-			'status'           => array(
+			'is_sales_counted'     => $is_sales_counted,
+			'status'               => array(
 				'raw'              => $status_raw,
 				'label'            => $status_label,
 				'is_sales_counted' => $is_sales_counted,
 			),
-			'amounts'          => $amounts,
+			'amounts'              => $amounts,
+			'payment_total_amount' => $amounts['payment_total_amount'],
+			'payment_total_label'  => $amounts['payment_total_label'],
 		);
 	}
 
@@ -315,7 +393,7 @@ final class SalesReportBuilder {
 			$used_points
 		);
 
-		return array(
+		$amounts = array(
 			'item_total'    => array(
 				'amount'   => $item_total_amount,
 				'label'    => $this->format_amount( $item_total_amount ),
@@ -381,6 +459,8 @@ final class SalesReportBuilder {
 
 			'sales_support' => $sales_support,
 		);
+
+		return $amounts + $this->build_legacy_amounts( $amounts, $raw_discount_amount, $raw_standard_discount_amount, $raw_reduced_discount_amount );
 	}
 
 	/**
