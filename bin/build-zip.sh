@@ -135,6 +135,7 @@ fi
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/vendor/autoload.php" >/dev/null
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/templates/default-sales-report-1.0.0.mustache" >/dev/null
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/templates/default-sales-report-1.1.0.mustache" >/dev/null
+unzip -Z -1 "${ZIP_FILE}" | grep -Fx "${PLUGIN_SLUG}/assets/reference.html" >/dev/null
 unzip -l "${ZIP_FILE}" | grep "${PLUGIN_SLUG}/languages/omoikane-simple-sales-reports-ja.mo" >/dev/null
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/assets/admin/dist/.vite/manifest.json" >/dev/null
 unzip -l "${ZIP_FILE}" | grep -F "${PLUGIN_SLUG}/src/Admin/AdminAssets.php" >/dev/null

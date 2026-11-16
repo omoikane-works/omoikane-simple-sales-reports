@@ -34,6 +34,7 @@ return array(
 	// Template form.
 	'template.form.name'                   => __( 'Template name', 'omoikane-simple-sales-reports' ),
 	'template.form.content'                => __( 'Template content', 'omoikane-simple-sales-reports' ),
+	'template.form.tag_reference'          => __( 'Template tag reference', 'omoikane-simple-sales-reports' ),
 
 	// Template notice.
 	'template.notice.saved'                => __( 'Template saved.', 'omoikane-simple-sales-reports' ),

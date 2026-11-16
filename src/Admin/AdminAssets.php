@@ -233,8 +233,9 @@ final class AdminAssets {
 			self::SCRIPT_HANDLE,
 			'ossrAdminLinks',
 			array(
-				'report'   => esc_url_raw( AdminPage::get_report_review_url() ),
-				'settings' => esc_url_raw(
+				'report'    => esc_url_raw( AdminPage::get_report_review_url() ),
+				'reference' => esc_url_raw( OSSR_PLUGIN_URL . 'assets/reference.html' ),
+				'settings'  => esc_url_raw(
 					add_query_arg(
 						array(
 							'page'                        => Plugin::OSSR_ADMIN_PAGE_SLUG,

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-11-12T07:27:07+00:00\n"
-"PO-Revision-Date: 2026-11-15T07:52:29+00:00\n"
+"PO-Revision-Date: 2026-11-15T17:18:39+00:00\n"
 "Language: ja\n"
 "X-Generator: Poedit 3.10\n"
 "X-Domain: omoikane-simple-sales-reports\n"
@@ -118,196 +118,200 @@ msgstr "テンプレート名"
 msgid "Template content"
 msgstr "テンプレート内容"
 
-#: resources/i18n.php:39
+#: resources/i18n.php:37
+msgid "Template tag reference"
+msgstr "テンプレートタグリファレンス"
+
+#: resources/i18n.php:40
 msgid "Template saved."
 msgstr "テンプレートを保存しました。"
 
-#: resources/i18n.php:40
+#: resources/i18n.php:41
 msgid "Template deleted."
 msgstr "テンプレートを削除しました。"
 
-#: resources/i18n.php:41
+#: resources/i18n.php:42
 msgid "Template duplicated."
 msgstr "テンプレートを複製しました。"
 
-#: resources/i18n.php:44
+#: resources/i18n.php:45
 msgid "Template name is required."
 msgstr "テンプレート名は必須です。"
 
-#: resources/i18n.php:45
+#: resources/i18n.php:46
 msgid "Template content is required."
 msgstr "テンプレート内容は必須です。"
 
 #. Translators: 1: Template name.
-#: resources/i18n.php:49
+#: resources/i18n.php:50
 #, php-format
 msgid "Delete \"%1$s\"?"
 msgstr "「%1$s」を削除しますか？"
 
-#: resources/i18n.php:52
+#: resources/i18n.php:53
 msgid "System templates cannot be edited. Duplicate this template to edit it."
 msgstr "システムテンプレートは編集できません。複製して編集してください。"
 
-#: resources/i18n.php:53
+#: resources/i18n.php:54
 msgid "System templates cannot be deleted."
 msgstr "システムテンプレートは削除できません。"
 
-#: resources/i18n.php:56
+#: resources/i18n.php:57
 msgid "Branding Images"
 msgstr "ブランド画像"
 
-#: resources/i18n.php:57
+#: resources/i18n.php:58
 msgid "Logo"
 msgstr "ロゴ"
 
-#: resources/i18n.php:58
+#: resources/i18n.php:59
 msgid "Company Stamp"
 msgstr "社印"
 
-#: resources/i18n.php:59
+#: resources/i18n.php:60
 msgid "PNG, JPEG, or WebP. Up to 1 MiB, 4,096 px per side, and 4,194,304 pixels in total. Static images only."
 msgstr "PNG・JPEG・WebPの静止画に対応しています。ファイルは1 MiB以下、幅と高さはそれぞれ4,096 px以下、総画素数は4,194,304以下です。"
 
-#: resources/i18n.php:60
+#: resources/i18n.php:61
 msgid "No image registered."
 msgstr "画像は未登録です。"
 
-#: resources/i18n.php:61
+#: resources/i18n.php:62
 msgid "Image file"
 msgstr "画像ファイル"
 
-#: resources/i18n.php:62
+#: resources/i18n.php:63
 msgid "Saved image"
 msgstr "保存済みの画像"
 
-#: resources/i18n.php:63
+#: resources/i18n.php:64
 msgid "Unsaved preview"
 msgstr "未保存のプレビュー"
 
-#: resources/i18n.php:64
+#: resources/i18n.php:65
 msgid "Discard selection"
 msgstr "画像の選択を取り消す"
 
-#: resources/i18n.php:65
+#: resources/i18n.php:66
 msgid "Register"
 msgstr "登録"
 
-#: resources/i18n.php:66
+#: resources/i18n.php:67
 msgid "Replace"
 msgstr "差し替え"
 
-#: resources/i18n.php:67
+#: resources/i18n.php:68
 msgid "Retry"
 msgstr "再試行"
 
-#: resources/i18n.php:68
+#: resources/i18n.php:69
 msgid "Delete this image?"
 msgstr "この画像を削除しますか？"
 
-#: resources/i18n.php:69
+#: resources/i18n.php:70
 msgid "Image saved."
 msgstr "画像を保存しました。"
 
-#: resources/i18n.php:70
+#: resources/i18n.php:71
 msgid "Image deleted."
 msgstr "画像を削除しました。"
 
-#: resources/i18n.php:71
+#: resources/i18n.php:72
 msgid "The image file could not be read."
 msgstr "画像ファイルを読み込めませんでした。"
 
-#: resources/i18n.php:72
+#: resources/i18n.php:73
 #: src/Configs/BrandingImageService.php:328
 msgid "The image file must be 1 MiB or smaller."
 msgstr "画像ファイルは1 MiB以下にしてください。"
 
-#: resources/i18n.php:75
+#: resources/i18n.php:76
 msgid "View"
 msgstr "表示"
 
-#: resources/i18n.php:76
+#: resources/i18n.php:77
 msgid "Check in report generation"
 msgstr "帳票作成で確認"
 
 #. Translators: %s: Saved template name.
-#: resources/i18n.php:78
+#: resources/i18n.php:79
 #, php-format
 msgid "Select “%s”, then choose Show and Print."
 msgstr "「%s」を選び、［表示］→［印刷］で確認できます。"
 
-#: resources/i18n.php:79
+#: resources/i18n.php:80
 msgid "Logo and company stamp placement"
 msgstr "ロゴ・社印の配置"
 
-#: resources/i18n.php:80
+#: resources/i18n.php:81
 msgid "Positive X moves right and positive Y moves down from the template anchor. Height is calculated from the image proportions."
 msgstr "テンプレートの基準点から右がXの正方向、下がYの正方向です。高さは画像の縦横比に合わせて自動で決まります。"
 
-#: resources/i18n.php:81
+#: resources/i18n.php:82
 msgid "Show on report"
 msgstr "帳票に表示する"
 
-#: resources/i18n.php:82
+#: resources/i18n.php:83
 msgid "X (mm)"
 msgstr "X座標（mm）"
 
-#: resources/i18n.php:83
+#: resources/i18n.php:84
 msgid "Y (mm)"
 msgstr "Y座標（mm）"
 
-#: resources/i18n.php:84
+#: resources/i18n.php:85
 msgid "Width (mm)"
 msgstr "幅（mm）"
 
-#: resources/i18n.php:85
+#: resources/i18n.php:86
 msgid "Image registered"
 msgstr "画像登録済み"
 
-#: resources/i18n.php:86
+#: resources/i18n.php:87
 msgid "Image registration could not be checked."
 msgstr "画像の登録状況を確認できませんでした。"
 
-#: resources/i18n.php:87
+#: resources/i18n.php:88
 msgid "Manage images in Settings (opens in a new tab)"
 msgstr "設定で画像を登録・削除（新しいタブ）"
 
-#: resources/i18n.php:88
+#: resources/i18n.php:89
 msgid "No standard image tags were found in this template. To display the images, add image tags to the body or duplicate the latest standard template."
 msgstr "標準の画像描画タグが見つかりません。画像を表示するには本文に描画タグを追加するか、最新の標準テンプレートを複製してください。"
 
-#: resources/i18n.php:89
+#: resources/i18n.php:90
 msgid "The placement settings could not be loaded. You can still save the name and content."
 msgstr "配置設定を読み込めませんでした。名前と本文は保存できます。"
 
-#: resources/i18n.php:90
+#: resources/i18n.php:91
 msgid "The saved placement settings are damaged. Both images are currently hidden. Save changed placements or restore the defaults to repair the settings."
 msgstr "保存済みの配置設定が破損しているため、両画像を非表示として扱っています。配置を変更して保存するか、既定値で修復してください。"
 
-#: resources/i18n.php:91
+#: resources/i18n.php:92
 msgid "Repair with defaults"
 msgstr "既定値で修復"
 
-#: resources/i18n.php:92
+#: resources/i18n.php:93
 msgid "Save to repair the settings using the values shown below."
 msgstr "［保存］すると、下に表示している値で配置設定を修復します。"
 
-#: resources/i18n.php:93
+#: resources/i18n.php:94
 msgid "Enter a number from −1000 to 1000 mm."
 msgstr "−1000〜1000 mmの数値を入力してください。"
 
-#: resources/i18n.php:94
+#: resources/i18n.php:95
 msgid "Enter a number from 0.1 to 1000 mm."
 msgstr "0.1〜1000 mmの数値を入力してください。"
 
-#: resources/i18n.php:95
+#: resources/i18n.php:96
 msgid "Check the highlighted placement fields."
 msgstr "エラーが表示されている配置項目を確認してください。"
 
-#: resources/i18n.php:98
+#: resources/i18n.php:99
 msgid "An unknown error occurred."
 msgstr "不明なエラーが発生しました。"
 
-#: resources/i18n.php:99
+#: resources/i18n.php:100
 msgid "OSSR REST config is missing."
 msgstr "OSSR REST 設定が見つかりません。"
 

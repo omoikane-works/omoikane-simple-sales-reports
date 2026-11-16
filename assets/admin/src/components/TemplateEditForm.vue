@@ -34,6 +34,7 @@ const invalidFields = ref<InvalidPlacementFields>({});
 const repair = ref(false);
 const formElement = ref<HTMLFormElement | null>(null);
 const placementHeading = ref<HTMLHeadingElement | null>(null);
+const referenceUrl = window.ossrAdminLinks?.reference;
 
 watch(
     () => props.editingTemplate,
@@ -135,12 +136,15 @@ async function submit() {
             <p v-else role="status">{{ t("template.placement.unavailable") }}</p>
         </section>
 
-        <p class="ossr-pk-form-item">
-            <label>
-                <span>{{ t("template.form.content") }}</span>
-                <textarea v-model="content" rows="18" class="large-text code" :readonly="editingTemplate.is_system || isLoading"></textarea>
-            </label>
-        </p>
+        <div class="ossr-pk-form-item">
+            <div class="ossr-pk-content-header">
+                <label for="ossr-template-content">{{ t("template.form.content") }}</label>
+                <a v-if="referenceUrl" :href="referenceUrl" target="_blank" rel="noopener noreferrer">
+                    {{ t("template.form.tag_reference") }}
+                </a>
+            </div>
+            <textarea id="ossr-template-content" v-model="content" rows="18" class="large-text code" :readonly="editingTemplate.is_system || isLoading"></textarea>
+        </div>
 
         <div class="ossr-pk-form-actions">
             <button
@@ -178,7 +182,16 @@ async function submit() {
     align-items: center;
 }
 
-.ossr-pk-form-item label span {
+.ossr-pk-content-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 16px;
+    margin: 1em 0 4px;
+}
+
+.ossr-pk-form-item label span,
+.ossr-pk-content-header label {
     display: block;
     font-weight: bold;
 }

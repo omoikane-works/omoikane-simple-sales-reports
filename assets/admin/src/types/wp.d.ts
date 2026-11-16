@@ -13,6 +13,6 @@ declare global {
     interface Window {
         ossrRestConfig?: OssrRestConfig;
         ossrI18n?: OssrI18n;
-        ossrAdminLinks?: { report: string; settings: string };
+        ossrAdminLinks?: { report: string; reference: string; settings: string };
     }
 }
