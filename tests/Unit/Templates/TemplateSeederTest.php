@@ -24,6 +24,16 @@ use PHPUnit\Framework\TestCase;
 final class TemplateSeederTest extends TestCase {
 
 	/**
+	 * Catalog fingerprint from the v1.1.0 upgrade with the missing revision.
+	 */
+	private const CURRENT_CATALOG_HASH = 'dadb712675316700075d28abdfcd0e201fc5bb86688fb4c64e2af60046589820';
+
+	/**
+	 * Bulk lookup of the bundled key and version pairs.
+	 */
+	private const CATALOG_QUERY = "SELECT COUNT(DISTINCT template_key, version) FROM 'wp_ossr_templates' WHERE (template_key, version) IN (('default_sales_report', '1.0.0'), ('default_sales_report', '1.1.0'))";
+
+	/**
 	 * Fake wpdb.
 	 *
 	 * @var FakeWpdb
@@ -158,20 +168,53 @@ final class TemplateSeederTest extends TestCase {
 	}
 
 	/**
-	 * Retry an incomplete catalog and skip template queries after completion.
+	 * Catalog options present when a bundled revision is missing.
 	 *
+	 * @return array<string, array{string|null}>
+	 */
+	public static function initial_catalog_hashes(): array {
+		return array(
+			'matching hash' => array( self::CURRENT_CATALOG_HASH ),
+			'old hash'      => array( 'previous-catalog' ),
+			'no hash'       => array( null ),
+		);
+	}
+
+	/**
+	 * Resume a failed repair and skip inserts once all bundled revisions exist.
+	 *
+	 * @param string|null $previous_hash Catalog fingerprint before boot.
 	 * @return void
 	 */
-	public function test_maybe_seed_retries_failed_insert_and_skips_completed_catalog(): void {
-		$GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] = 'previous-catalog';
-		$this->wpdb->record_call                                    = function ( string $call, string $argument ): void {
+	#[DataProvider( 'initial_catalog_hashes' )]
+	public function test_maybe_seed_retries_failed_insert_and_preserves_existing_template( ?string $previous_hash ): void {
+		$options = array(
+			'ossr_sales_report_template_id' => 7,
+		);
+		if ( null !== $previous_hash ) {
+			$options['ossr_template_catalog_hash'] = $previous_hash;
+		}
+		$GLOBALS['ossr_test_options'] = $options;
+
+		$legacy = array(
+			'id'           => 7,
+			'template_key' => TemplateKeys::DEFAULT_SALES_REPORT,
+			'version'      => '1.0.0',
+			'content'      => 'Existing template body',
+			'settings'     => '{"branding":{"logo":{"enabled":true}}}',
+			'is_active'    => 1,
+		);
+		$this->wpdb->insert( 'wp_ossr_templates', $legacy );
+		$this->wpdb->record_call = function ( string $call, string $argument ): void {
 			ossr_test_record_call( $call, $argument );
 			if ( 'get_var' === $call ) {
 				$this->wpdb->set_var(
 					match ( true ) {
+						self::CATALOG_QUERY === $argument              => (string) count( $this->wpdb->get_inserted_rows() ),
 						str_starts_with( $argument, 'SHOW TABLES' )    => 'wp_ossr_templates',
 						str_contains( $argument, "version = '1.0.0'" ) => '1',
-						default                                       => '0',
+						str_contains( $argument, "version = '1.1.0'" ) => count( $this->wpdb->get_inserted_rows() ) > 1 ? '1' : '0',
+						default                                       => null,
 					}
 				);
 			}
@@ -180,20 +223,58 @@ final class TemplateSeederTest extends TestCase {
 
 		TemplateSeeder::maybe_seed();
 
-		$this->assertSame( 'previous-catalog', $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] );
-		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'get_var', 'insert' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
-		$this->assertSame( array(), $this->wpdb->get_inserted_rows() );
+		$failed_calls = array( 'get_option', 'get_var', 'get_var', 'get_var', 'insert' );
+		if ( self::CURRENT_CATALOG_HASH === $previous_hash ) {
+			array_splice( $failed_calls, 1, 0, 'get_var' );
+			$this->assertSame( array( 'get_var', self::CATALOG_QUERY ), $GLOBALS['ossr_test_calls'][1] );
+		}
+		$this->assertSame( $failed_calls, array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertSame( $options, $GLOBALS['ossr_test_options'] );
+		$this->assertSame( array( $legacy ), $this->wpdb->get_inserted_rows() );
 
 		$this->wpdb->set_insert_result( 1 );
 		TemplateSeeder::maybe_seed();
 
-		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] );
-		$this->assertCount( 1, $this->wpdb->get_inserted_rows() );
+		$this->assertSame( self::CURRENT_CATALOG_HASH, $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] );
+		$this->assertSame( 7, $GLOBALS['ossr_test_options']['ossr_sales_report_template_id'] );
+		$rows = $this->wpdb->get_inserted_rows();
+		$this->assertSame( array( '1.0.0', '1.1.0' ), array_column( $rows, 'version' ) );
+		$this->assertSame( $legacy, $rows[0] );
+		$this->assertSame( array(), $this->wpdb->get_updated_rows() );
 
 		$GLOBALS['ossr_test_calls'] = array();
 		TemplateSeeder::maybe_seed();
 
-		$this->assertSame( array( array( 'get_option', 'ossr_template_catalog_hash', false ) ), $GLOBALS['ossr_test_calls'] );
+		$this->assertSame(
+			array(
+				array( 'get_option', 'ossr_template_catalog_hash', false ),
+				array( 'get_var', self::CATALOG_QUERY ),
+			),
+			$GLOBALS['ossr_test_calls']
+		);
+		$this->assertSame( $rows, $this->wpdb->get_inserted_rows() );
+	}
+
+	/**
+	 * A failed lookup must not be treated as a complete catalog.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_seed_falls_through_when_catalog_lookup_fails(): void {
+		$GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] = self::CURRENT_CATALOG_HASH;
+		$this->wpdb->record_call                                    = function ( string $call, string $argument ): void {
+			ossr_test_record_call( $call, $argument );
+			if ( 'get_var' === $call ) {
+				$this->wpdb->set_var( str_starts_with( $argument, 'SHOW TABLES' ) ? 'wp_ossr_templates' : null );
+			}
+		};
+
+		TemplateSeeder::maybe_seed();
+
+		$this->assertSame( array( 'get_var', self::CATALOG_QUERY ), $GLOBALS['ossr_test_calls'][1] );
+		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'get_var', 'get_var' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertFalse( $this->wpdb->suppress_errors( false ) );
+		$this->assertSame( array(), $this->wpdb->get_inserted_rows() );
 	}
 
 	/**
@@ -202,7 +283,8 @@ final class TemplateSeederTest extends TestCase {
 	 * @return void
 	 */
 	public function test_maybe_seed_recreates_missing_template_table(): void {
-		$this->wpdb->record_call = function ( string $call, string $argument ): void {
+		$GLOBALS['ossr_test_options']['ossr_template_catalog_hash'] = self::CURRENT_CATALOG_HASH;
+		$this->wpdb->record_call                                    = function ( string $call, string $argument ): void {
 			ossr_test_record_call( $call, $argument );
 			if ( 'get_var' === $call && str_starts_with( $argument, 'SELECT EXISTS' ) ) {
 				$this->wpdb->set_var( '0' );
@@ -211,7 +293,7 @@ final class TemplateSeederTest extends TestCase {
 
 		TemplateSeeder::maybe_seed();
 
-		$this->assertSame( array( 'get_option', 'get_var', 'dbDelta', 'get_var', 'insert', 'get_var', 'insert', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
-		$this->assertCount( 2, $this->wpdb->get_inserted_rows() );
+		$this->assertSame( array( 'get_option', 'get_var', 'get_var', 'dbDelta', 'get_var', 'insert', 'get_var', 'insert', 'update_option' ), array_column( $GLOBALS['ossr_test_calls'], 0 ) );
+		$this->assertSame( array( '1.0.0', '1.1.0' ), array_column( $this->wpdb->get_inserted_rows(), 'version' ) );
 	}
 }

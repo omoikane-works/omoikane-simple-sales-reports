@@ -73,6 +73,26 @@ final class FakeWpdb {
 	private mixed $var = null;
 
 	/**
+	 * Whether database errors are suppressed.
+	 *
+	 * @var bool
+	 */
+	private bool $errors_suppressed = false;
+
+	/**
+	 * Set error suppression and return the previous state.
+	 *
+	 * @param bool $suppress Whether to suppress database errors.
+	 * @return bool
+	 */
+	public function suppress_errors( bool $suppress = true ): bool {
+		$previous                = $this->errors_suppressed;
+		$this->errors_suppressed = $suppress;
+
+		return $previous;
+	}
+
+	/**
 	 * Inserted rows.
 	 *
 	 * @var array<int, array<string, mixed>>

@@ -198,6 +198,7 @@ final class ActivationTest extends TestCase {
 		$this->assertStringStartsWith( 'CREATE TABLE wp_ossr_templates (', $calls[2][1] );
 		$this->assertSame( array( 'insert', 'wp_ossr_templates' ), $calls[8] );
 		$this->assertSame( array( TemplateKeys::DEFAULT_SALES_REPORT, TemplateKeys::DEFAULT_SALES_REPORT ), array_column( $this->wpdb->get_inserted_rows(), 'template_key' ) );
+		$this->assertSame( array( '1.0.0', '1.1.0' ), array_column( $this->wpdb->get_inserted_rows(), 'version' ) );
 		$catalog_hash = $GLOBALS['ossr_test_options']['ossr_template_catalog_hash'];
 		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $catalog_hash );
 		$this->assertSame( array( 'update_option', 'ossr_template_catalog_hash', $catalog_hash, true ), $calls[11] );

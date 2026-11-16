@@ -55,12 +55,12 @@ final class TemplateSeeder {
 	);
 
 	/**
-	 * Seed templates when the bundled catalog changes.
+	 * Seed templates when the bundled catalog changes or a revision is missing.
 	 *
 	 * @return void
 	 */
 	public static function maybe_seed(): void {
-		if ( self::catalog_hash() === get_option( self::CATALOG_HASH_OPTION ) ) {
+		if ( self::catalog_hash() === get_option( self::CATALOG_HASH_OPTION ) && self::has_all_catalog_templates() ) {
 			return;
 		}
 
@@ -69,6 +69,40 @@ final class TemplateSeeder {
 		}
 
 		self::seed();
+	}
+
+	/**
+	 * Check all bundled keys and versions in one query.
+	 *
+	 * @return bool
+	 */
+	private static function has_all_catalog_templates(): bool {
+		global $wpdb;
+
+		$table_name = TemplateTable::get_table_name();
+		$arguments  = array( $table_name );
+		foreach ( self::DEFAULT_TEMPLATES as $template ) {
+			$arguments[] = $template['template_key'];
+			$arguments[] = $template['version'];
+		}
+		$pairs = implode( ', ', array_fill( 0, count( self::DEFAULT_TEMPLATES ), '(%s, %s)' ) );
+
+		// A missing table is handled by the creation path in maybe_seed().
+		$suppressed = $wpdb->suppress_errors( true );
+		try {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Check the current rows before skipping repair.
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Only SQL placeholders are interpolated.
+					"SELECT COUNT(DISTINCT template_key, version) FROM %i WHERE (template_key, version) IN ({$pairs})",
+					...$arguments
+				)
+			);
+		} finally {
+			$wpdb->suppress_errors( $suppressed );
+		}
+
+		return (string) count( self::DEFAULT_TEMPLATES ) === (string) $count;
 	}
 
 	/**
