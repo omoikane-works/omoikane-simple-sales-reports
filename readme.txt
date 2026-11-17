@@ -2,9 +2,9 @@
 Contributors: omoikaneworks
 Tags: welcart, sales report, report, order, japanese
 Requires at least: 6.6
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,9 @@ Register the images in the Settings tab, then select the standard sales report t
 3. Print or save as a PDF using the browser's print function.
 
 == Changelog ==
+
+= 1.1.1 =
+* Updated the tested WordPress version to 7.1.
 
 = 1.1.0 =
 * Added template management to view and duplicate standard templates and edit or delete custom templates.

@@ -1,0 +1,165 @@
+name: Deploy to WordPress.org
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: Release version without the v prefix (e.g. 1.2.0)
+                required: true
+                type: string
+            dry_run:
+                description: Preview SVN changes without committing
+                type: boolean
+                default: true
+
+permissions:
+    contents: read
+
+concurrency:
+    group: wordpress-org-omoikane-simple-sales-reports
+    cancel-in-progress: false
+
+env:
+    SLUG: omoikane-simple-sales-reports
+    VERSION: ${{ inputs.version }}
+    SVN_URL: https://plugins.svn.wordpress.org/omoikane-simple-sales-reports/
+
+jobs:
+    deploy:
+        runs-on: ubuntu-24.04
+        environment: ${{ inputs.dry_run && 'wordpress-org-dry-run' || 'wordpress-org' }}
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Fetch the published Release ZIP
+              id: release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  GH_REPO: ${{ github.repository }}
+              run: |
+                  set -euo pipefail
+                  if [[ ! "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+                      echo '::error::Enter a version in MAJOR.MINOR.PATCH format, without a v prefix.'
+                      exit 1
+                  fi
+
+                  tag="v$VERSION"
+                  if [[ "$(gh api "repos/$GH_REPO/git/ref/tags/$tag" --jq .ref)" != "refs/tags/$tag" ]]; then
+                      echo "::error::Git tag $tag could not be verified."
+                      exit 1
+                  fi
+
+                  if ! gh release view "$tag" --json tagName,isDraft,publishedAt |
+                      jq -e --arg tag "$tag" '.tagName == $tag and .isDraft == false and (.publishedAt // "" | length > 0)' >/dev/null; then
+                      echo "::error::A published GitHub Release for $tag is required."
+                      exit 1
+                  fi
+
+                  staging=$(mktemp -d "$RUNNER_TEMP/ossr-wordpress.XXXXXX")
+                  filename="$SLUG-$VERSION.zip"
+                  gh release download "$tag" --pattern "$filename" --dir "$staging"
+                  sha256sum "$staging/$filename"
+                  echo "archive=$staging/$filename" >> "$GITHUB_OUTPUT"
+
+            - name: Verify and extract the plugin
+              id: package
+              env:
+                  ARCHIVE: ${{ steps.release.outputs.archive }}
+              run: |
+                  python3 - <<'PY'
+                  import os
+                  import re
+                  import stat
+                  from pathlib import Path
+                  from zipfile import ZipFile
+
+                  slug = os.environ['SLUG']
+                  version = os.environ['VERSION']
+                  archive = Path(os.environ['ARCHIVE'])
+                  package = archive.parent / slug
+
+                  with ZipFile(archive) as zip_file:
+                      paths = set()
+                      for entry in zip_file.infolist():
+                          parts = tuple(entry.filename.removesuffix('/').split('/'))
+                          mode = stat.S_IFMT(entry.external_attr >> 16)
+                          if (
+                              parts[0] != slug
+                              or any(part in ('', '.', '..') for part in parts)
+                              or '\\' in entry.filename
+                              or (len(parts) == 1 and not entry.is_dir())
+                              or mode not in (0, stat.S_IFREG, stat.S_IFDIR)
+                              or parts in paths
+                          ):
+                              raise SystemExit(f'::error::Unexpected ZIP entry {entry.filename!r}')
+                          paths.add(parts)
+                      zip_file.extractall(archive.parent)
+
+                  plugin = package / f'{slug}.php'
+                  readme = package / 'readme.txt'
+                  for file in (plugin, readme, package / 'vendor/autoload.php', package / 'src/Plugin.php',
+                               package / 'assets/admin/dist/.vite/manifest.json'):
+                      if not file.is_file():
+                          raise SystemExit(f'::error::Missing packaged file {file.relative_to(package)}')
+
+                  for file, field in ((plugin, 'Version'), (readme, 'Stable tag')):
+                      with file.open('rb') as source:
+                          header = source.read(8192).decode('utf-8-sig', errors='replace')
+                      header = header.replace('\r\n', '\n').replace('\r', '\n')
+                      match = re.search(rf'^[ \t/*#@]*{field}:[ \t]*([^\n]*)', header, re.I | re.M)
+                      if not match or match[1].strip() != version:
+                          raise SystemExit(f'::error::{file.name} must have {field}: {version}')
+
+                  print(f'Verified package for {slug} {version}')
+                  with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+                      print(f'build_dir={package}', file=output)
+                  PY
+
+            - name: Check SVN tag and restrict commit paths
+              run: |
+                  set -euo pipefail
+                  if ! command -v svn >/dev/null; then
+                      sudo apt-get update
+                      sudo apt-get install -y subversion
+                  fi
+                  if ! tags=$(svn list --non-interactive --no-auth-cache "${SVN_URL}tags/"); then
+                      echo '::error::The WordPress.org SVN tags directory could not be verified.'
+                      exit 1
+                  fi
+                  if grep -Fxq -e "$VERSION/" -e "$VERSION" <<< "$tags"; then
+                      echo "::error::WordPress.org SVN tag $VERSION already exists."
+                      exit 1
+                  fi
+
+                  # 10up 2.3.0 sets MIME properties on existing top-level assets
+                  # even if the asset copy is skipped. Commit only plugin files.
+                  svn_bin=$(command -v svn)
+                  svn_path=$(mktemp -d "$RUNNER_TEMP/ossr-svn.XXXXXX")
+                  cat > "$svn_path/svn" <<'SH'
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+                  if [[ "$1" == commit ]]; then
+                      if [[ "$DRY_RUN" == true ]]; then
+                          echo '::error::An SVN commit was attempted during a dry run.'
+                          exit 1
+                      fi
+                      exec "$SVN_BIN" "$@" -- trunk "tags/$VERSION"
+                  fi
+                  exec "$SVN_BIN" "$@"
+                  SH
+                  chmod +x "$svn_path/svn"
+                  echo "$svn_path" >> "$GITHUB_PATH"
+                  echo "SVN_BIN=$svn_bin" >> "$GITHUB_ENV"
+
+            - name: Deploy verified Release files
+              uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
+              with:
+                  dry-run: ${{ inputs.dry_run }}
+              env:
+                  BUILD_DIR: ${{ steps.package.outputs.build_dir }}
+                  ASSETS_DIR: .wordpress-org-assets-excluded
+                  DRY_RUN: ${{ inputs.dry_run }}
+                  # The shell entry point requires nonempty variables even for a dry run.
+                  SVN_USERNAME: ${{ inputs.dry_run && 'dry-run' || secrets.SVN_USERNAME }}
+                  SVN_PASSWORD: ${{ inputs.dry_run && 'dry-run' || secrets.SVN_PASSWORD }}
